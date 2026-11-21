@@ -290,13 +290,14 @@ def e5_vs_turing(table: pd.DataFrame, demo: bool = False) -> go.Figure:
     fig = go.Figure()
     for color, loops in zip(CATEGORICAL, sorted(part["lazos"].unique()), strict=False):
         rows = part[part["lazos"] == loops].sort_values("letras")
+        label = f"{loops} lazo{'s' if loops != 1 else ''}"
         fig.add_scatter(
             x=rows["letras"],
             y=np.maximum(rows["turing"], E5_FLOOR),
             mode="lines",
             line={"color": color, "dash": "dash", "width": 1.5},
-            name=f"Turing, {loops} lazo{'s' if loops != 1 else ''}",
-            hovertemplate="%{x} letras: %{y} (Turing)<extra></extra>",
+            showlegend=False,
+            hovertemplate=f"{label}, %{{x}} letras: %{{y}} (Turing)<extra></extra>",
         )
         fig.add_scatter(
             x=rows["letras"],
@@ -310,10 +311,18 @@ def e5_vs_turing(table: pd.DataFrame, demo: bool = False) -> go.Figure:
                 "arrayminus": np.maximum(rows["paradas_media"] - rows["ic_bajo"], 0),
                 "color": color,
             },
-            name=f"medido, {loops} lazo{'s' if loops != 1 else ''}",
+            name=label,
             customdata=rows["paradas_media"],
-            hovertemplate="%{x} letras: %{customdata:.3g} paradas falsas<extra></extra>",
+            hovertemplate=f"{label}, %{{x}} letras: %{{customdata:.3g}} paradas falsas"
+            "<extra>medido</extra>",
         )
+    fig.add_scatter(
+        x=[None],
+        y=[None],
+        mode="lines",
+        line={"color": DARK.text_muted, "dash": "dash", "width": 1.5},
+        name="Turing (discontinua)",
+    )
     title = "Paradas falsas por orden de rotores frente a la tabla de Turing"
     row = part[(part["letras"] == 12) & (part["lazos"] == 3)]
     if not row.empty:
@@ -325,20 +334,33 @@ def e5_vs_turing(table: pd.DataFrame, demo: bool = False) -> go.Figure:
     fig.update_layout(
         template=_template(demo),
         title=title,
-        height=480,
+        height=520,
         xaxis_title="letras (vértices) del menú",
         yaxis_title="paradas falsas por orden (escala log)",
         yaxis_type="log",
         xaxis={"dtick": 2},
+        legend={"orientation": "h", "yanchor": "top", "y": -0.2, "x": 0, "xanchor": "left"},
+        margin={"b": 120},
     )
     return fig
+
+
+def _stops_text(value: float) -> str:
+    """Paradas por orden para una celda: 17.575 · 678 · 26,3 · 0,11 · 0."""
+    if np.isnan(value):
+        return ""
+    if value >= 100:
+        return fmt_int(round(value))
+    if value >= 1:
+        return fmt_dec(value, 1)
+    return "0" if value == 0 else fmt_dec(value, 2)
 
 
 def e5_heatmap(table: pd.DataFrame, diagonal: str = "si", demo: bool = False) -> go.Figure:
     """E5: mapa de calor letras × lazos de las paradas falsas por orden (escala log)."""
     part = table[(table["diagonal"] == diagonal) & (table["modo"] == "bletchley")]
     letters = sorted(part["letras"].unique())
-    loops = sorted(part["lazos"].unique(), reverse=True)
+    loops = sorted(part["lazos"].unique())  # Plotly dibuja la primera categoría abajo
     grid = np.full((len(loops), len(letters)), np.nan)
     turing = np.full_like(grid, np.nan)
     for r in part.itertuples():
@@ -351,8 +373,9 @@ def e5_heatmap(table: pd.DataFrame, diagonal: str = "si", demo: bool = False) ->
             x=[str(v) for v in letters],
             y=[str(v) for v in loops],
             customdata=np.stack([grid, turing], axis=-1),
-            text=[[f"{v:.3g}" for v in row] for row in grid],
+            text=[[_stops_text(v) for v in row] for row in grid],
             texttemplate="%{text}",
+            textfont={"size": 13},
             colorscale=[[i / (len(SEQUENTIAL_DARK) - 1), c] for i, c in enumerate(SEQUENTIAL_DARK)],
             zmin=np.log10(E5_FLOOR),
             zmax=np.log10(20_000),
@@ -366,9 +389,11 @@ def e5_heatmap(table: pd.DataFrame, diagonal: str = "si", demo: bool = False) ->
     fig.update_layout(
         template=_template(demo),
         title=f"Paradas falsas por orden, {'con' if diagonal == 'si' else 'sin'} diagonal board",
-        height=380,
+        height=340,
         xaxis_title="letras (vértices) del menú",
         yaxis_title="lazos",
+        xaxis={"type": "category"},
+        yaxis={"type": "category"},
     )
     return fig
 

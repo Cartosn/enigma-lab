@@ -298,9 +298,8 @@ for tab, (experiment, info) in zip(tabs, INFO.items(), strict=False):
                 config=plotly_figs.plotly_config(),
                 width="stretch",
             )
-            maps = st.columns(2)
-            for column, diagonal in zip(maps, ("si", "no"), strict=True):
-                column.plotly_chart(
+            for diagonal in ("si", "no"):
+                st.plotly_chart(
                     plotly_figs.e5_heatmap(table, diagonal, demo),
                     theme=None,
                     config=plotly_figs.plotly_config(),
