@@ -170,14 +170,15 @@ def _other_results(e2: dict[str, Any], e3: dict[str, Any]) -> list[str]:
     lines = []
     if e3:
         de, es = e3["aleman"], e3["espanol"]
+        length = fmt_int(de["L"])
         lines += [
             f"- **E3 (diapositivas 6 y 23):** IC del corpus alemán {fmt_dec(de['ic_corpus'], 4)} "
             f"(Pommerening: {fmt_dec(e3['ic_referencia_aleman'], 4)}); español "
-            f"{fmt_dec(es['ic_corpus'], 4)}. Con mensajes de {de['L']} letras, el IC del alemán "
+            f"{fmt_dec(es['ic_corpus'], 4)}. Con mensajes de {length} letras, el IC del alemán "
             f"pasa de {fmt_dec(de['ic_plano'][0], 4)} en el plano a "
             f"{fmt_dec(de['ic_cifrado'][0], 4)} en el cifrado (1/26 = "
             f"{fmt_dec(e3['ic_azar'], 4)}).",
-            f"- La prueba χ² (α = 5 %), con {de['L']} letras, rechaza la uniformidad del "
+            f"- La prueba χ² (α = 5 %), con {length} letras, rechaza la uniformidad del "
             f"{fmt_pct(de['rechaza_plano'], 0)} de los textos planos en alemán y del "
             f"{fmt_pct(de['rechaza_cifrado'], 1)} de los cifrados (un cifrado uniforme daría "
             "5 %).",
@@ -189,7 +190,7 @@ def _other_results(e2: dict[str, Any], e3: dict[str, Any]) -> list[str]:
                 f"poco menos: la E, el {fmt_pct(de['frecuencia_e_plano'])} del alemán, debería "
                 f"ser el {fmt_pct(de['frecuencia_e_cifrado_esperada'], 2)} del cifrado y no el "
                 f"{fmt_pct(1 / 26, 2)}. Con esa distribución, la χ² no central predice un "
-                f"{fmt_pct(de['rechaza_cifrado_teoria'], 1)} de rechazos con {de['L']} letras; "
+                f"{fmt_pct(de['rechaza_cifrado_teoria'], 1)} de rechazos con {length} letras; "
                 f"se midió {fmt_pct(de['rechaza_cifrado'], 1)}. Las frecuencias del idioma se "
                 "filtran débiles y al revés."
             )

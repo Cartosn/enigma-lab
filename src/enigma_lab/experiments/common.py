@@ -49,8 +49,9 @@ def git_commit() -> str:
             text=True,
             check=True,
         )
+        # Los resultados (results/) son salidas: que cambien no ensucia el código.
         dirty = subprocess.run(
-            ["git", "status", "--porcelain", "--untracked-files=no"],
+            ["git", "status", "--porcelain", "--untracked-files=no", "--", ".", ":!results"],
             cwd=paths.ROOT,
             capture_output=True,
             text=True,
