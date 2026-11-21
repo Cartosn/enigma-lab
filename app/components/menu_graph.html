@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<!--
+  Enigma Lab · el menú como grafo (spec 8.2, punto 5).
+  Solo dibuja lo que calcula Python (enigma_lab.cribs.menu): letras con sus posiciones,
+  aristas con su paso, cuáles están en un lazo y la letra de prueba.
+-->
+<style>
+  @font-face { font-family: "Inter"; src: url("/app/static/fonts/InterVariable.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "JetBrains Mono"; src: url("/app/static/fonts/JetBrainsMono-Bold.woff2") format("woff2"); font-weight: 700; }
+  html, body { margin: 0; background: var(--background); color: var(--text); font-family: Inter, system-ui, sans-serif; }
+  /* Ancho máximo: así el grafo (720 × 470) cabe completo en el iframe de 520 px. */
+  svg { display: block; width: 100%; max-width: 760px; height: auto; margin: 0 auto; }
+  .edge { fill: none; stroke: var(--border); stroke-width: 2.5; }
+  .edge.loop { stroke: var(--accent); stroke-width: 3.5; }
+  .elabel { font-size: 13px; fill: var(--text_muted); text-anchor: middle; dominant-baseline: central;
+            paint-order: stroke; stroke: var(--background); stroke-width: 4px; }
+  .elabel.loop { fill: var(--accent); }
+  .node circle { fill: var(--surface); stroke: var(--border); stroke-width: 2; }
+  .node.test circle { stroke: var(--accent_2); stroke-width: 4; }
+  .node text { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 20px;
+               fill: var(--text); text-anchor: middle; dominant-baseline: central; }
+  .tag { font-size: 13px; fill: var(--accent_2); text-anchor: middle; }
+  .legend { font-size: 13px; fill: var(--text_muted); }
+</style>
+</head>
+<body>
+<svg id="g" viewBox="0 0 720 470" role="img" aria-label="Grafo del menú"></svg>
+<script id="payload" type="application/json">__PAYLOAD__</script>
+<script>
+(() => {
+  "use strict";
+  const P = JSON.parse(document.getElementById("payload").textContent);
+  for (const [k, v] of Object.entries(P.theme)) document.documentElement.style.setProperty("--" + k, v);
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("g");
+  const el = (tag, attrs, text) => { const n = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (text != null) n.textContent = text; svg.appendChild(n); return n; };
+  const W = 720, H = 430, M = 52;
+  const pos = {};
+  P.nodes.forEach(n => { pos[n.id] = { x: M + n.x * (W - 2 * M), y: M + n.y * (H - 2 * M) }; });
+
+  // Aristas: las paralelas (misma pareja) se dibujan como curvas separadas.
+  const groups = {};
+  P.edges.forEach(e => { const key = [e.a, e.b].sort().join(""); (groups[key] = groups[key] || []).push(e); });
+  Object.values(groups).forEach(list => {
+    list.forEach((e, i) => {
+      const a = pos[e.a], b = pos[e.b];
+      const bend = list.length === 1 ? 0 : (i - (list.length - 1) / 2) * 46;
+      const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+      const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+      const cx = mx - dy / len * bend, cy = my + dx / len * bend;
+      el("path", { class: "edge" + (e.in_loop ? " loop" : ""), d: `M${a.x},${a.y} Q${cx},${cy} ${b.x},${b.y}` });
+      const lx = 0.25 * a.x + 0.5 * cx + 0.25 * b.x, ly = 0.25 * a.y + 0.5 * cy + 0.25 * b.y;
+      el("text", { class: "elabel" + (e.in_loop ? " loop" : ""), x: lx, y: ly }, String(e.offset));
+    });
+  });
+  P.nodes.forEach(n => {
+    const g = document.createElementNS(NS, "g"); g.setAttribute("class", "node" + (n.test ? " test" : ""));
+    const t = document.createElementNS(NS, "title"); t.textContent = `${n.id}: grado ${n.degree}`; g.appendChild(t);
+    const c = document.createElementNS(NS, "circle"); c.setAttribute("cx", pos[n.id].x); c.setAttribute("cy", pos[n.id].y); c.setAttribute("r", 22); g.appendChild(c);
+    const tx = document.createElementNS(NS, "text"); tx.setAttribute("x", pos[n.id].x); tx.setAttribute("y", pos[n.id].y); tx.textContent = n.id; g.appendChild(tx);
+    svg.appendChild(g);
+  });
+  el("line", { x1: 16, y1: 452, x2: 44, y2: 452, class: "edge loop" });
+  el("text", { class: "legend", x: 52, y: 456 }, "en un lazo");
+  el("line", { x1: 140, y1: 452, x2: 168, y2: 452, class: "edge" });
+  el("text", { class: "legend", x: 176, y: 456 }, "sin lazo");
+  el("circle", { cx: 268, cy: 452, r: 8, fill: "none", stroke: "var(--accent_2)", "stroke-width": 3 });
+  el("text", { class: "legend", x: 284, y: 456 }, "letra de prueba");
+  el("text", { class: "legend", x: 410, y: 456 }, "número de cada arista: su paso en el crib");
+})();
+</script>
+</body>
+</html>

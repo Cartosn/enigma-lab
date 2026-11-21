@@ -37,6 +37,7 @@ MODULES: tuple[Module, ...] = (
         "Cuántos bits aporta cada componente y por qué domina el plugboard.",
         "Fase 2",
         ":material/key:",
+        page="pages/espacio.py",
     ),
     Module(
         "estadistica",
@@ -44,6 +45,7 @@ MODULES: tuple[Module, ...] = (
         "Qué estadística del idioma deja pasar el cifrado y cuál no.",
         "Fase 2",
         ":material/bar_chart:",
+        page="pages/estadistica.py",
     ),
     Module(
         "cribs",
@@ -51,6 +53,7 @@ MODULES: tuple[Module, ...] = (
         "El crib deslizándose sobre el cifrado y el menú que alimenta a la Bombe.",
         "Fase 2",
         ":material/hub:",
+        page="pages/cribs.py",
     ),
     Module(
         "bombe",
@@ -65,6 +68,7 @@ MODULES: tuple[Module, ...] = (
         "E1 a E8: pregunta, método, resultados con intervalos y la referencia publicada.",
         "Fases 2 a 5",
         ":material/science:",
+        page="pages/experimentos.py",
     ),
     Module(
         "banburismus",

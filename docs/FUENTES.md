@@ -33,6 +33,18 @@ de una de estas fuentes (spec, sección 0). Las de la sección 12 del spec van t
 - **Validación a mano:** CyberChef, versión web (GCHQ), consultada el 20-11-2026.
   https://gchq.github.io/CyberChef/
 
+## Corpus (Project Gutenberg, dominio público)
+
+Los descarga `scripts/fetch_corpora.py` del espejo oficial
+https://www.mirrorservice.org/sites/ftp.ibiblio.org/pub/docs/books/gutenberg (consultado
+el 20-11-2026). El detalle, con la licencia, está en `data/corpora/README.md`.
+
+| Obra | Ebook | Archivo | SHA-256 |
+| --- | --- | --- | --- |
+| Fontane, T. (1895). *Effi Briest* | 5323 | `5323-0.txt` | `f582a4b31c666cfb188fbf95963a3dbe22aa45a51c5ae6658cbb3392a5969241` |
+| Kafka, F. (1915). *Die Verwandlung* | 22367 | `22367-8.txt` | `fe91c871104780ce5a8fe3e12e79b757f6fb5ffa28ed83d6186e618fb3bf344a` |
+| Cervantes, M. de (1605). *El ingenioso hidalgo don Quijote de la Mancha* | 2000 | `2000-0.txt` | `1d0eb85cbe75661d50cc5b50c4537cddd37b6ae9f29d778dded2d80c689fe1dc` |
+
 ## Citadas además en la presentación (diapositiva 24)
 
 - Crypto Museum: páginas de la Bombe y de Colossus. https://www.cryptomuseum.com/

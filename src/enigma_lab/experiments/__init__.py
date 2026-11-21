@@ -10,5 +10,8 @@ y guardan ``results/eN_*.parquet``, sus figuras y sus cifras en ``results/summar
 
 EXPERIMENTS = {
     "e1": "enigma_lab.experiments.e1_validation",
+    "e2": "enigma_lab.experiments.e2_keyspace",
+    "e3": "enigma_lab.experiments.e3_statistics",
+    "e4": "enigma_lab.experiments.e4_cribs",
 }
 """Experimentos disponibles, por identificador (crecen con cada fase)."""

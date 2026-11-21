@@ -18,7 +18,7 @@ SEMILLA ?= 2026
 MODO ?= completo
 E ?= todos
 
-.PHONY: help install test test-rapido lint format app requirements experimento reproduce rapido resumen
+.PHONY: help install test test-rapido lint format app requirements corpus experimento reproduce rapido resumen
 
 help: ## Muestra esta lista
 	@$(UV) run --no-project python scripts/make_help.py Makefile
@@ -44,10 +44,13 @@ format: ## Formatea el código con ruff
 app: ## Abre Enigma Lab en el navegador (http://localhost:8501)
 	$(UV) run streamlit run app/Inicio.py --server.port $(PORT) $(STREAMLIT_FLAGS)
 
+corpus: ## Descarga el corpus completo de Project Gutenberg (verifica SHA-256)
+	$(UV) run python scripts/fetch_corpora.py
+
 experimento: ## Corre un experimento: make experimento E=e1 MODO=rapido
 	$(UV) run python -m enigma_lab.experiments $(E) --mode $(MODO) --seed $(SEMILLA)
 
-reproduce: ## Corre todos los experimentos en modo completo y arma el resumen
+reproduce: corpus ## Corre todos los experimentos en modo completo y arma el resumen
 	$(UV) run python -m enigma_lab.experiments todos --mode completo --seed $(SEMILLA)
 	$(UV) run python -m enigma_lab.resumen
 

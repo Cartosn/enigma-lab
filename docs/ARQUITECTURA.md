@@ -53,8 +53,8 @@ flowchart LR
 
     classDef done fill:#171B21,stroke:#F2B134,color:#E8E6E3
     classDef todo fill:#0F1216,stroke:#2A3038,color:#9AA3AD,stroke-dasharray: 4 3
-    class core,viz,app,exp,results,pres,ref,demo done
-    class stats,cribs,bombe,banb,rej,att,report,corp todo
+    class core,viz,app,exp,results,pres,ref,demo,stats,cribs,corp done
+    class bombe,banb,rej,att,report todo
 ```
 
 ## Estado por fase
@@ -70,7 +70,10 @@ flowchart LR
 | `experiments/` | Marco común y E1 (validación) | 1 |
 | `cifras.py`, `resumen.py` | Cifras de la presentación y `make resumen` | 1 |
 | `app/components/enigma_machine.html` | Animación SVG que reproduce la traza | 1 |
-| `stats/`, `cribs/` | Estadística del idioma, arrastre y menús (hoy solo `stats/inference.py`) | 2 |
+| `stats/` | Corpus y normalización, frecuencias, IC, χ², n-gramas e intervalos | 2 |
+| `cribs/` | Arrastre del crib (escalar y vectorizado) y menú con lazos y letra de prueba | 2 |
+| `experiments/` E2–E4 | Espacio de claves, estadística del cifrado y supervivencia de cribs | 2 |
+| `app/pages/` | Espacio de claves, Estadística, Cribs y menús (con dos animaciones) y Experimentos | 2 |
 | `bombe/` | Bombe en Numba, versión de referencia y verificador | 3 |
 | `banburismus/` | Decibanes y SPRT | 4 |
 | `rejewski/`, `attacks/` | Extensiones P2 | 5 |

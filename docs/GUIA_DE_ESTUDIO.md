@@ -7,7 +7,7 @@ cada fase.
 **Temas:**
 1. [El espacio de claves](#1-el-espacio-de-claves) (fase 0)
 2. [La máquina y el doble paso](#2-la-máquina-y-el-doble-paso) (fase 1)
-3. Cribs y menús (fase 2)
+3. [Estadística del idioma, cribs y menús](#3-estadística-del-idioma-cribs-y-menús) (fase 2)
 4. La Bombe, el diagonal board y el verificador (fase 3)
 5. Banburismus y la prueba secuencial (fase 4)
 6. Rejewski y el ataque moderno (fase 5)
@@ -132,6 +132,71 @@ reflector delgado. Con ella el simulador descifra un mensaje real del U-264 (194
   - Reproduce los 9 vectores publicados (BDZGO, EWTYX, el doble paso…).
   - Coincide con py-enigma en 10.000 claves aleatorias y con CyberChef en 6 casos.
   - Descifra un mensaje real de 1942.
+
+## 3. Estadística del idioma, cribs y menús
+
+**El corpus.** Son textos de dominio público: en alemán, Fontane y Kafka; en español,
+Cervantes. Se normalizan a A–Z: en alemán Ä → AE, Ö → OE, Ü → UE, ß → SS; en español
+se quitan las tildes y Ñ → N. Con «X como separador», cada tramo de espacios y signos
+se vuelve una X, como en los mensajes militares. (`stats/corpus.py` · `normalize`)
+
+**Índice de coincidencia.** IC = Σ nᵢ(nᵢ − 1) / (N(N − 1)) es la probabilidad de que dos
+letras del texto, tomadas al azar, sean iguales.
+- En alemán ≈ 0,0758 (Pommerening); nuestro corpus da 0,0757.
+- Al azar, 1/26 ≈ 0,0385.
+- Una sustitución fija no lo cambia. Enigma lo lleva a 1/26, porque usa otra sustitución
+  en cada letra.
+
+(`stats/frequencies.py` · `index_of_coincidence`; experimento E3)
+
+**Prueba χ².** χ² = Σ (Oᵢ − Eᵢ)²/Eᵢ, con Eᵢ = N/26 y 25 grados de libertad. Con
+mensajes de cientos de letras, rechaza la uniformidad de prácticamente todos los textos
+planos. En los cifrados de Enigma la rechaza en ≈ 5 % de los casos, lo que se espera con
+α = 5 % si el cifrado es uniforme. (`chi2_uniform`; cifras de E3 en `RESUMEN.md`)
+
+**El distinguidor.** Lo que Enigma no puede esconder es que ninguna letra se cifra a sí
+misma: la diagonal de la matriz plano × cifrado es cero. Con una sustitución al azar,
+que ninguna de L letras coincida pasaría con probabilidad (25/26)^L; con L = 100, el
+1,98 %. (`stats/inference.py` · `no_fixed_point_probability`)
+
+**N-gramas.** Para reconocer un descifrado bueno se suman los log₁₀ de las
+probabilidades de sus cuadrigramas en el corpus.
+- Texto alemán: unos −4,0 por cuadrigrama.
+- Letras al azar: unos −7,2.
+- Un cuadrigrama que no aparece en el corpus recibe un piso de 0,01 apariciones.
+
+(`stats/ngrams.py`)
+
+**El arrastre del crib.** El crib se coloca en cada posición del cifrado. Si una letra del
+crib cae sobre la misma letra cifrada, esa posición es imposible (`cribs/dragging.py`).
+- **Con letras al azar:** una alineación falsa sobrevive con probabilidad (25/26)^L; el
+  60,1 % con L = 13 y el 14,1 % con L = 50.
+- **Con alemán real:** sobreviven un poco más. La letra j del crib choca solo si es
+  distinta de la letra plana de esa posición, y entonces con probabilidad 1/25. Con κ,
+  la probabilidad de que dos letras del texto coincidan, queda
+  P ≈ (1 − (1 − κ)/25)^L. Con κ = 1/26 vuelve a dar (25/26)^L.
+
+E4 lo mide (`experiments/e4_cribs.py`).
+
+**El menú.** Con el crib alineado, cada columna (p, c, paso i) es una arista p — c: esas
+dos letras pasan por el mismo aleatorizador en el paso i. El grafo es un `MultiGraph`,
+porque la misma pareja puede repetirse en dos pasos (`cribs/menu.py`).
+- **Lazos:** el número ciclomático E − V + 1 de la componente usada.
+- **Letra de prueba:** la de mayor grado en esa componente.
+- **El ejemplo de la diapositiva 11:** 11 letras, 13 aristas y 3 lazos (E–B–I–T, el
+  triángulo E–C–T y las dos aristas T–C); letra de prueba T, de grado 6.
+
+**Preguntas que pueden salir:**
+- *¿Por qué el IC del cifrado es 1/26 si Enigma es una sustitución?* Porque cambia de
+  sustitución en cada letra: la misma letra plana sale cifrada como letras distintas,
+  y las frecuencias se reparten.
+- *¿Por qué con alemán sobreviven más alineaciones falsas que (25/26)^L?* Porque cuando
+  la letra del crib coincide con la letra plana de esa posición, el conflicto es
+  imposible. En alemán eso pasa con probabilidad κ ≈ 0,08 en vez de 1/26. El
+  experimento E4 lo mide.
+- *¿Qué es un lazo y por qué importa?* Es un ciclo del menú: una cadena de hipótesis de
+  plugboard que debe volver a cerrar en la letra de partida. Con una hipótesis falsa
+  casi nunca cierra, y cada lazo divide las paradas falsas por unas 26 (fase 3).
 
 ## Preguntas probables
 

@@ -17,6 +17,10 @@ htmlcov/
 # Configuración local (Streamlit)
 .streamlit/secrets.toml
 
+# Corpus completo y archivos descargados (make corpus); las muestras sí se versionan
+data/corpora/fuentes/
+data/corpora/completo/
+
 # Salida del piloto (scripts/piloto_enigma.py)
 crib_montecarlo.csv
 

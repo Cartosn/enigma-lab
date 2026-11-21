@@ -15,11 +15,13 @@ from functools import cache
 
 import numpy as np
 
-from enigma_lab import SEED
+from enigma_lab import SEED, paths
 from enigma_lab.core import keyspace as ks
 from enigma_lab.core.machine import Enigma, EnigmaConfig, encrypt, groups_of_five
 from enigma_lab.core.stepping import cycle_structure, notch_sets
 from enigma_lab.core.vectors import vector
+from enigma_lab.cribs.dragging import alignments, valid_positions
+from enigma_lab.cribs.menu import MenuStats, menu_at, menu_stats
 from enigma_lab.stats.inference import no_fixed_point_probability
 from enigma_lab.viz.numfmt import NBSP, fmt_dec, fmt_int, fmt_pct, fmt_sci
 
@@ -89,6 +91,48 @@ def _pilot_properties() -> tuple[int, int, int]:
 
 def _pct(fraction: float, decimals: int = 1) -> str:
     return fmt_pct(fraction, decimals)
+
+
+SLIDE_10 = ("BBGCCKITCTTEZZZLCZ", "WETTERBERICHT")
+
+
+def _slide10_count() -> str:
+    return str(len(alignments(*SLIDE_10)))
+
+
+def _slide10_valid() -> str:
+    return ", ".join(str(p) for p in valid_positions(*SLIDE_10))
+
+
+def _slide10_conflict() -> str:
+    """La letra del crib que choca en la posición 7 en las alineaciones 4 y 5."""
+    crib = SLIDE_10[1]
+    found: set[tuple[str, int]] = set()
+    for a in alignments(*SLIDE_10)[4:]:
+        found |= {(crib[j], a.position + j) for j in a.conflicts if a.position + j == 7}
+    return "; ".join(
+        f"{letter} sobre la {letter} de la posición {p}" for letter, p in sorted(found)
+    )
+
+
+def _menu(which: str) -> MenuStats:
+    """Métricas del menú de la diapositiva 11 («slide») o del caso de respaldo («backup»)."""
+    if which == "slide":
+        return menu_stats(menu_at(*SLIDE_10, 0))
+    import json
+
+    data = json.loads((paths.DEMO / "respaldo_bombe.json").read_text(encoding="utf-8"))
+    return menu_stats(menu_at(data["ciphertext"], data["crib"], data["crib_position"]))
+
+
+def _menu_numbers(which: str) -> str:
+    s = _menu(which)
+    return f"{s.letters} · {s.edges} · {s.components} · {s.loops}"
+
+
+def _test_letter(which: str) -> str:
+    s = _menu(which)
+    return f"{s.test_letter}, grado {s.test_degree}"
 
 
 # ---------------------------------------------------------------- registro
@@ -215,6 +259,31 @@ CIFRAS: tuple[Cifra, ...] = (
         f"14,1{NBSP}%",
         lambda: _pct(no_fixed_point_probability(50)),
     ),
+    # Diapositivas 10 y 11 · cribs/ (casos deterministas de 6.5)
+    Cifra("10", "alineaciones de WETTERBERICHT sobre BBGCCKITCTTEZZZLCZ", "6", _slide10_count),
+    Cifra("10", "alineaciones sin conflictos", "0, 1, 2, 3", _slide10_valid),
+    Cifra(
+        "10",
+        "conflicto de las alineaciones 4 y 5",
+        "T sobre la T de la posición 7",
+        _slide10_conflict,
+    ),
+    Cifra(
+        "11",
+        "menú de la alineación 0: letras, aristas, componentes y lazos",
+        "11 · 13 · 1 · 3",
+        lambda: _menu_numbers("slide"),
+    ),
+    Cifra("11", "letra de prueba y su grado", "T, grado 6", lambda: _test_letter("slide")),
+    Cifra(
+        "6.5",
+        "menú del caso de respaldo: letras, aristas, componentes y lazos",
+        "11 · 13 · 1 · 3",
+        lambda: _menu_numbers("backup"),
+    ),
+    Cifra(
+        "6.5", "letra de prueba del caso de respaldo", "T, grado 4", lambda: _test_letter("backup")
+    ),
     # Pendientes
     Cifra(
         "9",
@@ -223,22 +292,10 @@ CIFRAS: tuple[Cifra, ...] = (
         pending="fase 5 (P2): rejewski/; si no se hace, la diapositiva solo cita a Kuhl",
     ),
     Cifra(
-        "10, 11",
-        "casos deterministas de 6.5 (arrastre y menú)",
-        "6 alineaciones; menú de 11 letras, 13 aristas y 3 lazos",
-        pending="fase 2: cribs/",
-    ),
-    Cifra(
         "13, 17",
         "decibanes y aproximación de Wald",
         "+1,845 dB; +0,0211 y −0,0184 dB; ±19,96 dB; 929 y 1.062 letras",
         pending="fase 4: banburismus/",
-    ),
-    Cifra(
-        "15",
-        "E4: fracción simulada con texto alemán real",
-        "dentro del IC de (25/26)^L",
-        pending="fase 2: E4",
     ),
     Cifra(
         "16",

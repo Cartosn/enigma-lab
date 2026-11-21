@@ -12,7 +12,7 @@ validación es P0 y bloquea las demás fases: las pruebas de este documento corr
 | 6.2 | CyberChef: 3 casos de la Bombe | Fase 3 |
 | 6.3 | Propiedades con hypothesis | **Hecho** (salvo la Bombe, fase 3) |
 | 6.4 | Bombe en 200 casos aleatorios | Fase 3 |
-| 6.5 | Casos deterministas de las diapositivas 10 y 11 | Fase 2 |
+| 6.5 | Casos deterministas de las diapositivas 10 y 11 | **Hecho** |
 
 ## 6.1 · Vectores de prueba
 
@@ -95,6 +95,23 @@ cualquier reflector y de 0 a 13 cables. Hypothesis corre en modo determinista.
 - **Prueba de las diapositivas 6 y 14:** 2.000 claves y 200.000 letras. Da 0 puntos
   fijos, involución en las 2.000 claves y lotes iguales al escalar.
 - **La Bombe en Numba coincide con la de referencia:** fase 3.
+
+## 6.5 · Casos de las diapositivas 10 y 11
+
+`tests/test_cribs.py` los comprueba, y `enigma_lab/cifras.py` los lleva a `RESUMEN.md`.
+
+- **Arrastre (diapositiva 10):** cifrado `BBGCCKITCTTEZZZLCZ`, crib `WETTERBERICHT`.
+  - Hay 6 alineaciones, de la 0 a la 5. La 0, la 1, la 2 y la 3 no tienen conflictos.
+  - En la 4 y la 5, una T del crib cae sobre la T de la posición 7.
+  - La 4 además choca en la posición 11 (E sobre E); el spec no lo menciona, pero no lo
+    contradice.
+- **Menú (diapositiva 11), alineación 0:**
+  - 11 letras, 13 aristas, 1 componente y 3 lazos; la letra de prueba es T, de grado 6.
+  - Las aristas en lazos son exactamente las del texto: E–B (1), B–I (6), I–T (9),
+    T–E (7), E–C (4) y las dos T–C (3 y 10).
+- **Caso de respaldo:** 11 letras, 13 aristas y 3 lazos; letra de prueba T, de grado 4.
+- **Versión vectorizada del arrastre:** hypothesis comprueba que da lo mismo que la
+  escalar.
 
 ## Otras comprobaciones
 

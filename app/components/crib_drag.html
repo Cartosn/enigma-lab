@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<!--
+  Enigma Lab · el crib deslizándose sobre el cifrado (spec 8.2, punto 5).
+  Solo dibuja lo que calcula Python (enigma_lab.cribs.dragging.alignments): por cada
+  alineación, las posiciones del crib que chocan con el cifrado.
+-->
+<style>
+  @font-face { font-family: "Inter"; src: url("/app/static/fonts/InterVariable.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "JetBrains Mono"; src: url("/app/static/fonts/JetBrainsMono-Regular.woff2") format("woff2"); font-weight: 400; }
+  @font-face { font-family: "JetBrains Mono"; src: url("/app/static/fonts/JetBrainsMono-Bold.woff2") format("woff2"); font-weight: 700; }
+  html, body { margin: 0; background: var(--background); color: var(--text);
+               font-family: Inter, system-ui, sans-serif; font-size: 16px; }
+  body.demo { font-size: 20px; }
+  .wrap { overflow-x: auto; padding: 4px 2px 8px; }
+  .grid { position: relative; font-family: "JetBrains Mono", ui-monospace, Consolas, monospace; }
+  .row { display: flex; gap: 3px; height: 2.2em; align-items: center; }
+  .label { width: 6.5em; flex: none; color: var(--text_muted); font-family: Inter, sans-serif;
+           font-size: 0.85em; }
+  .cell { width: 1.75em; height: 1.9em; flex: none; display: flex; align-items: center;
+          justify-content: center; border-radius: 5px; border: 1px solid var(--border);
+          background: var(--surface); font-weight: 700; }
+  .index .cell { border: none; background: none; color: var(--text_muted); font-weight: 400;
+                 font-size: 0.7em; }
+  .spacer { width: 1.75em; flex: none; }
+  .crib .cell { border-color: var(--accent_2); }
+  .crib.bad .cell { border-color: var(--border); }
+  .cell.clash { background: var(--error); border-color: var(--error); color: var(--ink); }
+  .cipher .cell.under { border-color: var(--accent_2); }
+  .moving { transition: margin-left 260ms ease; }
+  @media (prefers-reduced-motion: reduce) { .moving { transition: none; } }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px 10px; align-items: center; margin: 4px 0 6px; }
+  button { font: inherit; font-size: 0.9rem; color: var(--text); background: var(--surface);
+           border: 1px solid var(--border); border-radius: 8px; padding: 5px 12px; cursor: pointer; }
+  button:hover { border-color: var(--accent_2); }
+  button.primary { background: var(--accent); color: var(--ink); border-color: var(--accent); font-weight: 600; }
+  #status { font-size: 0.95rem; }
+  .ok { color: var(--success); font-weight: 600; }
+  .no { color: var(--error); font-weight: 600; }
+  .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; }
+  .chip { font-family: "JetBrains Mono", monospace; font-size: 0.8rem; min-width: 2.2em; text-align: center;
+          padding: 2px 4px; border-radius: 6px; cursor: pointer; border: 1px solid var(--border); }
+  .chip.valid { border-color: var(--success); color: var(--success); }
+  .chip.invalid { border-color: var(--error); color: var(--error); opacity: 0.75; }
+  .chip.current { outline: 2px solid var(--accent); }
+</style>
+</head>
+<body>
+<div class="controls">
+  <button id="prev" type="button">◀ Anterior</button>
+  <button id="play" type="button" class="primary">▶ Deslizar</button>
+  <button id="next" type="button">Siguiente ▶</button>
+  <span id="status" aria-live="polite"></span>
+</div>
+<div class="wrap"><div class="grid" id="grid"></div></div>
+<div class="chips" id="chips" aria-label="Alineaciones"></div>
+<script id="payload" type="application/json">__PAYLOAD__</script>
+<script>
+(() => {
+  "use strict";
+  const P = JSON.parse(document.getElementById("payload").textContent);
+  for (const [k, v] of Object.entries(P.theme)) document.documentElement.style.setProperty("--" + k, v);
+  if (P.demo) document.body.classList.add("demo");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const grid = document.getElementById("grid");
+  const cell = (text, cls = "") => { const d = document.createElement("div"); d.className = "cell " + cls; d.textContent = text; return d; };
+  const row = (label, cls) => {
+    const r = document.createElement("div"); r.className = "row " + cls;
+    const l = document.createElement("span"); l.className = "label"; l.textContent = label; r.appendChild(l);
+    grid.appendChild(r); return r;
+  };
+  const idx = row("Posición", "index");
+  const cip = row("Cifrado", "cipher");
+  const cribRow = row("Crib", "crib");
+  [...P.cipher].forEach((ch, i) => { idx.appendChild(cell(String(i))); cip.appendChild(cell(ch)); });
+  const shift = document.createElement("div"); shift.className = "spacer moving"; cribRow.appendChild(shift);
+  const cribCells = [...P.crib].map(ch => { const c = cell(ch); cribRow.appendChild(c); return c; });
+  const cipherCells = [...cip.querySelectorAll(".cell")];
+
+  const chips = document.getElementById("chips");
+  const chipEls = P.alignments.map((a, i) => {
+    const b = document.createElement("span");
+    b.className = "chip " + (a.conflicts.length ? "invalid" : "valid");
+    b.textContent = a.position; b.title = a.conflicts.length ? "descartada" : "posible";
+    b.addEventListener("click", () => { stop(); show(i); });
+    chips.appendChild(b); return b;
+  });
+
+  const status = document.getElementById("status");
+  let current = 0, timer = null;
+  const show = (i) => {
+    current = i;
+    const a = P.alignments[i];
+    // ancho de una celda + separación, en em: 1.75em + 3px ≈ calculado en px
+    const w = cipherCells[1] ? cipherCells[1].offsetLeft - cipherCells[0].offsetLeft : 30;
+    shift.style.width = "0px";
+    shift.style.marginLeft = (a.position * w - 3) + "px";
+    cipherCells.forEach((c, k) => {
+      c.classList.toggle("under", k >= a.position && k < a.position + P.crib.length);
+      c.classList.remove("clash");
+    });
+    cribCells.forEach(c => c.classList.remove("clash"));
+    a.conflicts.forEach(j => { cribCells[j].classList.add("clash"); cipherCells[a.position + j].classList.add("clash"); });
+    cribRow.classList.toggle("bad", a.conflicts.length > 0);
+    chipEls.forEach((c, k) => c.classList.toggle("current", k === i));
+    const where = a.conflicts.map(j => `${P.crib[j]} en la posición ${a.position + j}`).join(", ");
+    status.innerHTML = a.conflicts.length
+      ? `Alineación ${a.position}: <span class="no">descartada</span> (${where} se cifraría a sí misma).`
+      : `Alineación ${a.position}: <span class="ok">posible</span>, ninguna letra choca.`;
+  };
+  const stop = () => { if (timer) clearInterval(timer); timer = null; playBtn.textContent = "▶ Deslizar"; };
+  const playBtn = document.getElementById("play");
+  playBtn.addEventListener("click", () => {
+    if (timer) return stop();
+    playBtn.textContent = "⏸ Pausa";
+    if (current >= P.alignments.length - 1) show(0);
+    timer = setInterval(() => { if (current + 1 >= P.alignments.length) stop(); else show(current + 1); }, reduced ? 1200 : 900);
+  });
+  document.getElementById("next").addEventListener("click", () => { stop(); show(Math.min(current + 1, P.alignments.length - 1)); });
+  document.getElementById("prev").addEventListener("click", () => { stop(); show(Math.max(current - 1, 0)); });
+  requestAnimationFrame(() => show(Math.min(P.start || 0, P.alignments.length - 1)));
+})();
+</script>
+</body>
+</html>

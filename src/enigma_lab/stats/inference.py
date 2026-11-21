@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import math
 
+import numpy as np
 from scipy.stats import norm
 
 
@@ -28,6 +29,17 @@ def wilson_interval(successes: int, n: int, confidence: float = 0.95) -> tuple[f
     center = (p + z**2 / (2 * n)) / denominator
     half = z * math.sqrt(p * (1 - p) / n + z**2 / (4 * n**2)) / denominator
     return max(0.0, center - half), min(1.0, center + half)
+
+
+def mean_ci(values: np.ndarray, confidence: float = 0.95) -> tuple[float, float, float]:
+    """Media y su IC normal: media ± z · s/√n. Devuelve (media, bajo, alto)."""
+    data = np.asarray(values, dtype=float)
+    mean = float(data.mean())
+    if len(data) < 2:
+        return mean, mean, mean
+    z = float(norm.ppf(0.5 + confidence / 2))
+    half = z * float(data.std(ddof=1)) / math.sqrt(len(data))
+    return mean, mean - half, mean + half
 
 
 def no_fixed_point_probability(length: int, alphabet: int = 26) -> float:

@@ -175,6 +175,67 @@ un commit propio, justo después del commit del código.
   siguiente (Q en el rotor I), igual que Wikipedia y py-enigma. CyberChef escribe la
   letra de llegada (R); la conversión está en `scripts/cyberchef_urls.py`.
 
+## Fase 2 · Estadística y cribs (20-11-2026)
+
+### D-024 · Corpus
+- **Libros:**
+  - alemán: *Effi Briest* (Fontane) y *Die Verwandlung* (Kafka), 578.365 letras;
+  - español: el *Quijote*, 1.620.450 letras.
+- **Descarte por derechos:** *Buddenbrooks* (Thomas Mann, †1955) se descartó. En
+  Colombia la protección dura la vida del autor más 80 años, así que sigue protegido
+  hasta 2035.
+- **Descarga:** gutenberg.org estaba en mantenimiento (503), así que se descargó de su
+  espejo oficial del Mirror Service, con URL y SHA-256 fijos.
+- **Muestras del repositorio:** unos 200 KB por idioma. La alemana sale mitad de cada
+  libro. La app y el modo rápido usan las muestras; el modo completo usa el corpus
+  completo (`make corpus`, que `make reproduce` corre primero).
+
+### D-025 · Normalización
+Sigue el spec (5.3): en alemán Ä → AE, Ö → OE, Ü → UE, ß → SS; en español se quitan las
+tildes y Ñ → N. Las demás marcas diacríticas se quitan. En el modo «X como separador»,
+cada tramo de caracteres que no son letras (espacios, signos y también dígitos) se
+vuelve una sola X.
+
+### D-026 · Diseño de E3
+- **Condiciones:** dos idiomas y longitudes de 25 a 1.000 letras (50 a 500 en modo
+  rápido); 1.000 mensajes por condición (200 en modo rápido).
+- **Claves:** cada mensaje lleva su propia clave aleatoria de Enigma I con 10 cables.
+- **IC 95 % de la media:** aproximación normal.
+- **Mapa de calor:** se acumula con los mensajes en alemán de la mayor longitud.
+
+### D-027 · Diseño de E4
+- **Mensajes:** de 250 letras, como el piloto.
+- **Crib:** es el propio tramo del mensaje que empieza en una posición t al azar; así
+  la alineación verdadera es t.
+- **Texto alemán:** va en modo «X como separador», porque así se escribían los cribs
+  reales (WETTERBERICHTX…).
+- **IC:** como las alineaciones de un mismo mensaje no son independientes, se calcula
+  con la media de las fracciones por mensaje (aproximación normal sobre los mensajes) y
+  no con un Wilson sobre todas las alineaciones juntas.
+- **Teoría corregida:** se agrega (1 − (1 − κ)/25)^L, con κ el IC del texto, como
+  referencia adicional (columna `teorico_kappa`). Con texto aleatorio coincide con
+  (25/26)^L.
+
+### D-028 · Métricas del menú
+- **Lazos:** el número ciclomático E − V + 1 de la componente usada. Esa componente es
+  la de más lazos; si empatan, la de más letras.
+- **Letra de prueba:** la de mayor grado en esa componente; si empatan, la primera en
+  orden alfabético.
+- **Aristas en lazos:** son las que no son puentes. Dos aristas paralelas, la misma
+  pareja en dos pasos, cuentan como un lazo.
+
+### D-029 · N-gramas
+Los modelos se construyen con la muestra del idioma; la puntuación es la suma de log₁₀ p.
+Los n-gramas que no aparecen reciben un piso de 0,01 apariciones, una convención habitual
+en el criptoanálisis con n-gramas.
+
+### D-030 · Página Experimentos
+- **Por defecto:** muestra los resultados guardados en `results/` (modo completo).
+- **«Correr ahora»:** repite el experimento en modo rápido dentro de la sesión, sin
+  sobrescribir `results/`.
+- **Descargas:** las figuras se generan con el estilo `enigma_print`, de modo que el PNG
+  o SVG descargado es el del informe. Así no hace falta kaleido.
+
 ## Pendientes de decidir
 
 ### P-001 · Equipo de las mediciones de la demo 2 (fase 3)
