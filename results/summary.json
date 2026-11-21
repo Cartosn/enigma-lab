@@ -4,8 +4,8 @@
       "experimento": "e1",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 18:28 UTC",
-      "commit": "66213fd"
+      "fecha": "2026-11-21 23:30 UTC",
+      "commit": "2f4db4e"
     },
     "vectores_ok": 9,
     "vectores_total": 9,
@@ -36,15 +36,15 @@
     "puntos_fijos": 0,
     "involucion_ok": 2000,
     "lotes_igual_escalar": 2000,
-    "segundos": 17.9
+    "segundos": 18.1
   },
   "e2": {
     "corrida": {
       "experimento": "e2",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 18:28 UTC",
-      "commit": "66213fd"
+      "fecha": "2026-11-21 23:30 UTC",
+      "commit": "2f4db4e"
     },
     "total_sin_anillos": "158962555217826360000",
     "bits_sin_anillos": 67.10724886600143,
@@ -70,8 +70,8 @@
       "experimento": "e4",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 18:28 UTC",
-      "commit": "66213fd"
+      "fecha": "2026-11-21 23:30 UTC",
+      "commit": "2f4db4e"
     },
     "n_por_L": 1000,
     "longitudes": [
@@ -290,8 +290,8 @@
       "experimento": "e3",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 18:28 UTC",
-      "commit": "66213fd"
+      "fecha": "2026-11-21 23:30 UTC",
+      "commit": "2f4db4e"
     },
     "n_por_condicion": 1000,
     "longitudes": [
@@ -352,8 +352,8 @@
       "experimento": "e5",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 18:31 UTC",
-      "commit": "66213fd"
+      "fecha": "2026-11-21 23:33 UTC",
+      "commit": "2f4db4e"
     },
     "n_por_celda": 100,
     "letras": [
@@ -562,11 +562,622 @@
     "exito_bletchley_sin_vuelta": 1.0,
     "vuelta_frac": 0.45,
     "exito_robusto": 0.98,
-    "robusto_tiempo_relativo": 13.921818570325927,
+    "robusto_tiempo_relativo": 14.079680324979078,
     "robusto_paradas_relativas": 10.91435616515124,
-    "s_por_orden_bletchley": 0.00636156909854617,
-    "s_por_orden_robusto": 0.09881551937534823,
+    "s_por_orden_bletchley": 0.006278486048278864,
+    "s_por_orden_robusto": 0.09718701562596835,
     "menus": 2000,
-    "segundos": 164.0
+    "segundos": 162.1
+  },
+  "e6": {
+    "corrida": {
+      "experimento": "e6",
+      "modo": "completo",
+      "semilla": 2026,
+      "fecha": "2026-11-21 23:34 UTC",
+      "commit": "2f4db4e"
+    },
+    "n_pares": 2000,
+    "letras_maximas": 10000,
+    "solapamientos": [
+      25,
+      50,
+      100,
+      200,
+      400,
+      800,
+      1600
+    ],
+    "alfas": [
+      0.05,
+      0.01,
+      0.001
+    ],
+    "corpus": "completo",
+    "pesos": {
+      "repeticion_db": 1.84524426592544,
+      "no_repeticion_db": -0.09295599423568819,
+      "por_letra_profundidad_db": 0.02105578577378993,
+      "por_letra_azar_db": -0.0184098303833371,
+      "umbral_db": 19.9563519459755
+    },
+    "wald": {
+      "profundidad": 928.8290219689005,
+      "azar": 1062.325100222401
+    },
+    "exacto": {
+      "profundidad": {
+        "letras": 959.7018529811329,
+        "acepta_profundidad": 0.9900904464162178,
+        "sobrepaso_arriba_db": 0.6533651621538574,
+        "sobrepaso_abajo_db": 0.04529467790324304,
+        "puntaje_final_db": 20.20727662311855
+      },
+      "azar": {
+        "letras": 1067.4147936900008,
+        "acepta_profundidad": 0.008649829512028636,
+        "sobrepaso_arriba_db": 0.6077190957294079,
+        "sobrepaso_abajo_db": 0.045461337979300964,
+        "puntaje_final_db": -19.650925300531185
+      }
+    },
+    "brecha_wald": {
+      "profundidad": {
+        "errores": 0.17144746205905215,
+        "sobrepaso_arriba": 30.722700735061682,
+        "sobrepaso_abajo": -0.02131718296149003,
+        "total": 30.872831012232382
+      },
+      "azar": {
+        "errores": 2.9271836713296073,
+        "sobrepaso_arriba": -0.2855358501304522,
+        "sobrepaso_abajo": 2.4480456483280983,
+        "total": 5.089693467599773
+      }
+    },
+    "por_alfa": {
+      "5": {
+        "alfa": 0.05,
+        "umbral_db": 12.787536009528289,
+        "wald": {
+          "profundidad": 546.5852726760498,
+          "azar": 625.1433157685233
+        },
+        "exacto": {
+          "profundidad": {
+            "letras": 576.0509270414685,
+            "acepta_profundidad": 0.9501707232926214
+          },
+          "azar": {
+            "letras": 635.4249300309251,
+            "acepta_profundidad": 0.043279077684918024
+          }
+        }
+      },
+      "1": {
+        "alfa": 0.01,
+        "umbral_db": 19.9563519459755,
+        "wald": {
+          "profundidad": 928.8290219689005,
+          "azar": 1062.325100222401
+        },
+        "exacto": {
+          "profundidad": {
+            "letras": 959.7018529811329,
+            "acepta_profundidad": 0.9900904464162178
+          },
+          "azar": {
+            "letras": 1067.4147936900008,
+            "acepta_profundidad": 0.008649829512028636
+          }
+        }
+      },
+      "0_1": {
+        "alfa": 0.001,
+        "umbral_db": 29.995654882259824,
+        "wald": {
+          "profundidad": 1421.731009904127,
+          "azar": 1626.069493806436
+        },
+        "exacto": {
+          "profundidad": {
+            "letras": 1452.7374679418574,
+            "acepta_profundidad": 0.999010312566944
+          },
+          "azar": {
+            "letras": 1628.960538838792,
+            "acepta_profundidad": 0.0008649979588113495
+          }
+        }
+      }
+    },
+    "tasas": {
+      "turing": 0.058823529411764705,
+      "azar": 0.038461538461538464,
+      "corpus_letras": 0.07574604154333889,
+      "corpus_x": 0.08016936930834644,
+      "medidas": {
+        "tasa_1_17": {
+          "profundidad": [
+            0.0587838,
+            0.05867978753635727,
+            0.058887812463642726
+          ],
+          "azar": [
+            0.03856495,
+            0.03847901950691322,
+            0.03865088049308678
+          ],
+          "desplazamiento_positivo": 0.5135
+        },
+        "aleman": {
+          "profundidad": [
+            0.08023145,
+            0.08009463181652773,
+            0.08036826818347226
+          ],
+          "azar": [
+            0.0385061,
+            0.03842139133254706,
+            0.038590808667452944
+          ],
+          "desplazamiento_positivo": 0.509
+        }
+      }
+    },
+    "simulacion": {
+      "tasa_1_17/letras_1_17": {
+        "profundidad": {
+          "letras": 983.243,
+          "ic": [
+            953.991406581152,
+            1012.4945934188481
+          ],
+          "aciertos": 0.9895,
+          "errores": 0.0105,
+          "sin_decidir": 0.0,
+          "wald": 928.8290219689005,
+          "exacto": 959.7018529811329,
+          "sobrepaso_arriba_db": 0.6735518386853151,
+          "sobrepaso_abajo_db": 0.048359840930425925,
+          "wald_identidad": 963.0320621817189
+        },
+        "azar": {
+          "letras": 1090.4675,
+          "ic": [
+            1060.9738903784448,
+            1119.9611096215551
+          ],
+          "aciertos": 0.988,
+          "errores": 0.012,
+          "sin_decidir": 0.0,
+          "wald": 1062.325100222401,
+          "exacto": 1067.4147936900008,
+          "sobrepaso_arriba_db": 0.5831825433382628,
+          "sobrepaso_abajo_db": 0.045437662489533986,
+          "wald_identidad": 1071.7154866474477
+        }
+      },
+      "aleman/letras_1_17": {
+        "profundidad": {
+          "letras": 332.4575,
+          "ic": [
+            325.02806503094126,
+            339.8869349690587
+          ],
+          "aciertos": 1.0,
+          "errores": 0.0,
+          "sin_decidir": 0.0,
+          "wald": 928.8290219689005,
+          "exacto": null,
+          "sobrepaso_arriba_db": 0.7288069228141743,
+          "sobrepaso_abajo_db": NaN,
+          "wald_identidad": 330.7052441779428
+        },
+        "azar": {
+          "letras": 1090.309,
+          "ic": [
+            1062.7540410053018,
+            1117.8639589946981
+          ],
+          "aciertos": 0.9935,
+          "errores": 0.0065,
+          "sin_decidir": 0.0,
+          "wald": 1062.325100222401,
+          "exacto": null,
+          "sobrepaso_arriba_db": 0.8306617681546096,
+          "sobrepaso_abajo_db": 0.04579821092202087,
+          "wald_identidad": 1077.14482819325
+        }
+      },
+      "aleman/letras": {
+        "profundidad": {
+          "letras": 262.4325,
+          "ic": [
+            254.01161391144336,
+            270.85338608855665
+          ],
+          "aciertos": 0.982,
+          "errores": 0.018,
+          "sin_decidir": 0.0,
+          "wald": 248.8911192821984,
+          "exacto": null,
+          "sobrepaso_arriba_db": 1.2310110288944878,
+          "sobrepaso_abajo_db": 0.08621000894664771,
+          "wald_identidad": 259.4986070136375
+        },
+        "azar": {
+          "letras": 323.3075,
+          "ic": [
+            315.35186808789973,
+            331.2631319121003
+          ],
+          "aciertos": 0.9945,
+          "errores": 0.0055,
+          "sin_decidir": 0.0,
+          "wald": 312.9386856888204,
+          "exacto": null,
+          "sobrepaso_arriba_db": 1.0941858569808225,
+          "sobrepaso_abajo_db": 0.08898364819024017,
+          "wald_identidad": 317.89902348243436
+        }
+      },
+      "aleman/trigramas": {
+        "profundidad": {
+          "letras": 253.962,
+          "ic": [
+            245.36962893231563,
+            262.5543710676844
+          ],
+          "aciertos": 0.9885,
+          "errores": 0.0115,
+          "sin_decidir": 0.0,
+          "wald": 221.36820959902485,
+          "exacto": null,
+          "sobrepaso_arriba_db": 1.88992854609413,
+          "sobrepaso_abajo_db": 0.0615274571802844,
+          "wald_identidad": 241.40642262819125
+        },
+        "azar": {
+          "letras": 356.7075,
+          "ic": [
+            348.4506346005898,
+            364.96436539941016
+          ],
+          "aciertos": 0.9925,
+          "errores": 0.0075,
+          "sin_decidir": 0.0,
+          "wald": 347.07548888444694,
+          "exacto": null,
+          "sobrepaso_arriba_db": 1.8911677378623921,
+          "sobrepaso_abajo_db": 0.07092942363495879,
+          "wald_identidad": 350.6675144039818
+        }
+      },
+      "aleman/tetragramas": {
+        "profundidad": {
+          "letras": 253.9705,
+          "ic": [
+            245.39627094445567,
+            262.54472905554434
+          ],
+          "aciertos": 0.9885,
+          "errores": 0.0115,
+          "sin_decidir": 0.0,
+          "wald": 221.19815086498113,
+          "exacto": null,
+          "sobrepaso_arriba_db": 1.9058293359714815,
+          "sobrepaso_abajo_db": 0.04899302539105206,
+          "wald_identidad": 241.43476456995498
+        },
+        "azar": {
+          "letras": 356.9925,
+          "ic": [
+            348.72208561718145,
+            365.26291438281856
+          ],
+          "aciertos": 0.9925,
+          "errores": 0.0075,
+          "sin_decidir": 0.0,
+          "wald": 347.58266192851573,
+          "exacto": null,
+          "sobrepaso_arriba_db": 1.8043920217165588,
+          "sobrepaso_abajo_db": 0.06063584357251536,
+          "wald_identidad": 351.00005106467313
+        }
+      }
+    },
+    "solapamiento": {
+      "tasa_1_17/letras_1_17": {
+        "25": {
+          "aciertos_profundidad": 0.0,
+          "aciertos_azar": 0.0,
+          "auc": 0.627659875,
+          "identifica": 0.06560327380952381
+        },
+        "50": {
+          "aciertos_profundidad": 0.0,
+          "aciertos_azar": 0.0,
+          "auc": 0.676793625,
+          "identifica": 0.09009368686868688
+        },
+        "100": {
+          "aciertos_profundidad": 0.0,
+          "aciertos_azar": 0.0,
+          "auc": 0.752283375,
+          "identifica": 0.1320964285714286
+        },
+        "200": {
+          "aciertos_profundidad": 0.0125,
+          "aciertos_azar": 0.0,
+          "auc": 0.824241875,
+          "identifica": 0.22164999999999999
+        },
+        "400": {
+          "aciertos_profundidad": 0.1515,
+          "aciertos_azar": 0.0445,
+          "auc": 0.911114125,
+          "identifica": 0.3999083333333333
+        },
+        "800": {
+          "aciertos_profundidad": 0.491,
+          "aciertos_azar": 0.415,
+          "auc": 0.969209125,
+          "identifica": 0.6728083333333333
+        },
+        "1600": {
+          "aciertos_profundidad": 0.8345,
+          "aciertos_azar": 0.8285,
+          "auc": 0.99622,
+          "identifica": 0.9150833333333332
+        }
+      },
+      "aleman/letras_1_17": {
+        "25": {
+          "aciertos_profundidad": 0.0,
+          "aciertos_azar": 0.0,
+          "auc": 0.71081,
+          "identifica": 0.14830022755022754
+        },
+        "50": {
+          "aciertos_profundidad": 0.001,
+          "aciertos_azar": 0.0,
+          "auc": 0.79666575,
+          "identifica": 0.23546048534798536
+        },
+        "100": {
+          "aciertos_profundidad": 0.0255,
+          "aciertos_azar": 0.0,
+          "auc": 0.882866125,
+          "identifica": 0.394375
+        },
+        "200": {
+          "aciertos_profundidad": 0.2265,
+          "aciertos_azar": 0.0,
+          "auc": 0.952942875,
+          "identifica": 0.6426547619047619
+        },
+        "400": {
+          "aciertos_profundidad": 0.716,
+          "aciertos_azar": 0.051,
+          "auc": 0.99194375,
+          "identifica": 0.8819166666666667
+        },
+        "800": {
+          "aciertos_profundidad": 0.9835,
+          "aciertos_azar": 0.3955,
+          "auc": 0.99967275,
+          "identifica": 0.99125
+        },
+        "1600": {
+          "aciertos_profundidad": 1.0,
+          "aciertos_azar": 0.8285,
+          "auc": 0.999999375,
+          "identifica": 1.0
+        }
+      },
+      "aleman/letras": {
+        "25": {
+          "aciertos_profundidad": 0.0065,
+          "aciertos_azar": 0.0,
+          "auc": 0.71081,
+          "identifica": 0.14830022755022754
+        },
+        "50": {
+          "aciertos_profundidad": 0.0345,
+          "aciertos_azar": 0.0,
+          "auc": 0.79666575,
+          "identifica": 0.23546048534798536
+        },
+        "100": {
+          "aciertos_profundidad": 0.1615,
+          "aciertos_azar": 0.0,
+          "auc": 0.882866125,
+          "identifica": 0.394375
+        },
+        "200": {
+          "aciertos_profundidad": 0.469,
+          "aciertos_azar": 0.279,
+          "auc": 0.952942875,
+          "identifica": 0.6426547619047619
+        },
+        "400": {
+          "aciertos_profundidad": 0.802,
+          "aciertos_azar": 0.729,
+          "auc": 0.99194375,
+          "identifica": 0.8819166666666667
+        },
+        "800": {
+          "aciertos_profundidad": 0.9635,
+          "aciertos_azar": 0.967,
+          "auc": 0.99967275,
+          "identifica": 0.99125
+        },
+        "1600": {
+          "aciertos_profundidad": 0.9815,
+          "aciertos_azar": 0.9945,
+          "auc": 0.999999375,
+          "identifica": 1.0
+        }
+      },
+      "aleman/trigramas": {
+        "25": {
+          "aciertos_profundidad": 0.017,
+          "aciertos_azar": 0.0,
+          "auc": 0.7111805,
+          "identifica": 0.158838677988678
+        },
+        "50": {
+          "aciertos_profundidad": 0.065,
+          "aciertos_azar": 0.0,
+          "auc": 0.799229625,
+          "identifica": 0.251925
+        },
+        "100": {
+          "aciertos_profundidad": 0.202,
+          "aciertos_azar": 0.0,
+          "auc": 0.886459875,
+          "identifica": 0.4157916666666666
+        },
+        "200": {
+          "aciertos_profundidad": 0.488,
+          "aciertos_azar": 0.1595,
+          "auc": 0.955909375,
+          "identifica": 0.66725
+        },
+        "400": {
+          "aciertos_profundidad": 0.8165,
+          "aciertos_azar": 0.684,
+          "auc": 0.99294275,
+          "identifica": 0.89875
+        },
+        "800": {
+          "aciertos_profundidad": 0.972,
+          "aciertos_azar": 0.9575,
+          "auc": 0.999734125,
+          "identifica": 0.9935
+        },
+        "1600": {
+          "aciertos_profundidad": 0.9875,
+          "aciertos_azar": 0.9925,
+          "auc": 1.0,
+          "identifica": 1.0
+        }
+      },
+      "aleman/tetragramas": {
+        "25": {
+          "aciertos_profundidad": 0.016,
+          "aciertos_azar": 0.0,
+          "auc": 0.711184,
+          "identifica": 0.158838677988678
+        },
+        "50": {
+          "aciertos_profundidad": 0.0615,
+          "aciertos_azar": 0.0,
+          "auc": 0.799227625,
+          "identifica": 0.251425
+        },
+        "100": {
+          "aciertos_profundidad": 0.203,
+          "aciertos_azar": 0.0,
+          "auc": 0.886475625,
+          "identifica": 0.4157916666666666
+        },
+        "200": {
+          "aciertos_profundidad": 0.4885,
+          "aciertos_azar": 0.1595,
+          "auc": 0.955913375,
+          "identifica": 0.66725
+        },
+        "400": {
+          "aciertos_profundidad": 0.8155,
+          "aciertos_azar": 0.6845,
+          "auc": 0.99293925,
+          "identifica": 0.89925
+        },
+        "800": {
+          "aciertos_profundidad": 0.972,
+          "aciertos_azar": 0.958,
+          "auc": 0.999733875,
+          "identifica": 0.9935
+        },
+        "1600": {
+          "aciertos_profundidad": 0.9875,
+          "aciertos_azar": 0.9925,
+          "auc": 1.0,
+          "identifica": 1.0
+        }
+      }
+    },
+    "modelos": {
+      "letras_1_17": {
+        "probabilidades": [
+          0.058823529411764705
+        ],
+        "repeticion_db": [
+          1.84524426592544
+        ],
+        "no_repeticion_db": [
+          -0.09295599423568819
+        ],
+        "por_letra_profundidad_db": 0.02105578577378993,
+        "por_letra_azar_db": -0.0184098303833371
+      },
+      "letras": {
+        "probabilidades": [
+          0.08016936930834644
+        ],
+        "repeticion_db": [
+          3.189818149911533
+        ],
+        "no_repeticion_db": [
+          -0.1925879305956249
+        ],
+        "por_letra_profundidad_db": 0.07857743162334999,
+        "por_letra_azar_db": -0.062495389037657306
+      },
+      "trigramas": {
+        "probabilidades": [
+          0.07520975057690188,
+          0.11875640521164163,
+          0.25238936417384844
+        ],
+        "repeticion_db": [
+          2.912474963714094,
+          4.8963039088289895,
+          8.170443975209968
+        ],
+        "no_repeticion_db": [
+          -0.16923418608403107,
+          -0.3787068730679234,
+          -1.0929118949288499
+        ],
+        "por_letra_profundidad_db": 0.08834703475481395,
+        "por_letra_azar_db": -0.05634862020915353
+      },
+      "tetragramas": {
+        "probabilidades": [
+          0.07520975057690188,
+          0.11875640521164163,
+          0.23878040341509557,
+          0.29270090360455236
+        ],
+        "repeticion_db": [
+          2.912474963714094,
+          4.8963039088289895,
+          7.929720295658692,
+          8.813974111284402
+        ],
+        "no_repeticion_db": [
+          -0.16923418608403107,
+          -0.3787068730679234,
+          -1.0145670060917558,
+          -1.3336355744801274
+        ],
+        "por_letra_profundidad_db": 0.08841495659244311,
+        "por_letra_azar_db": -0.056266399476157275
+      }
+    },
+    "segundos": 46.4
   }
 }

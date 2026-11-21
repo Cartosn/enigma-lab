@@ -1,10 +1,10 @@
 # Resumen de resultados para la presentación
 
-- **Fecha:** 2026-11-21 18:31 UTC
-- **Commit:** 66213fd
+- **Fecha:** 2026-11-21 23:34 UTC
+- **Commit:** 2f4db4e
 - **Semilla:** 2026
 - **Modo:** completo
-- **Corridas:** E1: modo completo, 2026-11-21 18:28 UTC, commit 66213fd; E2: modo completo, 2026-11-21 18:28 UTC, commit 66213fd; E3: modo completo, 2026-11-21 18:28 UTC, commit 66213fd; E4: modo completo, 2026-11-21 18:28 UTC, commit 66213fd; E5: modo completo, 2026-11-21 18:31 UTC, commit 66213fd
+- **Corridas:** E1: modo completo, 2026-11-21 23:30 UTC, commit 2f4db4e; E2: modo completo, 2026-11-21 23:30 UTC, commit 2f4db4e; E3: modo completo, 2026-11-21 23:30 UTC, commit 2f4db4e; E4: modo completo, 2026-11-21 23:30 UTC, commit 2f4db4e; E5: modo completo, 2026-11-21 23:33 UTC, commit 2f4db4e; E6: modo completo, 2026-11-21 23:34 UTC, commit 2f4db4e
 
 Generado por `make resumen` a partir de `results/summary.json` y los Parquet, sin volver a correr experimentos. Cada cifra sale del código.
 
@@ -35,13 +35,20 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 - **Toda la tabla de Turing** (8 a 16 letras): en 15 de 17 celdas con valor exacto, las hipótesis abiertas por orden que medimos están entre la mitad y el doble de la estimación de Turing. Detalle por celda en `r3_bombe.csv` (columnas `paradas_media`, `hipotesis_media` y `turing`).
 - **Pocas letras y sin lazos:** con 8 letras Turing da 40.000 paradas por orden, más que las 17.576 posiciones. Su cifra cuenta hipótesis abiertas, no posiciones: medimos 37.546 hipótesis en 17.219 posiciones.
 - **Éxito:** en modo Bletchley aparece la parada verdadera en el 55,0 % de los menús. El central se movió dentro del tramo en el 45,0 %; sin esa vuelta, en el 100,0 %.
-- **Modo robusto** (menús de 12 y 16 letras): éxito 98,0 %, 13,9 veces el tiempo y 10,9 veces las paradas del modo Bletchley.
-- **Tiempo por orden** (17.576 posiciones, en el equipo de `make reproduce`): 0,006 s en modo Bletchley y 0,099 s en modo robusto.
+- **Modo robusto** (menús de 12 y 16 letras): éxito 98,0 %, 14,1 veces el tiempo y 10,9 veces las paradas del modo Bletchley.
+- **Tiempo por orden** (17.576 posiciones, en el equipo de `make reproduce`): 0,006 s en modo Bletchley y 0,097 s en modo robusto.
 - **«Letras» son vértices** (P-002, D-031): las letras distintas del menú. Con esa lectura la columna de 12 letras queda cerca de la de Turing (entre 0,8 y 2,8 veces su valor); contando aristas no.
 
 ### Diapositiva 17 · Banburismus (E6)
 
-Pendiente (fase 4).
+- **Cifras de Turing** (diapositivas 13 y 17, comprobadas en `test_presentacion.py`): +1,845 dB por repetición y −0,093 dB por no repetición; en promedio, +0,0211 dB por letra en profundidad y −0,0184 dB al azar. Umbrales con α = β = 1 %: ±19,96 dB. Aproximación de Wald: 929 letras para confirmar la profundidad y 1.062 para descartarla.
+- **Cifra para la diapositiva: la simulación del SPRT** (criterio de la fase 4). Letras sueltas y un texto cuyas columnas en profundidad repiten con 1/17 exacta, cifrado con la máquina real; 2.000 pares, semilla 2026. Confirmar la profundidad toma 983 letras (IC 95 % 954–1.012) y descartarla, 1.090 letras (IC 95 % 1.061–1.120). El cálculo exacto, sin simulación, da 959,7 y 1.067,4, dentro de los dos IC. Errores en la simulación: 1,1 % en profundidad y 1,2 % al azar (exactos: 0,99 % y 0,86 %).
+- **La diferencia con Wald es el sobrepaso.** Wald supone que el puntaje se detiene justo en ±19,96 dB; en realidad se detiene al cruzarlo, y lo pasa. Una repetición suma 1,845 dB de golpe: arriba, el puntaje pasa el umbral por 0,65 dB en promedio (simulación: 0,67). La identidad de Wald, E[N] = E[S_N] / μ, es exacta, así que en profundidad son 30,9 letras más: 30,7 por ese sobrepaso y 0,2 por lo demás. Abajo, cada no repetición resta solo 0,093 dB y el sobrepaso es de 0,045 dB. Al azar la diferencia es de 5,1 letras: 2,4 por el sobrepaso de abajo, 2,9 porque el error real queda por debajo del 1 % y −0,3 por el de arriba. Con la simulación, E[S_N] / μ da 963 y 1.072 letras.
+- **Con texto alemán real** (corpus, X como separador): en profundidad las letras repiten 1 de cada 12,5, medido con la máquina, y no 1 de cada 17. El IC del corpus es 0,0802 con la X y 0,0757 sin ella (1 de cada 13,2); al azar se miden 1 de cada 26. Con los pesos de Turing, confirmar la profundidad toma 332 letras (IC 95 % 325–340): la decisión llega antes que las 929 de Wald. Descartarla toma 1.090 letras (IC 95 % 1.063–1.118), como con 1/17.
+- **Cuánto aceleran los multigramas** (pesos medidos en el corpus, α = β = 1 %). Con letras sueltas y la tasa del corpus: 262 letras en profundidad y 323 al azar, con un error de 1,8 % en profundidad: las repeticiones del texto real vienen en racimos, y un modelo de letras independientes no lo sabe. Con bigramas y trigramas: 254 y 357, con errores de 1,1 % y 0,8 %; hasta tetragramas, 254 y 357. Frente a los pesos de Turing, los bigramas y trigramas necesitan un 24 % menos de letras para confirmar y un 67 % menos para descartar.
+- **Solapamientos de mensajes reales** (100, 200 y 400 letras). El desplazamiento verdadero saca el mayor puntaje de los 51 en el 39 %, 64 % y 88 % de los pares de texto alemán con letras sueltas, en el 42 %, 67 % y 90 % con bigramas y trigramas y en el 13 %, 22 % y 40 % con la tasa 1/17. El SPRT (α = β = 1 %) confirma la profundidad dentro de ese solapamiento en el 20 %, 49 % y 82 % de los pares (alemán, bigramas y trigramas).
+- **Curva ROC** del puntaje tras 200 letras, sin detenerse (AUC): tasa 1/17 0,824; alemán con letras sueltas 0,953; alemán con bigramas y trigramas 0,956. Con letras sueltas el puntaje solo depende del número de repeticiones, así que las dos tasas dan la misma curva.
+- Datos para los gráficos: `r4_banburismus.csv` (tabla larga: fuente, puntuación, solapamiento, α e hipótesis), `r4_roc.csv` (curvas ROC) y `r4_trayectorias.csv` (decibanes acumulados, 10 pares por hipótesis).
 
 ### Otros resultados útiles
 
@@ -92,29 +99,37 @@ Pendiente (fase 4).
 | 6.5 | menú del caso de respaldo: letras, aristas, componentes y lazos | 11 · 13 · 1 · 3 | 11 · 13 · 1 · 3 | sí |
 | 6.5 | letra de prueba del caso de respaldo | T, grado 4 | T, grado 4 | sí |
 | 9 | Kuhl: 105.456 · 21.230 · 11.466 | 105.456 · 21.230 · 11.466 | — | pendiente (fase 5 (P2): rejewski/; si no se hace, la diapositiva solo cita a Kuhl) |
-| 13, 17 | decibanes y aproximación de Wald | +1,845 dB; +0,0211 y −0,0184 dB; ±19,96 dB; 929 y 1.062 letras | — | pendiente (fase 4: banburismus/) |
+| 13, 17 | decibanes por repetición: 10·log₁₀((1/17)/(1/26)) | +1,845 dB | +1,845 dB | sí |
+| 5.6 | decibanes por no repetición: 10·log₁₀((16/17)/(25/26)) | −0,093 dB | −0,093 dB | sí |
+| 17 | decibanes por letra, en promedio, en profundidad | +0,0211 dB | +0,0211 dB | sí |
+| 17 | decibanes por letra, en promedio, al azar | −0,0184 dB | −0,0184 dB | sí |
+| 13, 17 | umbrales de Wald con α = β = 1 % | ±19,96 dB | ±19,96 dB | sí |
+| 13, 17 | letras esperadas según Wald, en profundidad y al azar | 929 y 1.062 | 929 y 1.062 | sí |
 | 16 | Turing, 12 letras: paradas por orden con 0, 1, 2 y 3 lazos; en 60 órdenes con 2 y 3 | 820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60 | 820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60 | sí |
 
-37 de 37 cifras calculadas coinciden; 2 llegan en fases siguientes.
+43 de 43 cifras calculadas coinciden; 1 llegan en fases siguientes.
 
 ## 3. Demos
 
 - **Demo 1 (diapositiva 4):** el cálculo es instantáneo. La traza de «Vector BDZGO» tarda 0,2 ms y la de «Portada» 0,6 ms en el equipo donde corrió `make resumen` (Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos). Los 45 s del guion los pone la interacción. Falta cronometrar el recorrido completo en el portátil del autor.
-- **Demo 2 (diapositiva 12):** `make bench-demo` del 2026-11-21 18:25 UTC (commit 5b34896) en Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos, Windows 11. Casos de compañero: clave como la de «Clave aleatoria» (10 cables), mensaje alemán de 78 letras que empieza por el crib, crib en la posición 0. Flujo completo de la página La Bombe: barrido, máquina de verificación y «Verificar». Éxito: el descifrado es el mensaje letra por letra.
+- **Demo 2 (diapositiva 12):** `make bench-demo` del 2026-11-21 21:27 UTC (commit 2cfa34b) en Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos, Windows 11. Casos de compañero: clave como la de «Clave aleatoria» (10 cables), mensaje alemán de 78 letras que empieza por el crib, crib en la posición 0. Flujo completo de la página La Bombe: barrido, máquina de verificación y «Verificar». Éxito: el descifrado es el mensaje letra por letra.
 
 | Configuración | Éxito (IC 95 %) | p50 | p95 | Barrido p95 | ¿Cumple? |
 | --- | --- | --- | --- | --- | --- |
-| 60 órdenes, modo robusto | 60 de 60 (94 %–100 %) | 6,4 s | 9,8 s | 7,3 s | sí |
-| Rotores I, II y III (6 órdenes), modo robusto | 60 de 60 (94 %–100 %) | 1,3 s | 1,7 s | 0,8 s | sí |
-| Crib WETTERBERICHTXFUER, 60 órdenes, modo robusto | 59 de 60 (91 %–100 %) | 8,9 s | 10,4 s | 10,4 s | sí |
+| 60 órdenes, modo robusto | 30 de 30 (89 %–100 %) | 7,2 s | 11,0 s | 9,0 s | sí |
+| Rotores I, II y III (6 órdenes), modo robusto | 30 de 30 (89 %–100 %) | 1,3 s | 1,7 s | 0,8 s | sí |
+| Crib WETTERBERICHTXFUER, 60 órdenes, modo robusto | 29 de 30 (83 %–99 %) | 9,1 s | 11,0 s | 11,0 s | sí |
 
-- **Recomendada (la más simple con éxito ≥ 95% y p95 ≤ 30 s):** 60 órdenes, modo robusto: el compañero usa «Clave aleatoria» sin restricciones y empieza su mensaje por WETTERBERICHT (con X entre palabras). En la demo: «Rotores I a V (60 órdenes)», modo robusto. Éxito 100,0 %, p95 9,8 s.
+- **Recomendada (la más simple con éxito ≥ 95% y p95 ≤ 30 s):** 60 órdenes, modo robusto: el compañero usa «Clave aleatoria» sin restricciones y empieza su mensaje por WETTERBERICHT (con X entre palabras). En la demo: «Rotores I a V (60 órdenes)», modo robusto. Éxito 100,0 %, p95 11,0 s.
 - Estos tiempos son del equipo indicado. Este equipo es un escritorio; el presupuesto de 30 s es del portátil del autor (P-001): corre `make bench-demo` allí antes de ensayar y usa la configuración que recomiende.
 
 ## 4. Discrepancias
 
 Ninguna contradicción con las diapositivas ni con el guion. Notas:
 
+- Diapositivas 13 y 17: 929 y 1.062 letras son la aproximación de Wald, que ignora el sobrepaso de los umbrales. Con las mismas tasas, el valor exacto es 959,7 y 1.067,4, y la simulación lo confirma. Las cifras de la diapositiva siguen bien si se presentan como «según Wald».
+- Diapositiva 13 y guion («las letras se repiten 1 de cada 17 veces»): es la tasa del tráfico naval que da Wikipedia. Nuestro corpus literario repite 1 de cada 12,5 con la X como separador y 1 de cada 13,2 solo con letras. Con él, la profundidad se confirma en unas 332 letras con los pesos de Turing. No contradice la diapositiva: es otro texto.
+- Spec 5.6 («en profundidad … hasta que se mueve el rotor central»): con la máquina real los dos mensajes recorren la misma sucesión de estados, así que la profundidad dura todo el solapamiento. El rotor central decide si el desplazamiento verdadero es +δ o δ − 26 (D-042); por eso se prueban los desplazamientos de −25 a +25.
 - Diapositiva 16: la tabla de Turing cuenta «letras del menú» como letras distintas (vértices del grafo), igual que la diapositiva 11 (11 letras, 13 aristas). Con esa lectura, nuestra Bombe da 678 · 26,3 · 0,99 · 0,11 paradas falsas por orden con 12 letras y 0 a 3 lazos, frente a 820 · 31 · 1,2 · 0,04 de Turing. Si «letras» fueran aristas (letras del crib), no coincidirían (ver D-031).
 - Guion, diapositiva 16: «en los 60 órdenes quedan unas 2 paradas falsas en total; con dos lazos serían unas 72» son cifras de Turing (0,04 y 1,2 por 60). Nuestra Bombe da 6,6 y 59,4. El mensaje del guion se sostiene (con 3 lazos, unas pocas paradas en los 60 órdenes; con 2, decenas).
 - Verificador (spec 6.4, «siempre»): recupera una clave equivalente en 200 de 200 de los casos de la prueba, que se usaron para ajustar su diseño, y en 198 de 200 casos nuevos. Las 2 fallas tienen el plugboard exacto y difieren en una sola letra, la segunda o la última del mensaje: un doble paso del central justo en el borde que el texto no alcanza a decidir. La parada verdadera aparece siempre (400 de 400).
@@ -126,7 +141,6 @@ Ninguna contradicción con las diapositivas ni con el guion. Notas:
 
 ## 5. Pendientes
 
-- Fase 4 · Banburismus (E6): semana 3.
 - Fase 5 · Rejewski (E7) y ataque moderno (E8), opcionales: semana 3.
 - Fase 6 · modo demo completo, Docker, informe y entrega: fin de la semana 3.
 - Demo 2 · correr `make bench-demo` en el portátil del autor (P-001) y confirmar la configuración: antes de ensayar.

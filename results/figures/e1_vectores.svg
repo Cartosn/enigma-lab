@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
   "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="453.6pt" height="228.96pt" viewBox="0 0 453.6 228.96" xmlns="http://www.w3.org/2000/svg" version="1.1">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="365.94pt" height="208.3242pt" viewBox="0 0 365.94 208.3242" xmlns="http://www.w3.org/2000/svg" version="1.1">
  <metadata>
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2026-11-21T13:28:44.848894</dc:date>
+    <dc:date>2026-11-21T18:30:39.905724</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -21,67 +21,67 @@
  </defs>
  <g id="figure_1">
   <g id="patch_1">
-   <path d="M 0 228.96 
-L 453.6 228.96 
-L 453.6 0 
+   <path d="M 0 208.3242 
+L 365.94 208.3242 
+L 365.94 0 
 L 0 0 
 z
 " style="fill: #ffffff"/>
   </g>
   <g id="axes_1">
    <g id="line2d_1">
-    <path d="M 56.7 57.988523 
-L 408.24 57.988523 
-" clip-path="url(#p97aa0ac681)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
+    <path d="M 7.2 55.338323 
+L 358.74 55.338323 
+" clip-path="url(#pdbdbc7f6ed)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
    </g>
    <g id="line2d_2">
-    <path d="M 56.7 74.940369 
-L 408.24 74.940369 
-" clip-path="url(#p97aa0ac681)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
+    <path d="M 7.2 72.290169 
+L 358.74 72.290169 
+" clip-path="url(#pdbdbc7f6ed)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
    </g>
    <g id="line2d_3">
-    <path d="M 56.7 91.892215 
-L 408.24 91.892215 
-" clip-path="url(#p97aa0ac681)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
+    <path d="M 7.2 89.242015 
+L 358.74 89.242015 
+" clip-path="url(#pdbdbc7f6ed)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
    </g>
    <g id="line2d_4">
-    <path d="M 56.7 108.844062 
-L 408.24 108.844062 
-" clip-path="url(#p97aa0ac681)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
+    <path d="M 7.2 106.193862 
+L 358.74 106.193862 
+" clip-path="url(#pdbdbc7f6ed)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
    </g>
    <g id="line2d_5">
-    <path d="M 56.7 125.795908 
-L 408.24 125.795908 
-" clip-path="url(#p97aa0ac681)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
+    <path d="M 7.2 123.145708 
+L 358.74 123.145708 
+" clip-path="url(#pdbdbc7f6ed)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
    </g>
    <g id="line2d_6">
-    <path d="M 56.7 142.747754 
-L 408.24 142.747754 
-" clip-path="url(#p97aa0ac681)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
+    <path d="M 7.2 140.097554 
+L 358.74 140.097554 
+" clip-path="url(#pdbdbc7f6ed)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
    </g>
    <g id="line2d_7">
-    <path d="M 56.7 159.6996 
-L 408.24 159.6996 
-" clip-path="url(#p97aa0ac681)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
+    <path d="M 7.2 157.0494 
+L 358.74 157.0494 
+" clip-path="url(#pdbdbc7f6ed)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
    </g>
    <g id="line2d_8">
-    <path d="M 56.7 176.651446 
-L 408.24 176.651446 
-" clip-path="url(#p97aa0ac681)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
+    <path d="M 7.2 174.001246 
+L 358.74 174.001246 
+" clip-path="url(#pdbdbc7f6ed)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
    </g>
    <g id="line2d_9">
-    <path d="M 56.7 193.603292 
-L 408.24 193.603292 
-" clip-path="url(#p97aa0ac681)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
+    <path d="M 7.2 190.953092 
+L 358.74 190.953092 
+" clip-path="url(#pdbdbc7f6ed)" style="fill: none; stroke: #e6e9ec; stroke-width: 0.5; stroke-linecap: round"/>
    </g>
    <g id="line2d_10">
-    <path d="M 56.7 41.036677 
-L 408.24 41.036677 
-" clip-path="url(#p97aa0ac681)" style="fill: none; stroke: #d0d7de; stroke-width: 0.8; stroke-linecap: round"/>
+    <path d="M 7.2 38.386477 
+L 358.74 38.386477 
+" clip-path="url(#pdbdbc7f6ed)" style="fill: none; stroke: #d0d7de; stroke-width: 0.8; stroke-linecap: round"/>
    </g>
    <g id="text_1">
     <!-- Prueba -->
-    <g style="fill: #59636e" transform="translate(56.7 34.255938) scale(0.09 -0.09)">
+    <g style="fill: #59636e" transform="translate(7.2 31.605738) scale(0.09 -0.09)">
      <defs>
       <path id="Inter-Regular-177" d="M 563 0 
 L 563 4656 
@@ -266,7 +266,7 @@ z
    </g>
    <g id="text_2">
     <!-- Esperado (y obtenido) -->
-    <g style="fill: #59636e" transform="translate(221.9238 34.255938) scale(0.09 -0.09)">
+    <g style="fill: #59636e" transform="translate(172.4238 31.605738) scale(0.09 -0.09)">
      <defs>
       <path id="Inter-Regular-5f" d="M 563 0 
 L 563 4656 
@@ -549,7 +549,7 @@ z
    </g>
    <g id="text_3">
     <!-- Resultado -->
-    <g style="fill: #59636e" transform="translate(359.0244 34.255938) scale(0.09 -0.09)">
+    <g style="fill: #59636e" transform="translate(309.5244 31.605738) scale(0.09 -0.09)">
      <defs>
       <path id="Inter-Regular-180" d="M 563 0 
 L 563 4656 
@@ -598,7 +598,7 @@ z
    </g>
    <g id="text_4">
     <!-- AAAAA con I-II-III y anillos AAA -->
-    <g style="fill: #1f2328" transform="translate(56.7 52.604641) scale(0.085 -0.085)">
+    <g style="fill: #1f2328" transform="translate(7.2 49.954441) scale(0.085 -0.085)">
      <defs>
       <path id="Inter-Regular-2" d="M 163 0 
 L 1853 4656 
@@ -696,7 +696,7 @@ z
    </g>
    <g id="text_5">
     <!-- BDZGO -->
-    <g style="fill: #1f2328" transform="translate(221.9238 52.2126) scale(0.075 -0.075)">
+    <g style="fill: #1f2328" transform="translate(172.4238 49.5624) scale(0.075 -0.075)">
      <defs>
       <path id="JetBrainsMono-Regular-1a" d="M 595 0 
 L 595 4672 
@@ -830,7 +830,7 @@ z
    </g>
    <g id="text_6">
     <!-- ✓ coincide -->
-    <g style="fill: #57ab5a" transform="translate(359.0244 52.604641) scale(0.085 -0.085)">
+    <g style="fill: #57ab5a" transform="translate(309.5244 49.954441) scale(0.085 -0.085)">
      <defs>
       <path id="Inter-Regular-732" d="M 694 2091 
 L 1059 2466 
@@ -856,7 +856,7 @@ z
    </g>
    <g id="text_7">
     <!-- Lo mismo con anillos BBB -->
-    <g style="fill: #1f2328" transform="translate(56.7 69.556487) scale(0.085 -0.085)">
+    <g style="fill: #1f2328" transform="translate(7.2 66.906287) scale(0.085 -0.085)">
      <defs>
       <path id="Inter-Regular-119" d="M 563 0 
 L 563 4656 
@@ -965,7 +965,7 @@ z
    </g>
    <g id="text_8">
     <!-- EWTYX -->
-    <g style="fill: #1f2328" transform="translate(221.9238 69.164446) scale(0.075 -0.075)">
+    <g style="fill: #1f2328" transform="translate(172.4238 66.514246) scale(0.075 -0.075)">
      <defs>
       <path id="JetBrainsMono-Regular-25" d="M 640 0 
 L 640 4672 
@@ -1070,7 +1070,7 @@ z
    </g>
    <g id="text_9">
     <!-- ✓ coincide -->
-    <g style="fill: #57ab5a" transform="translate(359.0244 69.556487) scale(0.085 -0.085)">
+    <g style="fill: #57ab5a" transform="translate(309.5244 66.906287) scale(0.085 -0.085)">
      <use xlink:href="#Inter-Regular-732"/>
      <use xlink:href="#Inter-Regular-6f1" transform="translate(88.421875 0)"/>
      <use xlink:href="#Inter-Regular-24a" transform="translate(116.546875 0)"/>
@@ -1085,7 +1085,7 @@ z
    </g>
    <g id="text_10">
     <!-- Doble paso desde ADU -->
-    <g style="fill: #1f2328" transform="translate(56.7 86.508333) scale(0.085 -0.085)">
+    <g style="fill: #1f2328" transform="translate(7.2 83.858133) scale(0.085 -0.085)">
      <defs>
       <path id="Inter-Regular-54" d="M 2016 0 
 L 563 0 
@@ -1154,7 +1154,7 @@ z
    </g>
    <g id="text_11">
     <!-- ADU → ADV → AEW → BFX → BFY -->
-    <g style="fill: #1f2328" transform="translate(221.9238 86.116292) scale(0.075 -0.075)">
+    <g style="fill: #1f2328" transform="translate(172.4238 83.466092) scale(0.075 -0.075)">
      <defs>
       <path id="JetBrainsMono-Regular-1" d="M 320 0 
 L 1536 4672 
@@ -1268,7 +1268,7 @@ z
    </g>
    <g id="text_12">
     <!-- ✓ coincide -->
-    <g style="fill: #57ab5a" transform="translate(359.0244 86.508333) scale(0.085 -0.085)">
+    <g style="fill: #57ab5a" transform="translate(309.5244 83.858133) scale(0.085 -0.085)">
      <use xlink:href="#Inter-Regular-732"/>
      <use xlink:href="#Inter-Regular-6f1" transform="translate(88.421875 0)"/>
      <use xlink:href="#Inter-Regular-24a" transform="translate(116.546875 0)"/>
@@ -1283,7 +1283,7 @@ z
    </g>
    <g id="text_13">
     <!-- Ejemplo de py-enigma (10 cables) -->
-    <g style="fill: #1f2328" transform="translate(56.7 103.460179) scale(0.085 -0.085)">
+    <g style="fill: #1f2328" transform="translate(7.2 100.809979) scale(0.085 -0.085)">
      <defs>
       <path id="Inter-Regular-2cf" d="M 491 3494 
 L 1056 3494 
@@ -1441,7 +1441,7 @@ z
    </g>
    <g id="text_14">
     <!-- BLA → THEXRUSSIANSXAREXCOMINGX -->
-    <g style="fill: #1f2328" transform="translate(221.9238 103.068138) scale(0.075 -0.075)">
+    <g style="fill: #1f2328" transform="translate(172.4238 100.417938) scale(0.075 -0.075)">
      <defs>
       <path id="JetBrainsMono-Regular-53" d="M 832 0 
 L 832 4672 
@@ -1638,7 +1638,7 @@ z
    </g>
    <g id="text_15">
     <!-- ✓ coincide -->
-    <g style="fill: #57ab5a" transform="translate(359.0244 103.460179) scale(0.085 -0.085)">
+    <g style="fill: #57ab5a" transform="translate(309.5244 100.809979) scale(0.085 -0.085)">
      <use xlink:href="#Inter-Regular-732"/>
      <use xlink:href="#Inter-Regular-6f1" transform="translate(88.421875 0)"/>
      <use xlink:href="#Inter-Regular-24a" transform="translate(116.546875 0)"/>
@@ -1653,7 +1653,7 @@ z
    </g>
    <g id="text_16">
     <!-- Periodo de los rotores I-II-III -->
-    <g style="fill: #1f2328" transform="translate(56.7 120.412026) scale(0.085 -0.085)">
+    <g style="fill: #1f2328" transform="translate(7.2 117.761826) scale(0.085 -0.085)">
      <use xlink:href="#Inter-Regular-177"/>
      <use xlink:href="#Inter-Regular-266" transform="translate(63.34375 0)"/>
      <use xlink:href="#Inter-Regular-354" transform="translate(121.640625 0)"/>
@@ -1689,7 +1689,7 @@ z
    </g>
    <g id="text_17">
     <!-- periodo 16.900; 676 fuera del… -->
-    <g style="fill: #1f2328" transform="translate(221.9238 120.019985) scale(0.075 -0.075)">
+    <g style="fill: #1f2328" transform="translate(172.4238 117.369785) scale(0.075 -0.075)">
      <defs>
       <path id="JetBrainsMono-Regular-13d" d="M 589 -1152 
 L 589 3520 
@@ -2162,7 +2162,7 @@ z
    </g>
    <g id="text_18">
     <!-- ✓ coincide -->
-    <g style="fill: #57ab5a" transform="translate(359.0244 120.412026) scale(0.085 -0.085)">
+    <g style="fill: #57ab5a" transform="translate(309.5244 117.761826) scale(0.085 -0.085)">
      <use xlink:href="#Inter-Regular-732"/>
      <use xlink:href="#Inter-Regular-6f1" transform="translate(88.421875 0)"/>
      <use xlink:href="#Inter-Regular-24a" transform="translate(116.546875 0)"/>
@@ -2177,7 +2177,7 @@ z
    </g>
    <g id="text_19">
     <!-- Traza de la primera letra (diapo… -->
-    <g style="fill: #1f2328" transform="translate(56.7 137.363872) scale(0.085 -0.085)">
+    <g style="fill: #1f2328" transform="translate(7.2 134.713672) scale(0.085 -0.085)">
      <defs>
       <path id="Inter-Regular-19b" d="M 306 4131 
 L 306 4656 
@@ -2274,7 +2274,7 @@ z
    </g>
    <g id="text_20">
     <!-- A → A → C → D → F → S → S → E… -->
-    <g style="fill: #1f2328" transform="translate(221.9238 136.971831) scale(0.075 -0.075)">
+    <g style="fill: #1f2328" transform="translate(172.4238 134.321631) scale(0.075 -0.075)">
      <use xlink:href="#JetBrainsMono-Regular-1"/>
      <use xlink:href="#JetBrainsMono-Regular-3be" transform="translate(60 0)"/>
      <use xlink:href="#JetBrainsMono-Regular-473" transform="translate(120 0)"/>
@@ -2309,7 +2309,7 @@ z
    </g>
    <g id="text_21">
     <!-- ✓ coincide -->
-    <g style="fill: #57ab5a" transform="translate(359.0244 137.363872) scale(0.085 -0.085)">
+    <g style="fill: #57ab5a" transform="translate(309.5244 134.713672) scale(0.085 -0.085)">
      <use xlink:href="#Inter-Regular-732"/>
      <use xlink:href="#Inter-Regular-6f1" transform="translate(88.421875 0)"/>
      <use xlink:href="#Inter-Regular-24a" transform="translate(116.546875 0)"/>
@@ -2324,7 +2324,7 @@ z
    </g>
    <g id="text_22">
     <!-- Mensaje de la portada (diapositi… -->
-    <g style="fill: #1f2328" transform="translate(56.7 154.315718) scale(0.085 -0.085)">
+    <g style="fill: #1f2328" transform="translate(7.2 151.665518) scale(0.085 -0.085)">
      <defs>
       <path id="Inter-Regular-124" d="M 563 0 
 L 563 4656 
@@ -2392,7 +2392,7 @@ z
    </g>
    <g id="text_23">
     <!-- LGNEVYPYZQDVKESNPUYYQVWSKYNZJ… -->
-    <g style="fill: #1f2328" transform="translate(221.9238 153.923677) scale(0.075 -0.075)">
+    <g style="fill: #1f2328" transform="translate(172.4238 151.273477) scale(0.075 -0.075)">
      <defs>
       <path id="JetBrainsMono-Regular-7a" d="M 589 0 
 L 589 4672 
@@ -2511,7 +2511,7 @@ z
    </g>
    <g id="text_24">
     <!-- ✓ coincide -->
-    <g style="fill: #57ab5a" transform="translate(359.0244 154.315718) scale(0.085 -0.085)">
+    <g style="fill: #57ab5a" transform="translate(309.5244 151.665518) scale(0.085 -0.085)">
      <use xlink:href="#Inter-Regular-732"/>
      <use xlink:href="#Inter-Regular-6f1" transform="translate(88.421875 0)"/>
      <use xlink:href="#Inter-Regular-24a" transform="translate(116.546875 0)"/>
@@ -2526,7 +2526,7 @@ z
    </g>
    <g id="text_25">
     <!-- Caso de respaldo de la Bombe -->
-    <g style="fill: #1f2328" transform="translate(56.7 171.267564) scale(0.085 -0.085)">
+    <g style="fill: #1f2328" transform="translate(7.2 168.617364) scale(0.085 -0.085)">
      <defs>
       <path id="Inter-Regular-49" d="M 2447 -63 
 Q 1850 -63 1383 226 
@@ -2590,7 +2590,7 @@ z
    </g>
    <g id="text_26">
     <!-- ICGWNXTXINRGBWMLPFTAXFNLHILVE… -->
-    <g style="fill: #1f2328" transform="translate(221.9238 170.875523) scale(0.075 -0.075)">
+    <g style="fill: #1f2328" transform="translate(172.4238 168.225323) scale(0.075 -0.075)">
      <use xlink:href="#JetBrainsMono-Regular-43"/>
      <use xlink:href="#JetBrainsMono-Regular-1b" transform="translate(60 0)"/>
      <use xlink:href="#JetBrainsMono-Regular-39" transform="translate(120 0)"/>
@@ -2625,7 +2625,7 @@ z
    </g>
    <g id="text_27">
     <!-- ✓ coincide -->
-    <g style="fill: #57ab5a" transform="translate(359.0244 171.267564) scale(0.085 -0.085)">
+    <g style="fill: #57ab5a" transform="translate(309.5244 168.617364) scale(0.085 -0.085)">
      <use xlink:href="#Inter-Regular-732"/>
      <use xlink:href="#Inter-Regular-6f1" transform="translate(88.421875 0)"/>
      <use xlink:href="#Inter-Regular-24a" transform="translate(116.546875 0)"/>
@@ -2640,7 +2640,7 @@ z
    </g>
    <g id="text_28">
     <!-- Mensaje real del U-264 (M4, 25-1… -->
-    <g style="fill: #1f2328" transform="translate(56.7 188.21941) scale(0.085 -0.085)">
+    <g style="fill: #1f2328" transform="translate(7.2 185.56921) scale(0.085 -0.085)">
      <defs>
       <path id="Inter-Regular-53f" d="M 481 0 
 L 481 428 
@@ -2807,7 +2807,7 @@ z
    </g>
    <g id="text_29">
     <!-- VONVONJLOOKSJHFFTTTEINSEINSDR… -->
-    <g style="fill: #1f2328" transform="translate(221.9238 187.827369) scale(0.075 -0.075)">
+    <g style="fill: #1f2328" transform="translate(172.4238 185.177169) scale(0.075 -0.075)">
      <use xlink:href="#JetBrainsMono-Regular-a1"/>
      <use xlink:href="#JetBrainsMono-Regular-60" transform="translate(60 0)"/>
      <use xlink:href="#JetBrainsMono-Regular-5a" transform="translate(120 0)"/>
@@ -2842,7 +2842,7 @@ z
    </g>
    <g id="text_30">
     <!-- ✓ coincide -->
-    <g style="fill: #57ab5a" transform="translate(359.0244 188.21941) scale(0.085 -0.085)">
+    <g style="fill: #57ab5a" transform="translate(309.5244 185.56921) scale(0.085 -0.085)">
      <use xlink:href="#Inter-Regular-732"/>
      <use xlink:href="#Inter-Regular-6f1" transform="translate(88.421875 0)"/>
      <use xlink:href="#Inter-Regular-24a" transform="translate(116.546875 0)"/>
@@ -2857,7 +2857,7 @@ z
    </g>
    <g id="text_31">
     <!-- E1 · Los 9 vectores de la sección 6.1: 9 coinciden -->
-    <g style="fill: #1f2328" transform="translate(56.7 21.4752) scale(0.12 -0.12)">
+    <g style="fill: #1f2328" transform="translate(7.2 18.825) scale(0.12 -0.12)">
      <defs>
       <path id="Inter-SemiBold-5f" d="M 469 0 
 L 469 4656 
@@ -3390,8 +3390,8 @@ z
   </g>
  </g>
  <defs>
-  <clipPath id="p97aa0ac681">
-   <rect x="56.7" y="27.4752" width="351.54" height="176.2992"/>
+  <clipPath id="pdbdbc7f6ed">
+   <rect x="7.2" y="24.825" width="351.54" height="176.2992"/>
   </clipPath>
  </defs>
 </svg>
