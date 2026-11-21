@@ -257,11 +257,13 @@ def _slide_16(e5: dict[str, Any], table: pd.DataFrame | None) -> list[str]:
         if on[k + 1]["paradas_media"] > 0
     ]
     if ratios:
+        few = round(on[3]["paradas_media"] * n)
         lines.append(
             "- **Cada lazo divide las paradas** por "
             + ", ".join(fmt_dec(r, 1) for r in ratios)
             + " (de 0 a 1, de 1 a 2 y de 2 a 3 lazos; Turing: por unas 26). Con las letras "
-            "fijas, un lazo más es una arista más con las mismas letras."
+            "fijas, un lazo más es una arista más con las mismas letras. Con 3 lazos hubo "
+            f"solo {few} paradas falsas en {n} menús, así que el último cociente es impreciso."
         )
     if all(c is not None for c in off):
         lines.append(
@@ -276,12 +278,14 @@ def _slide_16(e5: dict[str, Any], table: pd.DataFrame | None) -> list[str]:
     )
     exact = within[within["turing_cota"] == ""]
     if len(exact):
-        ratio = exact["paradas_media"].clip(lower=1e-9) / exact["turing"]
+        # Turing cuenta hipótesis abiertas (ver «Pocas letras y sin lazos»).
+        ratio = exact["hipotesis_media"].clip(lower=1e-9) / exact["turing"]
         close = int(((ratio >= 0.5) & (ratio <= 2)).sum())
         lines.append(
             f"- **Toda la tabla de Turing** (8 a 16 letras): en {close} de {len(exact)} celdas "
-            "con valor exacto, la media medida está entre la mitad y el doble de la de Turing. "
-            "Detalle por celda en `r3_bombe.csv` (columnas `turing` y `hipotesis_media`)."
+            "con valor exacto, las hipótesis abiertas por orden que medimos están entre la "
+            "mitad y el doble de la estimación de Turing. Detalle por celda en "
+            "`r3_bombe.csv` (columnas `paradas_media`, `hipotesis_media` y `turing`)."
         )
     eight = _cell(table, 8, 0, "si", "bletchley")
     if eight is not None:
@@ -313,9 +317,12 @@ def _slide_16(e5: dict[str, Any], table: pd.DataFrame | None) -> list[str]:
             else "."
         )
     )
+    factors = [c["paradas_media"] / c["turing"] for c in on if c["turing"] > 0]
     lines.append(
         "- **«Letras» son vértices** (P-002, D-031): las letras distintas del menú. Con esa "
-        "lectura la columna de 12 letras coincide con Turing; contando aristas no."
+        f"lectura la columna de 12 letras queda cerca de la de Turing (entre "
+        f"{fmt_dec(min(factors), 1)} y {fmt_dec(max(factors), 1)} veces su valor); contando "
+        "aristas no."
     )
     return lines
 
@@ -436,6 +443,13 @@ def _discrepancies(
                 + " paradas falsas por orden con 12 letras y 0 a 3 lazos, frente a 820 · 31 · "
                 "1,2 · 0,04 de Turing. Si «letras» fueran aristas (letras del crib), no "
                 "coincidirían (ver D-031)."
+            )
+            lines.append(
+                "- Guion, diapositiva 16: «en los 60 órdenes quedan unas 2 paradas falsas en "
+                "total; con dos lazos serían unas 72» son cifras de Turing (0,04 y 1,2 por 60). "
+                f"Nuestra Bombe da {_stops(60 * on[3]['paradas_media'])} y "
+                f"{_stops(60 * on[2]['paradas_media'])}. El mensaje del guion se sostiene "
+                "(con 3 lazos, unas pocas paradas en los 60 órdenes; con 2, decenas)."
             )
     lines.append(
         "- Verificador (spec 6.4, «siempre»): recupera una clave equivalente en 200 de 200 de "
