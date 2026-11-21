@@ -14,12 +14,14 @@ import pandas as pd
 import streamlit as st
 
 from enigma_lab import SEED, paths
+from enigma_lab.banburismus.sprt import exact_turing
 from enigma_lab.experiments import (
     e1_validation,
     e2_keyspace,
     e3_statistics,
     e4_cribs,
     e5_bombe,
+    e6_banburismus,
 )
 from enigma_lab.experiments.common import read_summary
 from enigma_lab.viz import plotly_figs
@@ -65,9 +67,18 @@ INFO: dict[str, dict[str, str]] = {
         "referencia": "Tabla de Turing (Wikipedia «Bombe»): con 12 letras, 820, 31, 1,2 y 0,04 "
         "paradas por orden con 0, 1, 2 y 3 lazos.",
     },
+    "e6": {
+        "tab": "E6 · Banburismus",
+        "pregunta": "¿Cuánto solapamiento necesita el Banburismus?",
+        "metodo": "Pares de mensajes en profundidad cifrados con la máquina real (misma clave "
+        "diaria, claves de mensaje que solo difieren en el rotor derecho), con texto de tasa 1/17 "
+        "o alemán del corpus. El SPRT de Wald con letras sueltas o multigramas, en el "
+        "desplazamiento verdadero y en uno falso: aciertos, letras hasta decidir y curva ROC.",
+        "referencia": "Aproximación de Wald con letras sueltas y tasas 1/17 y 1/26 (Wikipedia "
+        "«Banburismus»): 929 letras en profundidad y 1.062 al azar.",
+    },
 }
 PENDING = {
-    "e6": ("E6 · Banburismus", 4),
     "e7": ("E7 · Rejewski", 5),
     "e8": ("E8 · Ataque moderno", 5),
 }
@@ -93,6 +104,9 @@ def _run_quick(experiment: str) -> dict[str, Any]:
         return {"df": e4_cribs.run(e4_cribs.PARAMS["rapido"], SEED)}
     if experiment == "e5":
         return {"df": e5_bombe.run(e5_bombe.PARAMS["rapido"], SEED)}
+    if experiment == "e6":
+        df, paths = e6_banburismus.run_with_trajectories(e6_banburismus.PARAMS["rapido"], SEED)
+        return {"df": df, "trayectorias": paths}
     return {"df": e2_keyspace.run()}
 
 
@@ -321,6 +335,58 @@ for tab, (experiment, info) in zip(tabs, INFO.items(), strict=False):
             )
             st.dataframe(table, hide_index=True, width="stretch")
             _downloads("e5_bombe", table, e5_bombe.figure(df))
+
+        elif experiment == "e6":
+            df = quick["df"] if quick else _saved("e6_banburismus_pruebas")
+            if df is None:
+                st.info("Aún no hay resultados guardados: corre  make reproduce.")
+                continue
+            trajectories = quick["trayectorias"] if quick else _saved("e6_banburismus_trayectorias")
+            corpus = "muestra" if quick else summary.get("e6", {}).get("corpus", "completo")
+            saved_table = None if quick else _saved("e6_banburismus")
+            table = saved_table if saved_table is not None else e6_banburismus.aggregate(df, corpus)
+            st.plotly_chart(
+                plotly_figs.e6_letters(table, demo),
+                theme=None,
+                config=plotly_figs.plotly_config(),
+                width="stretch",
+            )
+            exact = {h: exact_turing(0.01, h == "profundidad") for h in ("profundidad", "azar")}
+            st.caption(
+                f"Cálculo exacto con tasa 1/17 (sin simulación): "
+                f"{fmt_dec(exact['profundidad'].letters, 1)} letras en profundidad y "
+                f"{fmt_dec(exact['azar'].letters, 1)} al azar. La diferencia con Wald es el "
+                f"sobrepaso: arriba, el puntaje pasa el umbral por "
+                f"{fmt_dec(exact['profundidad'].overshoot_upper, 2)} dB en promedio; abajo, por "
+                f"{fmt_dec(exact['azar'].overshoot_lower, 3)} dB."
+            )
+            st.plotly_chart(
+                plotly_figs.e6_identification(table, demo),
+                theme=None,
+                config=plotly_figs.plotly_config(),
+                width="stretch",
+            )
+            mark = e6_banburismus.ROC_OVERLAP
+            curves = []
+            for text, keys in e6_banburismus.SOURCES.items():
+                for key in keys:
+                    group = df[(df["fuente"] == text) & (df["puntuacion"] == key)]
+                    depth, chance = e6_banburismus.scores_at(group, mark)
+                    fpr, tpr = e6_banburismus.roc_points(depth, chance)
+                    label = e6_banburismus.SHORT_LABELS[e6_banburismus.combo(text, key)]
+                    curves.append((label, fpr, tpr, e6_banburismus.auc(depth, chance)))
+            st.plotly_chart(
+                plotly_figs.roc_curves(curves, mark, demo),
+                theme=None,
+                config=plotly_figs.plotly_config(),
+                width="stretch",
+            )
+            st.dataframe(table, hide_index=True, width="stretch")
+            _downloads(
+                "e6_banburismus",
+                table,
+                e6_banburismus.figure(df, trajectories=trajectories, corpus=corpus),
+            )
 
 for tab, (name, phase) in zip(tabs[len(INFO) :], PENDING.values(), strict=True):
     with tab:

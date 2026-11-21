@@ -7,16 +7,19 @@ necesita cada ataque?** Enigma Lab es una app que simula la máquina Enigma, la 
 Turing-Welchman y experimentos estadísticos sobre los ataques. Sirve para la demo en
 vivo de la presentación y produce las cifras de sus diapositivas.
 
-> **Estado:** fase 3 de 6 cerrada.
+> **Estado:** fase 4 de 6 cerrada.
 > - **Núcleo:** Enigma I, M3 y M4 validadas contra los vectores publicados, py-enigma
 >   (10.000 claves) y CyberChef.
 > - **Estadística:** del idioma, con un corpus de Gutenberg.
 > - **Cribs y menús:** arrastre del crib y menú de la Bombe.
 > - **Bombe:** union-find en Numba, con diagonal board, modos Bletchley y robusto, y un
 >   verificador que recupera la clave; validada contra CyberChef y la tabla de Turing.
-> - **Experimentos:** E1 a E5.
-> - **App:** páginas Máquina, Espacio de claves, Estadística, Cribs y menús, La Bombe y
->   Experimentos.
+> - **Banburismus:** mensajes en profundidad cifrados con la máquina, decibanes con letras
+>   sueltas o multigramas y la prueba secuencial de Wald, simulada y calculada de forma
+>   exacta.
+> - **Experimentos:** E1 a E6.
+> - **App:** páginas Máquina, Espacio de claves, Estadística, Cribs y menús, La Bombe,
+>   Banburismus y Experimentos.
 >
 > El detalle está en [`docs/PROGRESS.md`](docs/PROGRESS.md).
 
@@ -35,7 +38,7 @@ todos los objetivos.
 
 `make reproduce` hace tres cosas:
 1. descarga el corpus completo (`make corpus`, con SHA-256 verificado);
-2. corre los experimentos E1 a E5 en modo completo, con semilla 2026;
+2. corre los experimentos E1 a E6 en modo completo, con semilla 2026;
 3. arma `results/presentacion/`.
 
 `make resumen` rehace el resumen sin volver a correr nada. Sin internet, `make rapido`

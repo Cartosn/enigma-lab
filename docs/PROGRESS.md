@@ -1,6 +1,6 @@
 # Progreso
 
-Última actualización: 21-11-2026 · fase 3 cerrada.
+Última actualización: 21-11-2026 · fase 4 cerrada.
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
@@ -8,9 +8,101 @@
 | 1 · Núcleo Enigma | Cerrada (20-11-2026) | 1 |
 | 2 · Estadística y cribs | Cerrada (20-11-2026) | 1–2 (reunión con el profe) |
 | 3 · Bombe | Cerrada (21-11-2026) | 2 |
-| 4 · Banburismus | Siguiente | 3 |
-| 5 · Extensiones P2 | Pendiente | 3 |
+| 4 · Banburismus | Cerrada (21-11-2026) | 3 |
+| 5 · Extensiones P2 | Siguiente (opcional) | 3 |
 | 6 · Pulido y entrega | Pendiente | Fin de la 3 |
+
+## Fase 4 · Banburismus
+
+**Criterio de aceptación:** se cumple.
+
+| Criterio | Resultado |
+| --- | --- |
+| Simulación del SPRT comparada con la aproximación de Wald (929 y 1.062 letras) | E6, con letras sueltas, tasa 1/17 y la máquina real (2.000 pares): 983 letras en profundidad (IC 95 % 954–1.012) y 1.090 al azar (1.061–1.120) |
+| La diferencia, explicada | Es el sobrepaso de los umbrales. El cálculo exacto da 959,7 y 1.067,4, dentro de los dos IC. En profundidad, 30,7 de las 30,9 letras de diferencia con Wald salen del sobrepaso de arriba, de 0,65 dB en promedio. Al azar, la diferencia es de 5,1 letras: 2,4 por el sobrepaso de abajo y 2,9 porque el error real (0,86 %) queda bajo el 1 % (D-048) |
+
+`make test` da 281 pruebas que pasan y 1 cifra pendiente (fase 5), en 1 min 45 s, con las
+lentas incluidas. `make lint` pasa sin errores. `make reproduce` completo (corpus y E1 a E6)
+tarda 4 min 20 s en este equipo; E6, 46 s.
+
+**Qué quedó:**
+- **`banburismus/`:**
+  - `depth.py`:
+    - pares de mensajes en profundidad, cifrados con la máquina por lotes;
+    - el desplazamiento verdadero, que sale de comparar los estados de la máquina (D-042);
+    - texto sintético con tasa 1/17, o fragmentos del corpus que no se solapan.
+  - `scoring.py`: decibanes de Turing, modelo de rachas para bigramas, trigramas y
+    tetragramas medido en el corpus (D-044), puntaje por desplazamiento y trayectorias.
+  - `sprt.py`:
+    - umbrales y aproximación de Wald;
+    - cálculo exacto con sobrepaso y su descomposición (D-048);
+    - el SPRT en Numba, con una versión en Python para las pruebas.
+- **E6:**
+  - *Factores:* dos fuentes de texto, cuatro puntuaciones, tres umbrales y solapamientos de
+    25 a 10.000 letras.
+  - *Medidas:* aciertos, letras hasta decidir, identificación del desplazamiento y curvas
+    ROC (D-045).
+- **Resumen y cifras:**
+  - la sección de la diapositiva 17 y `r4_banburismus.csv`;
+  - `r4_roc.csv` y `r4_trayectorias.csv`, para dibujarla (D-046);
+  - seis cifras nuevas en `cifras.py` (diapositivas 13 y 17).
+- **App:**
+  - página Banburismus: dos mensajes con el desplazamiento oculto, decibanes por
+    desplazamiento, trayectorias con los umbrales, las cuatro puntuaciones y la curva ROC;
+  - pestaña E6 en Experimentos;
+  - las dos revisadas en el navegador.
+- **`save_figure`** guarda el PNG a 2x (D-047); antes salía a 1x.
+- **Documentos:**
+  - guía de estudio: el tema 5 y «¿Qué es un decibán?»;
+  - VALIDACION y DECISIONES (D-042 a D-048);
+  - ARQUITECTURA y FUENTES: Wikipedia «Banburismus» y Wald (1945);
+  - README.
+
+**Cifras obtenidas** (modo completo, semilla 2026, 2.000 pares por fuente):
+- **Turing:**
+  - +1,845 dB por repetición y −0,093 por no repetición;
+  - +0,0211 y −0,0184 dB por letra;
+  - umbrales de ±19,96 dB;
+  - Wald: 929 y 1.062 letras.
+
+  Las seis cifras coinciden con las diapositivas 13 y 17.
+- **SPRT con letras sueltas y tasa 1/17:**
+  - *Simulación:* 983 letras en profundidad y 1.090 al azar, con errores de 1,1 % y 1,2 %.
+  - *Cálculo exacto:* 959,7 y 1.067,4, con errores de 0,99 % y 0,86 %.
+  - *Sobrepaso medio:* 0,65 dB arriba y 0,045 abajo.
+- **Tasa de repetición del corpus:**
+  - 0,0802 con la X (1 de cada 12,5) y 0,0757 sin ella (1 de cada 13,2), frente a
+    1/17 = 0,0588;
+  - medida con la máquina, en profundidad, 1 de cada 12,5, y al azar, 1 de cada 26.
+- **Alemán real, con α = β = 1 %** (letras hasta decidir):
+
+  | Puntuación | En profundidad | Al azar | Errores |
+  | --- | --- | --- | --- |
+  | Letras sueltas, tasa 1/17 (Turing) | 332 | 1.090 | 0 % y 0,65 % |
+  | Letras sueltas, tasa del corpus | 262 | 323 | 1,8 % y 0,55 % |
+  | Bigramas y trigramas | 254 | 357 | 1,15 % y 0,75 % |
+  | Hasta tetragramas | 254 | 357 | 1,15 % y 0,75 % |
+
+  Con texto real, la profundidad se confirma mucho antes que con 1/17. Los multigramas no
+  aceleran mucho frente a letras sueltas con la tasa del corpus, pero dejan el error en
+  torno al 1 %: las repeticiones del texto real vienen en racimos.
+- **Identificación del desplazamiento.** El verdadero gana entre los 51 en esta fracción de
+  pares, con 100, 200 y 400 letras de solapamiento:
+  - alemán, letras sueltas: 39 %, 64 % y 88 %;
+  - alemán, bigramas y trigramas: 42 %, 67 % y 90 %;
+  - tasa 1/17: 13 %, 22 % y 40 %.
+- **AUC con 200 letras:** 0,824 con tasa 1/17; 0,953 en alemán con letras sueltas y 0,956
+  con bigramas y trigramas.
+- **Cifras de la presentación:** 43 de 43 coinciden; la de Kuhl llega en la fase 5.
+
+**Qué falta (fase 5, P2, solo si alcanza el tiempo):** Rejewski (E7) y el ataque moderno
+(E8). Después, la fase 6: modo demo completo, Docker, informe y entrega.
+
+**Pendiente del autor:**
+- actualizar con `results/presentacion/` las diapositivas 13 y 17;
+- correr `make bench-demo` en el portátil y confirmar la configuración de la demo 2
+  (P-001);
+- crear el repositorio remoto.
 
 ## Fase 3 · Bombe
 

@@ -41,6 +41,24 @@ def test_keyspace_page_figures() -> None:
     assert re.match(r"70,2\s%", values["Parte del plugboard"])
 
 
+def test_banburismus_page_shows_turing_figures_and_finds_the_offset() -> None:
+    """Cifras de las diapositivas 13 y 17; con 1.500 letras gana el desplazamiento verdadero."""
+    page = str(paths.APP / "pages" / "banburismus.py")
+    app = AppTest.from_file(page, default_timeout=120).run()
+    assert not app.exception
+    values = {m.label: m.value for m in app.metric}
+    assert values["Repetición (1/17 frente a 1/26)"] == "+1,845 dB"
+    assert values["No repetición"] == "−0,093 dB"
+    assert values["Umbrales de Wald"] == "±19,96 dB"
+    assert values["Wald con letras sueltas"] == "929 y 1.062"
+    app.slider(key="banb_length").set_value(1500).run()
+    app.toggle(key="banb_reveal").set_value(True).run()
+    assert not app.exception
+    assert any("es el verdadero" in str(block.value) for block in app.success)
+    app.radio(key="banb_scoring").set_value("trigramas").run()
+    assert not app.exception
+
+
 def test_bombe_page_backup_case_decrypts() -> None:
     """La Bombe con el caso de respaldo: menú de 3 lazos, barrido, «Verificar» y las 78 letras."""
     import json

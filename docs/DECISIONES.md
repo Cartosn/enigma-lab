@@ -373,6 +373,104 @@ Docker Desktop seguía apagado. Se aplicó el respaldo del spec:
   lazo con el crib en la posición 3.
 - Resultado en VALIDACION (6.2).
 
+## Fase 4 · Banburismus (21-11-2026)
+
+### D-042 · La profundidad dura todo el solapamiento
+- **El spec (5.6)** dice que los dos mensajes quedan en profundidad «hasta que se mueve el
+  rotor central».
+- **Con la máquina real** no es así. Si las claves de mensaje coinciden en el rotor
+  izquierdo y en el central, las dos máquinas recorren la misma sucesión de estados del
+  odómetro, una adelantada respecto de la otra. Desde el primer estado en que coinciden,
+  coinciden en todos: el central, el doble paso y el izquierdo avanzan en el mismo estado en
+  las dos.
+- **Lo que hace el central** es decidir el desplazamiento. Sea δ = (derecho₂ − derecho₁)
+  mod 26:
+  - si el central no avanza mientras el derecho del mensaje 1 recorre esos δ pasos, el
+    desplazamiento es +δ;
+  - si avanza, es δ − 26.
+  Con los rotores I–V (una muesca) pasa exactamente uno de los dos. Por eso se prueban los
+  desplazamientos de −25 a +25, como en Wikipedia.
+- **Cómo se implementó.** `depth.true_offset` no usa esta regla: compara los estados de la
+  máquina (`core/stepping.step`). Las pruebas comprueban con la máquina escalar que los
+  estados coinciden letra por letra, y que en ese desplazamiento el cifrado repite
+  exactamente donde repite el texto plano.
+- **Rotores.** Las claves son de Enigma I (rotores I–V), como en el resto del proyecto. Con
+  los rotores de dos muescas de la M3 naval (VI–VIII) un par puede no quedar nunca en
+  profundidad: `true_offset` devuelve `None` y `make_pairs` sortea otra clave.
+
+### D-043 · Dos fuentes de texto plano
+- **«Tasa 1/17».** El mensaje 1 son letras uniformes. La letra j del mensaje 2 es la j + d
+  del 1 con probabilidad 1/17; si no, otra letra al azar. Es el modelo de Turing:
+  repeticiones independientes, 1/17 en profundidad y 1/26 al azar. Pasa por la máquina real.
+- **«Alemán».** Dos fragmentos del corpus con la X como separador, como en E4 y E5. Se
+  sortean de modo que no se solapen dentro del corpus.
+- **Sin ajustes.** Con el alemán no se toca nada para acercarse a 1/17: se reporta lo que da
+  (unas 1 de cada 12,5 repeticiones).
+
+### D-044 · Puntuaciones y modelo de multigramas
+- **Cuatro puntuaciones:**
+  - letras sueltas con 1/17 (Turing; los pesos del spec);
+  - letras sueltas con la tasa medida en el corpus;
+  - bigramas y trigramas;
+  - hasta tetragramas.
+- **Multigramas.** El spec pide puntuarlos, pero no da sus tasas. Turing usaba tablas del
+  tráfico naval, que no tenemos. Se usa la regla de la cadena: la probabilidad de repetir
+  depende de la racha de columnas que acaban de repetir, h_r, y se calcula con ρₙ, la
+  probabilidad de que dos n-gramas del corpus coincidan (`scoring.run_probabilities`). Así
+  el puntaje sigue siendo el logaritmo de un cociente de verosimilitudes, y los umbrales de
+  Wald conservan su sentido.
+- **De dónde salen los ρₙ.** Del mismo corpus del texto plano: la muestra en la app y en el
+  modo rápido, y el corpus completo en el modo completo. Son cuatro números, así que no hay
+  riesgo de sobreajuste.
+- **Para qué la segunda puntuación.** Separa dos efectos: usar la tasa correcta y usar
+  multigramas. Las tres medidas en el corpus solo se aplican al texto alemán, porque el
+  texto con tasa 1/17 no tiene racimos.
+
+### D-045 · Diseño de E6
+- **Pares.** 2.000 por fuente en modo completo y 300 en el rápido. Cada par aporta una
+  prueba en profundidad (el desplazamiento verdadero) y una al azar (otro de los 50
+  desplazamientos, al azar). Todas las puntuaciones y todos los umbrales se evalúan sobre
+  los mismos pares.
+- **Solapamiento máximo.** 10.000 letras (6.000 en el rápido). Con letras sueltas y 1/17,
+  la probabilidad de no decidir en 10.000 letras es ínfima; la columna `sin_decidir` lo
+  confirma.
+- **Solapamientos cortos** (25 a 1.600 letras). Es la misma prueba, truncada.
+- **Umbrales.** α = β de 5 %, 1 % y 0,1 %.
+- **Medidas:**
+  - *aciertos:* decisión correcta dentro del solapamiento;
+  - *letras leídas:* hasta decidir, o todo el solapamiento si no decide;
+  - *identificación:* el desplazamiento verdadero saca el mayor puntaje de los 51; con k
+    empatados cuenta 1/k;
+  - *ROC y AUC* del puntaje sin detenerse; el AUC es la U de Mann-Whitney sobre n₁·n₀.
+- **Referencias.** Wald con el modelo de cada puntuación y, para la fuente con tasa 1/17,
+  el cálculo exacto (D-048).
+
+### D-046 · CSV extra para la diapositiva 17
+`r4_banburismus.csv` lleva primero las columnas del spec y después las extras: fuente,
+hipótesis, α, `identifica`, `wald`, `exacto` y otras. Las trayectorias y la curva ROC no
+caben en esa tabla, así que van aparte:
+- `r4_trayectorias.csv`: 10 pares por hipótesis, un punto cada 20 letras, con la tasa 1/17
+  y con alemán y trigramas;
+- `r4_roc.csv`: las curvas ROC.
+
+### D-047 · PNG a 2x
+`save_figure` guardaba fuera del bloque `with` del estilo, donde no rigen `savefig.dpi` ni
+`savefig.bbox`. Por eso los PNG de E1 a E5 salían a 1x (630 × 360 px) y no a 2x, como pide
+el spec (sección 7). Ahora la función fija 200 puntos por pulgada y el recorte ajustado. Los
+PNG de E1 a E5 cambian en la siguiente corrida; los SVG y PDF conservan su contenido.
+
+### D-048 · El cálculo exacto del SPRT
+- **Para qué.** Explicar la diferencia con Wald sin el ruido de la simulación.
+- **Cómo.** Con letras sueltas independientes, el estado tras n letras es el número r de
+  repeticiones. Se propaga la probabilidad de cada r sin decidir, y se retiran las que
+  cruzan un umbral (`sprt.exact_letters`). Da exactos E[N], los errores reales y el
+  sobrepaso medio. La identidad de Wald se cumple con un error relativo de 10⁻⁹.
+- **La descomposición** (`sprt.wald_gap`). Con α = β = 1 %:
+  - en profundidad, 30,9 letras más que Wald: 30,7 por el sobrepaso de arriba y 0,2 por el
+    error real;
+  - al azar, 5,1 letras más: 2,4 por el sobrepaso de abajo y 2,9 porque el error real
+    (0,86 %) queda bajo el 1 %, menos 0,3 por el sobrepaso de arriba.
+
 ## Pendientes de decidir
 
 ### P-001 · Equipo de las mediciones de la demo 2

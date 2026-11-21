@@ -77,6 +77,7 @@ MODULES: tuple[Module, ...] = (
         "Decibanes y la prueba secuencial de Wald con dos mensajes en profundidad.",
         "Fase 4",
         ":material/stacked_line_chart:",
+        page="pages/banburismus.py",
     ),
     Module(
         "rejewski",

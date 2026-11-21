@@ -6,7 +6,8 @@ volver a correr experimentos:
 - ``RESUMEN.md``: se entiende por sí solo (fecha, commit, semilla y modo al inicio).
 - ``cifras.json``: las mismas cifras, para máquina.
 - Un CSV por diapositiva de resultados, en formato largo: ``r1_validacion.csv`` (14),
-  ``r2_cribs.csv`` (15) y ``r3_bombe.csv`` (16); ``r4_banburismus.csv`` llega en la fase 4.
+  ``r2_cribs.csv`` (15), ``r3_bombe.csv`` (16) y ``r4_banburismus.csv`` (17). Para dibujar
+  la 17 van además ``r4_roc.csv`` (curvas ROC) y ``r4_trayectorias.csv`` (D-046).
 
 La sección «Demos» toma la demo 2 de ``results/bench_demo2.json`` (``make bench-demo``).
 
@@ -34,7 +35,6 @@ from enigma_lab.experiments.common import git_commit, read_summary
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 
 PHASES_LEFT = [
-    ("Fase 4 · Banburismus (E6)", "semana 3"),
     ("Fase 5 · Rejewski (E7) y ataque moderno (E8), opcionales", "semana 3"),
     ("Fase 6 · modo demo completo, Docker, informe y entrega", "fin de la semana 3"),
     (
@@ -56,6 +56,19 @@ R3_COLUMNS = [
     "exito",
     "s_por_orden",
 ]
+R4_COLUMNS = [
+    "puntuacion",
+    "solapamiento",
+    "n",
+    "aciertos",
+    "letras_media",
+    "ic_bajo",
+    "ic_alto",
+    "auc",
+]
+R4_TRAJECTORIES = (("tasa_1_17", "letras_1_17"), ("aleman", "trigramas"))
+"""Las trayectorias que van a ``r4_trayectorias.csv``: el modelo de Turing y el alemán con
+multigramas, 10 por hipótesis y un punto cada 20 letras."""
 BENCH_FILE = "bench_demo2.json"
 
 
@@ -110,6 +123,34 @@ def r3_table(results_dir: Path) -> pd.DataFrame:
     """
     table = pd.read_parquet(results_dir / "e5_bombe.parquet")
     return table[R3_COLUMNS + [c for c in table.columns if c not in R3_COLUMNS]]
+
+
+def r4_table(results_dir: Path) -> pd.DataFrame:
+    """Diapositiva 17: el SPRT de E6, con las columnas del spec.
+
+    Se agregan al final, entre otras, ``fuente`` (tasa 1/17 o alemán), ``hipotesis``
+    (profundidad o azar), ``alfa``, ``identifica`` (el desplazamiento verdadero gana entre
+    los 51), ``wald`` y ``exacto``.
+    """
+    table = pd.read_parquet(results_dir / "e6_banburismus.parquet")
+    return table[R4_COLUMNS + [c for c in table.columns if c not in R4_COLUMNS]]
+
+
+def r4_extras(results_dir: Path) -> dict[str, pd.DataFrame]:
+    """Datos para dibujar la diapositiva 17: curvas ROC y unas pocas trayectorias."""
+    out: dict[str, pd.DataFrame] = {}
+    roc = results_dir / "e6_banburismus_roc.parquet"
+    if roc.is_file():
+        out["r4_roc"] = pd.read_parquet(roc).round({"fpr": 4, "tpr": 4, "auc": 4})
+    paths = results_dir / "e6_banburismus_trayectorias.parquet"
+    if paths.is_file():
+        data = pd.read_parquet(paths)
+        keep = pd.Series(False, index=data.index)
+        for text, key in R4_TRAJECTORIES:
+            keep |= (data["fuente"] == text) & (data["puntuacion"] == key)
+        data = data[keep & (data["par"] < 10) & (data["letra"] % 20 == 0)]
+        out["r4_trayectorias"] = data.round({"decibanes": 3}).reset_index(drop=True)
+    return out
 
 
 def read_bench(results_dir: Path) -> dict[str, Any]:
@@ -327,6 +368,184 @@ def _slide_16(e5: dict[str, Any], table: pd.DataFrame | None) -> list[str]:
     return lines
 
 
+def _sdb(value: float, decimals: int = 3) -> str:
+    """Decibanes con signo explícito: +1,845 · −0,093."""
+    return ("+" if value > 0 else "") + fmt_dec(value, decimals)
+
+
+def _one_in(rate: float) -> str:
+    """Una tasa como «1 de cada 12,5» (o «1 de cada 17» si da un entero)."""
+    every = 1 / rate
+    if abs(every - round(every)) < 0.05:
+        return f"1 de cada {fmt_int(round(every))}"
+    return f"1 de cada {fmt_dec(every, 1)}"
+
+
+def _letters_ci(cell: dict[str, Any]) -> str:
+    """«960 letras (IC 95 % 931–989)»."""
+    low, high = cell["ic"]
+    return (
+        f"{fmt_int(round(cell['letras']))} letras (IC 95 % "
+        f"{fmt_int(round(low))}–{fmt_int(round(high))})"
+    )
+
+
+def _slide_17_model(e6: dict[str, Any]) -> list[str]:
+    """Las cifras de Turing, la simulación con tasa 1/17 y la diferencia con Wald."""
+    w, wald, exact, gap = e6["pesos"], e6["wald"], e6["exacto"], e6["brecha_wald"]
+    base = e6["simulacion"]["tasa_1_17/letras_1_17"]
+    h1, h0 = base["profundidad"], base["azar"]
+    cells = (("profundidad", h1), ("azar", h0))
+    inside = all(c["ic"][0] <= exact[h]["letras"] <= c["ic"][1] for h, c in cells)
+    missed = (1 - exact["profundidad"]["acepta_profundidad"], exact["azar"]["acepta_profundidad"])
+    up, down = gap["profundidad"], gap["azar"]
+    return [
+        "- **Cifras de Turing** (diapositivas 13 y 17, comprobadas en `test_presentacion.py`): "
+        f"{_sdb(w['repeticion_db'])} dB por repetición y {_sdb(w['no_repeticion_db'])} dB por no "
+        f"repetición; en promedio, {_sdb(w['por_letra_profundidad_db'], 4)} dB por letra en "
+        f"profundidad y {_sdb(w['por_letra_azar_db'], 4)} dB al azar. Umbrales con α = β = 1 %: "
+        f"±{fmt_dec(w['umbral_db'], 2)} dB. Aproximación de Wald: "
+        f"{fmt_int(round(wald['profundidad']))} letras para confirmar la profundidad y "
+        f"{fmt_int(round(wald['azar']))} para descartarla.",
+        "- **Cifra para la diapositiva: la simulación del SPRT** (criterio de la fase 4). Letras "
+        "sueltas y un texto cuyas columnas en profundidad repiten con 1/17 exacta, cifrado con la "
+        f"máquina real; {fmt_int(e6['n_pares'])} pares, semilla {e6['corrida']['semilla']}. "
+        f"Confirmar la profundidad toma {_letters_ci(h1)} y descartarla, {_letters_ci(h0)}. "
+        f"El cálculo exacto, sin simulación, da {fmt_dec(exact['profundidad']['letras'], 1)} y "
+        f"{fmt_dec(exact['azar']['letras'], 1)}"
+        + (", dentro de los dos IC" if inside else "; **alguno queda fuera del IC**")
+        + f". Errores en la simulación: {fmt_pct(h1['errores'])} en profundidad y "
+        f"{fmt_pct(h0['errores'])} al azar (exactos: {fmt_pct(missed[0], 2)} y "
+        f"{fmt_pct(missed[1], 2)}).",
+        "- **La diferencia con Wald es el sobrepaso.** Wald supone que el puntaje se detiene justo "
+        f"en ±{fmt_dec(w['umbral_db'], 2)} dB; en realidad se detiene al cruzarlo, y lo pasa. Una "
+        f"repetición suma {fmt_dec(w['repeticion_db'], 3)} dB de golpe: arriba, el puntaje pasa "
+        f"el umbral por {fmt_dec(exact['profundidad']['sobrepaso_arriba_db'], 2)} dB en promedio "
+        f"(simulación: {fmt_dec(h1['sobrepaso_arriba_db'], 2)}). La identidad de Wald, "
+        "E[N] = E[S_N] / μ, es exacta, así que en profundidad son "
+        f"{fmt_dec(up['total'], 1)} letras más: {fmt_dec(up['sobrepaso_arriba'], 1)} por ese "
+        f"sobrepaso y {fmt_dec(up['errores'] + up['sobrepaso_abajo'], 1)} por lo demás. Abajo, "
+        f"cada no repetición resta solo {fmt_dec(-w['no_repeticion_db'], 3)} dB y el sobrepaso es "
+        f"de {fmt_dec(exact['azar']['sobrepaso_abajo_db'], 3)} dB. Al azar la diferencia es de "
+        f"{fmt_dec(down['total'], 1)} letras: {fmt_dec(down['sobrepaso_abajo'], 1)} por el "
+        f"sobrepaso de abajo, {fmt_dec(down['errores'], 1)} porque el error real queda por debajo "
+        f"del 1 % y {fmt_dec(down['sobrepaso_arriba'], 1)} por el de arriba. Con la simulación, "
+        f"E[S_N] / μ da {fmt_int(round(h1['wald_identidad']))} y "
+        f"{fmt_int(round(h0['wald_identidad']))} letras.",
+    ]
+
+
+def _slide_17_german(e6: dict[str, Any]) -> list[str]:
+    """El texto alemán real: su tasa de repetición y lo que cambian los multigramas."""
+    sim, rates, wald = e6["simulacion"], e6["tasas"], e6["wald"]
+    measured = rates["medidas"]["aleman"]
+    turing, letters = sim["aleman/letras_1_17"], sim["aleman/letras"]
+    tri, tetra = sim["aleman/trigramas"], sim["aleman/tetragramas"]
+    sooner = turing["profundidad"]["letras"] < wald["profundidad"]
+    faster = {h: 1 - tri[h]["letras"] / turing[h]["letras"] for h in ("profundidad", "azar")}
+    plain = {h: fmt_int(round(letters[h]["letras"])) for h in ("profundidad", "azar")}
+    return [
+        "- **Con texto alemán real** (corpus, X como separador): en profundidad las letras "
+        f"repiten {_one_in(measured['profundidad'][0])}, medido con la máquina, y no "
+        f"{_one_in(rates['turing'])}. El IC del corpus es {fmt_dec(rates['corpus_x'], 4)} con la X "
+        f"y {fmt_dec(rates['corpus_letras'], 4)} sin ella ({_one_in(rates['corpus_letras'])}); al "
+        f"azar se miden {_one_in(measured['azar'][0])}. Con los pesos de Turing, confirmar la "
+        f"profundidad toma {_letters_ci(turing['profundidad'])}"
+        + (
+            f": la decisión llega antes que las {fmt_int(round(wald['profundidad']))} de Wald"
+            if sooner
+            else ""
+        )
+        + f". Descartarla toma {_letters_ci(turing['azar'])}, como con 1/17.",
+        "- **Cuánto aceleran los multigramas** (pesos medidos en el corpus, α = β = 1 %). Con "
+        f"letras sueltas y la tasa del corpus: {plain['profundidad']} letras en profundidad y "
+        f"{plain['azar']} al azar, con un error de "
+        f"{fmt_pct(letters['profundidad']['errores'])} en profundidad: las repeticiones del texto "
+        "real vienen en racimos, y un modelo de letras independientes no lo sabe. Con bigramas y "
+        f"trigramas: {fmt_int(round(tri['profundidad']['letras']))} y "
+        f"{fmt_int(round(tri['azar']['letras']))}, con errores de "
+        f"{fmt_pct(tri['profundidad']['errores'])} y {fmt_pct(tri['azar']['errores'])}; hasta "
+        f"tetragramas, {fmt_int(round(tetra['profundidad']['letras']))} y "
+        f"{fmt_int(round(tetra['azar']['letras']))}. Frente a los pesos de Turing, los bigramas y "
+        f"trigramas necesitan un {fmt_pct(faster['profundidad'], 0)} menos de letras para "
+        f"confirmar y un {fmt_pct(faster['azar'], 0)} menos para descartar.",
+    ]
+
+
+def _slide_17_overlap(e6: dict[str, Any]) -> list[str]:
+    """Lo que alcanza con mensajes de verdad: identificación del desplazamiento y AUC."""
+    over = e6["solapamiento"]
+    marks = [m for m in ("100", "200", "400") if m in over["aleman/letras"]]
+    if not marks:
+        return []
+
+    def series(combo: str, field: str) -> str:
+        values = [fmt_pct(over[combo][m][field], 0) for m in marks]
+        return ", ".join(values[:-1]) + f" y {values[-1]}"
+
+    lengths = ", ".join(marks[:-1]) + f" y {marks[-1]}"
+    return [
+        f"- **Solapamientos de mensajes reales** ({lengths} letras). El desplazamiento verdadero "
+        "saca el mayor puntaje de los 51 en el "
+        f"{series('aleman/letras', 'identifica')} de los pares de texto alemán con letras sueltas, "
+        f"en el {series('aleman/trigramas', 'identifica')} con bigramas y trigramas y en el "
+        f"{series('tasa_1_17/letras_1_17', 'identifica')} con la tasa 1/17. El SPRT (α = β = 1 %) "
+        "confirma la profundidad dentro de ese solapamiento en el "
+        f"{series('aleman/trigramas', 'aciertos_profundidad')} de los pares (alemán, bigramas y "
+        "trigramas).",
+        "- **Curva ROC** del puntaje tras 200 letras, sin detenerse (AUC): "
+        + "; ".join(
+            f"{label} {fmt_dec(over[combo]['200']['auc'], 3)}"
+            for combo, label in (
+                ("tasa_1_17/letras_1_17", "tasa 1/17"),
+                ("aleman/letras", "alemán con letras sueltas"),
+                ("aleman/trigramas", "alemán con bigramas y trigramas"),
+            )
+            if "200" in over[combo]
+        )
+        + ". Con letras sueltas el puntaje solo depende del número de repeticiones, así que las "
+        "dos tasas dan la misma curva.",
+    ]
+
+
+def _slide_17(e6: dict[str, Any]) -> list[str]:
+    if not e6:
+        return ["Sin resultados de E6: corre `make reproduce` y luego `make resumen`."]
+    return [
+        *_slide_17_model(e6),
+        *_slide_17_german(e6),
+        *_slide_17_overlap(e6),
+        "- Datos para los gráficos: `r4_banburismus.csv` (tabla larga: fuente, puntuación, "
+        "solapamiento, α e hipótesis), `r4_roc.csv` (curvas ROC) y `r4_trayectorias.csv` "
+        "(decibanes acumulados, 10 pares por hipótesis).",
+    ]
+
+
+def _e6_notes(e6: dict[str, Any]) -> list[str]:
+    """Notas de E6 para «Discrepancias»."""
+    if not e6:
+        return []
+    wald, exact, rates = e6["wald"], e6["exacto"], e6["tasas"]
+    turing = e6["simulacion"]["aleman/letras_1_17"]["profundidad"]["letras"]
+    return [
+        f"- Diapositivas 13 y 17: {fmt_int(round(wald['profundidad']))} y "
+        f"{fmt_int(round(wald['azar']))} letras son la aproximación de Wald, que ignora el "
+        "sobrepaso de los umbrales. Con las mismas tasas, el valor exacto es "
+        f"{fmt_dec(exact['profundidad']['letras'], 1)} y {fmt_dec(exact['azar']['letras'], 1)}, y "
+        "la simulación lo confirma. Las cifras de la diapositiva siguen bien si se presentan como "
+        "«según Wald».",
+        "- Diapositiva 13 y guion («las letras se repiten 1 de cada 17 veces»): es la tasa del "
+        "tráfico naval que da Wikipedia. Nuestro corpus literario repite "
+        f"{_one_in(rates['corpus_x'])} con la X como separador y {_one_in(rates['corpus_letras'])} "
+        f"solo con letras. Con él, la profundidad se confirma en unas {fmt_int(round(turing))} "
+        "letras con los pesos de Turing. No contradice la diapositiva: es otro texto.",
+        "- Spec 5.6 («en profundidad … hasta que se mueve el rotor central»): con la máquina real "
+        "los dos mensajes recorren la misma sucesión de estados, así que la profundidad dura todo "
+        "el solapamiento. El rotor central decide si el desplazamiento verdadero es +δ o δ − 26 "
+        "(D-042); por eso se prueban los desplazamientos de −25 a +25.",
+    ]
+
+
 def _demo_2(bench: dict[str, Any]) -> list[str]:
     if not bench:
         return [
@@ -427,10 +646,12 @@ def _discrepancies(
     table: pd.DataFrame | None,
     e5_table: pd.DataFrame | None = None,
     bench: dict[str, Any] | None = None,
+    e6: dict[str, Any] | None = None,
 ) -> list[str]:
     lines = [
         "Ninguna contradicción con las diapositivas ni con el guion. Notas:",
         "",
+        *_e6_notes(e6 or {}),
     ]
     if e5_table is not None:
         on = [_cell(e5_table, 12, k, "si", "bletchley") for k in range(4)]
@@ -533,7 +754,7 @@ def build_markdown(
         "",
         "### Diapositiva 17 · Banburismus (E6)",
         "",
-        "Pendiente (fase 4).",
+        *_slide_17(summary.get("e6", {})),
         "",
         "### Otros resultados útiles",
         "",
@@ -571,7 +792,7 @@ def build_markdown(
         "",
         "## 4. Discrepancias",
         "",
-        *_discrepancies(summary.get("e4", {}), e4_table, e5_table, bench),
+        *_discrepancies(summary.get("e4", {}), e4_table, e5_table, bench, summary.get("e6", {})),
         "",
         "## 5. Pendientes",
         "",
@@ -601,6 +822,10 @@ def main(results_dir: Path | None = None) -> Path:
     if (results / "e5_bombe.parquet").is_file():
         e5_table = r3_table(results)
         e5_table.to_csv(out / "r3_bombe.csv", index=False)
+    if (results / "e6_banburismus.parquet").is_file():
+        r4_table(results).to_csv(out / "r4_banburismus.csv", index=False)
+        for name, extra in r4_extras(results).items():
+            extra.to_csv(out / f"{name}.csv", index=False)
     bench = read_bench(results)
     demo2 = {k: v for k, v in bench.items() if k != "configuraciones"}
     if bench:

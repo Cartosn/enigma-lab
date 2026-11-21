@@ -398,6 +398,276 @@ def e5_heatmap(table: pd.DataFrame, diagonal: str = "si", demo: bool = False) ->
     return fig
 
 
+# ---------------------------------------------------------------- Banburismus (fase 4)
+
+
+def _signed(value: int) -> str:
+    """Desplazamiento con signo: +8, −17, 0."""
+    return f"+{value}" if value > 0 else fmt_int(value)
+
+
+def banburismus_offsets(
+    table: pd.DataFrame, upper: float, true_offset: int | None = None, demo: bool = False
+) -> go.Figure:
+    """Decibanes por desplazamiento, de −25 a +25: el mejor en ámbar; el verdadero, si se revela."""
+    best_row = table.loc[table["decibanes"].idxmax()]
+    best = int(best_row["desplazamiento"])
+    colors = [DARK.accent if d == best else CATEGORICAL[1] for d in table["desplazamiento"]]
+    fig = go.Figure(
+        go.Bar(
+            x=table["desplazamiento"],
+            y=table["decibanes"],
+            marker_color=colors,
+            customdata=table[["repeticiones", "bigramas", "trigramas"]].to_numpy(),
+            hovertemplate="desplazamiento %{x}: %{y:.1f} dB<br>%{customdata[0]} repeticiones, "
+            "%{customdata[1]} bigramas y %{customdata[2]} trigramas<extra></extra>",
+        )
+    )
+    fig.add_hline(
+        y=upper,
+        line_dash="dash",
+        line_color=DARK.text_muted,
+        annotation_text=f"aceptar profundidad: +{fmt_dec(upper, 2)} dB",
+        annotation_position="top left",
+    )
+    if true_offset is not None:
+        value = float(table.loc[table["desplazamiento"] == true_offset, "decibanes"].iloc[0])
+        fig.add_annotation(
+            x=true_offset,
+            y=value,
+            text="verdadero",
+            showarrow=True,
+            arrowcolor=DARK.success,
+            font={"color": DARK.success},
+            ay=-40 if value >= 0 else 40,
+        )
+    fig.update_layout(
+        template=_template(demo),
+        title=f"El desplazamiento {_signed(best)} suma "
+        f"{fmt_dec(float(best_row['decibanes']), 1)} dB con "
+        f"{fmt_int(int(best_row['repeticiones']))} repeticiones",
+        xaxis_title="desplazamiento d (la letra j del mensaje 2 bajo la j + d del 1)",
+        yaxis_title="decibanes en el solapamiento",
+        xaxis={"dtick": 5},
+        height=400,
+        showlegend=False,
+    )
+    return fig
+
+
+def banburismus_trajectories(
+    paths: list[tuple[str, np.ndarray, str]], upper: float, lower: float, demo: bool = False
+) -> go.Figure:
+    """Decibanes acumulados letra a letra, con los umbrales de Wald y el punto donde se decide."""
+    fig = go.Figure()
+    for label, values, color in paths:
+        letters = np.arange(1, len(values) + 1)
+        fig.add_scatter(
+            x=letters,
+            y=values,
+            mode="lines",
+            name=label,
+            line={"color": color, "width": 2},
+            hovertemplate=f"{label}: letra %{{x}}, %{{y:.1f}} dB<extra></extra>",
+        )
+        crossed = np.flatnonzero((values >= upper) | (values <= lower))
+        if len(crossed):
+            k = int(crossed[0])
+            fig.add_scatter(
+                x=[k + 1],
+                y=[values[k]],
+                mode="markers",
+                marker={"color": color, "size": 11, "symbol": "diamond"},
+                showlegend=False,
+                hovertemplate=f"{label}: decide en la letra {k + 1}<extra></extra>",
+            )
+    for y, text, position in (
+        (upper, f"aceptar profundidad: +{fmt_dec(upper, 2)} dB", "top left"),
+        (lower, f"descartar: {fmt_dec(lower, 2)} dB", "bottom left"),
+    ):
+        fig.add_hline(
+            y=y,
+            line_dash="dash",
+            line_color=DARK.text_muted,
+            annotation_text=text,
+            annotation_position=position,
+        )
+    fig.update_layout(
+        template=_template(demo),
+        title="Trayectoria de la evidencia: se decide al cruzar un umbral",
+        xaxis_title="letras comparadas",
+        yaxis_title="decibanes acumulados",
+        height=420,
+        legend={"orientation": "h", "yanchor": "top", "y": -0.2, "x": 0, "xanchor": "left"},
+        margin={"b": 110},
+    )
+    return fig
+
+
+def roc_curves(
+    curves: list[tuple[str, np.ndarray, np.ndarray, float]], length: int, demo: bool = False
+) -> go.Figure:
+    """Curvas ROC (falsos positivos contra verdaderos), con su AUC y la diagonal del azar."""
+    fig = go.Figure()
+    for color, (label, fpr, tpr, area) in zip(CATEGORICAL, curves, strict=False):
+        fig.add_scatter(
+            x=fpr,
+            y=tpr,
+            mode="lines",
+            line={"color": color, "width": 2, "shape": "hv"},
+            name=f"{label}: AUC {fmt_dec(area, 3)}",
+            hovertemplate="falsos %{x:.1%}, verdaderos %{y:.1%}<extra></extra>",
+        )
+    fig.add_scatter(
+        x=[0, 1],
+        y=[0, 1],
+        mode="lines",
+        line={"color": DARK.text_muted, "dash": "dash", "width": 1},
+        name="azar: AUC 0,5",
+        hoverinfo="skip",
+    )
+    best = max(curves, key=lambda c: c[3]) if curves else None
+    fig.update_layout(
+        template=_template(demo),
+        title=f"Curva ROC con {fmt_int(length)} letras"
+        + (f": AUC {fmt_dec(best[3], 3)} en la mejor" if best else ""),
+        xaxis_title="falsos positivos (azar tomado por profundidad)",
+        yaxis_title="verdaderos positivos",
+        xaxis={"range": [0, 1], "tickformat": ".0%"},
+        yaxis={"range": [0, 1.02], "tickformat": ".0%"},
+        height=480,
+        legend={"orientation": "h", "yanchor": "top", "y": -0.2, "x": 0, "xanchor": "left"},
+        margin={"b": 140},
+    )
+    return fig
+
+
+def _e6_combos() -> list[tuple[str, str, str]]:
+    from enigma_lab.experiments.e6_banburismus import SHORT_LABELS, SOURCES, combo
+
+    return [
+        (text, key, SHORT_LABELS[combo(text, key)])
+        for text, keys in SOURCES.items()
+        for key in keys
+    ]
+
+
+def e6_letters(table: pd.DataFrame, demo: bool = False) -> go.Figure:
+    """E6: letras hasta decidir (α = β = 1 %) por fuente y puntuación, con IC 95 % y Wald."""
+    from enigma_lab.experiments.e6_banburismus import MAIN_ALPHA, reference_letters
+
+    longest = int(table["solapamiento"].max())
+    part = table[np.isclose(table["alfa"], MAIN_ALPHA) & (table["solapamiento"] == longest)]
+    combos = _e6_combos()
+    fig = go.Figure()
+    wald = reference_letters()
+    for color, hypothesis, name in zip(
+        CATEGORICAL, ("profundidad", "azar"), ("en profundidad", "al azar"), strict=False
+    ):
+        rows = [
+            part[
+                (part["fuente"] == t)
+                & (part["puntuacion"] == k)
+                & (part["hipotesis"] == hypothesis)
+            ]
+            for t, k, _ in combos
+        ]
+        present = [
+            (label, r.iloc[0]) for (_, _, label), r in zip(combos, rows, strict=True) if len(r)
+        ]
+        fig.add_bar(
+            y=[label for label, _ in present],
+            x=[r["letras_media"] for _, r in present],
+            orientation="h",
+            name=name,
+            marker_color=color,
+            error_x={
+                "type": "data",
+                "symmetric": False,
+                "array": [r["ic_alto"] - r["letras_media"] for _, r in present],
+                "arrayminus": [r["letras_media"] - r["ic_bajo"] for _, r in present],
+                "color": DARK.text_muted,
+            },
+            text=[fmt_int(round(r["letras_media"])) for _, r in present],
+            textposition="inside",
+            hovertemplate="%{y}: %{x:.0f} letras<extra>" + name + "</extra>",
+        )
+        fig.add_vline(
+            x=wald[hypothesis],
+            line_dash="dot",
+            line_color=color,
+            annotation_text=f"Wald {fmt_int(round(wald[hypothesis]))}",
+            annotation_position="top left" if hypothesis == "profundidad" else "top right",
+        )
+    base = part[(part["fuente"] == "tasa_1_17") & (part["hipotesis"] == "profundidad")]
+    title = "Letras hasta decidir frente a la aproximación de Wald"
+    if len(base):
+        letters = fmt_int(round(base["letras_media"].iloc[0]))
+        title = (
+            f"Con tasa 1/17 la profundidad se confirma en {letters} letras "
+            f"(Wald: {fmt_int(round(wald['profundidad']))})"
+        )
+    fig.update_layout(
+        template=_template(demo),
+        title=title,
+        barmode="group",
+        xaxis_title="letras hasta decidir (α = β = 1 %, media e IC 95 %)",
+        yaxis={"autorange": "reversed"},
+        height=460,
+    )
+    return fig
+
+
+def e6_identification(table: pd.DataFrame, demo: bool = False) -> go.Figure:
+    """E6: fracción de pares en que el desplazamiento verdadero gana, según el solapamiento."""
+    from enigma_lab.experiments.e6_banburismus import MAIN_ALPHA
+
+    longest = int(table["solapamiento"].max())
+    part = table[
+        np.isclose(table["alfa"], MAIN_ALPHA)
+        & (table["hipotesis"] == "profundidad")
+        & (table["solapamiento"] < longest)
+    ]
+    fig = go.Figure()
+    for color, (text, key, label) in zip(CATEGORICAL, _e6_combos(), strict=False):
+        rows = part[(part["fuente"] == text) & (part["puntuacion"] == key)].sort_values(
+            "solapamiento"
+        )
+        if rows.empty:
+            continue
+        fig.add_scatter(
+            x=rows["solapamiento"],
+            y=rows["identifica"],
+            mode="lines+markers",
+            name=label,
+            line={"color": color},
+            hovertemplate=f"{label}, %{{x}} letras: %{{y:.1%}}<extra></extra>",
+        )
+    fig.add_hline(
+        y=1 / 51,
+        line_dash="dot",
+        line_color=DARK.text_muted,
+        annotation_text="al azar: 1 de 51",
+        annotation_position="bottom right",
+    )
+    fig.update_layout(
+        template=_template(demo),
+        title="Con más solapamiento, el desplazamiento verdadero gana más veces",
+        xaxis_title="solapamiento (letras, escala log)",
+        yaxis_title="pares en que el verdadero gana entre los 51",
+        xaxis={
+            "type": "log",
+            "tickvals": sorted(part["solapamiento"].unique()),
+            "ticktext": [fmt_int(int(v)) for v in sorted(part["solapamiento"].unique())],
+        },
+        yaxis={"tickformat": ".0%", "range": [0, 1.02]},
+        height=440,
+        legend={"orientation": "h", "yanchor": "top", "y": -0.22, "x": 0, "xanchor": "left"},
+        margin={"b": 130},
+    )
+    return fig
+
+
 def plotly_config() -> dict[str, Any]:
     """Configuración de la barra de herramientas (descarga de la imagen a 2x)."""
     from enigma_lab.viz.theme import PLOTLY_CONFIG

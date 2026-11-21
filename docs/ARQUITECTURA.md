@@ -43,6 +43,7 @@ flowchart LR
     stats --> bombe
     stats --> att
     core --> att
+    stats --> banb
     core & stats & cribs & bombe & banb & rej & att --> exp
     exp --> results --> pres
     results --> report
@@ -53,8 +54,8 @@ flowchart LR
 
     classDef done fill:#171B21,stroke:#F2B134,color:#E8E6E3
     classDef todo fill:#0F1216,stroke:#2A3038,color:#9AA3AD,stroke-dasharray: 4 3
-    class core,viz,app,exp,results,pres,ref,demo,stats,cribs,corp,bombe done
-    class banb,rej,att,report todo
+    class core,viz,app,exp,results,pres,ref,demo,stats,cribs,corp,bombe,banb done
+    class rej,att,report todo
 ```
 
 ## Estado por fase
@@ -82,7 +83,11 @@ flowchart LR
 | `experiments/` E5 | Paradas falsas por letras y lazos, con y sin diagonal board, frente a Turing | 3 |
 | `app/pages/bombe.py`, `components/bombe_drums.html` | Página La Bombe y los tambores | 3 |
 | `scripts/bench_demo2.py` | `make bench-demo`: éxito y tiempos de la demo 2 | 3 |
-| `banburismus/` | Decibanes y SPRT | 4 |
+| `banburismus/depth.py` | Pares en profundidad cifrados con la máquina real; desplazamiento verdadero por estados | 4 |
+| `banburismus/scoring.py` | Decibanes de Turing, modelo de rachas para multigramas y puntaje por desplazamiento | 4 |
+| `banburismus/sprt.py` | Umbrales y aproximación de Wald, cálculo exacto con sobrepaso y SPRT en Numba | 4 |
+| `experiments/` E6 | SPRT frente a Wald, aciertos por solapamiento, identificación del desplazamiento y ROC | 4 |
+| `app/pages/banburismus.py` | Página Banburismus y pestaña E6 en Experimentos | 4 |
 | `rejewski/`, `attacks/` | Extensiones P2 | 5 |
 
 ## Flujo de una letra en la página Máquina
@@ -126,6 +131,27 @@ sequenceDiagram
     P->>J: JSON con las letras de cada tambor en la parada
     J-->>U: tambores (solo dibuja; no calcula)
 ```
+
+## Flujo de la página Banburismus
+
+```mermaid
+sequenceDiagram
+    participant U as Persona
+    participant P as pages/banburismus.py
+    participant D as banburismus.depth
+    participant S as banburismus.scoring
+    participant W as banburismus.sprt
+    U->>P: texto plano, letras por desplazamiento, puntuación, α
+    P->>D: make_pairs: clave diaria y dos claves de mensaje (máquina por lotes)
+    D-->>P: cifrados y desplazamiento verdadero (oculto)
+    P->>S: offset_scores: repeticiones y decibanes en los 51 desplazamientos
+    P->>S: trajectory: decibanes acumulados del mejor y de otros
+    P->>W: thresholds y wald_letters: umbrales y letras esperadas
+    P-->>U: barras, trayectorias con umbrales y curva ROC (300 pares)
+```
+
+E6 usa las mismas piezas con miles de pares y corre la prueba con el núcleo de Numba
+(`sprt.run_sprt`); la página solo usa NumPy.
 
 ## Convenciones de código
 

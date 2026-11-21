@@ -38,6 +38,25 @@ de una de estas fuentes (spec, sección 0). Las de la sección 12 del spec van t
   https://en.wikipedia.org/w/index.php?title=Bombe&oldid=1385546242 · Transcrita completa en
   `data/reference/turing_stops.csv`. Wikipedia la cita de Carter, F., «From Bombe 'stops'
   to Enigma keys», Bletchley Park Trust, Technical Papers, p. 3.
+- **Banburismus (fase 4, diapositivas 13 y 17):** Wikipedia, «Banburismus», revisión
+  1372577431 (01-09-2026), consultada el 21-11-2026.
+  https://en.wikipedia.org/w/index.php?title=Banburismus&oldid=1372577431 · De ahí salen:
+  - las tasas de repetición: 1 de cada 26 al azar y 1 de cada 17 en los mensajes navales
+    alemanes;
+  - los desplazamientos de −25 a +25;
+  - el ejemplo VFG/VFX: el mejor desplazamiento es 8, con nueve repeticiones (dos de ellas
+    bigramas) en 56 letras de solapamiento.
+
+  El artículo no da pesos en decibanes: +1,845, −0,093 y los demás los calcula el código
+  con esas tasas (`banburismus/scoring.py`).
+- **Prueba secuencial de Wald:**
+  - Wald, A. (1945). Sequential tests of statistical hypotheses. *The Annals of
+    Mathematical Statistics*, 16(2), 117–186. Umbrales y aproximación del número esperado
+    de observaciones.
+  - Wikipedia, «Sequential probability ratio test», revisión 1321902819 (13-11-2025),
+    consultada el 21-11-2026. Umbrales a ≈ log(β/(1 − α)) y b ≈ log((1 − β)/α), y la nota de
+    que son aproximados en el caso discreto porque el puntaje cruza el umbral entre dos
+    observaciones.
 - **Bombe de CyberChef (referencia de diseño y validación):** código fuente de GCHQ,
   `src/core/lib/Bombe.mjs`, `src/core/operations/Bombe.mjs` y `MultipleBombe.mjs`
   (licencia Apache 2.0), leído el 21-11-2026. https://github.com/gchq/CyberChef · La

@@ -1,14 +1,15 @@
-"""Experimentos E2 a E4 (con pocos casos) y el resumen para la presentación."""
+"""Experimentos E2 a E6 (con pocos casos) y el resumen para la presentación."""
 
 from __future__ import annotations
 
 import json
 import shutil
 
+import numpy as np
 import pytest
 
 from enigma_lab import SEED, paths, resumen
-from enigma_lab.experiments import e2_keyspace, e3_statistics, e4_cribs, e5_bombe
+from enigma_lab.experiments import e2_keyspace, e3_statistics, e4_cribs, e5_bombe, e6_banburismus
 
 SMALL_E3 = {"n": 60, "lengths": [100, 300], "source": "muestra"}
 SMALL_E4 = {"n": 300, "lengths": [5, 13, 30], "message_length": 250, "source": "muestra"}
@@ -21,6 +22,15 @@ SMALL_E5 = {
     "batch": 100_000,
     "max_candidates": 2_000_000,
     "source": "muestra",
+}
+SMALL_E6 = {
+    "n": 60,
+    "max_letters": 3_000,
+    "overlaps": [50, 200],
+    "alphas": [0.05, 0.01],
+    "corpus": "muestra",
+    "trajectories": 3,
+    "trajectory_letters": 500,
 }
 
 
@@ -68,6 +78,46 @@ def test_e5_bombe_small() -> None:
     assert e5_bombe.turing_value(12, 3) == (0.04, "")
 
 
+def test_e6_banburismus_small() -> None:
+    df, paths_df = e6_banburismus.run_with_trajectories(SMALL_E6, SEED)
+    # 1 puntuación con tasa 1/17 y 4 con alemán, 60 pares y 2 hipótesis.
+    assert len(df) == 5 * 60 * 2
+    table = e6_banburismus.aggregate(df, "muestra")
+    assert list(table.columns[:8]) == resumen.R4_COLUMNS
+    assert len(table) == 5 * 2 * 2 * 3  # combinaciones × α × hipótesis × solapamientos
+    longest = table[(table["solapamiento"] == 3_000) & np.isclose(table["alfa"], 0.01)]
+    assert (longest["sin_decidir"] < 0.05).all()
+    german = longest[(longest["fuente"] == "aleman") & (longest["hipotesis"] == "profundidad")]
+    assert (german["aciertos"] > 0.9).all() and (german["auc"] > 0.99).all()
+    wald = longest[longest["fuente"] == "tasa_1_17"].set_index("hipotesis")["wald"]
+    assert round(wald["profundidad"]) == 929 and round(wald["azar"]) == 1062
+    roc = e6_banburismus.roc_table(df)
+    assert set(roc["solapamiento"]) == {50, 200, 3_000}
+    assert ((roc["tpr"] >= 0) & (roc["tpr"] <= 1)).all()
+    assert set(paths_df["hipotesis"]) == {"profundidad", "azar"}
+    figures = e6_banburismus.summary(df, SMALL_E6)
+    assert figures["tasas"]["corpus_x"] > figures["tasas"]["turing"]
+    assert set(figures["simulacion"]) == {
+        "tasa_1_17/letras_1_17",
+        "aleman/letras_1_17",
+        "aleman/letras",
+        "aleman/trigramas",
+        "aleman/tetragramas",
+    }
+
+
+def test_e6_auc_matches_mann_whitney() -> None:
+    from scipy.stats import mannwhitneyu
+
+    rng = np.random.default_rng(SEED)
+    depth, chance = rng.normal(1, 1, 300), rng.normal(0, 1, 400)
+    u = mannwhitneyu(depth, chance).statistic
+    assert e6_banburismus.auc(depth, chance) == pytest.approx(u / (300 * 400))
+    fpr, tpr = e6_banburismus.roc_points(depth, chance)
+    assert fpr[0] == tpr[0] == 0 and fpr[-1] == tpr[-1] == 1
+    assert np.trapezoid(tpr, fpr) == pytest.approx(e6_banburismus.auc(depth, chance))
+
+
 def test_turing_table_is_complete() -> None:
     table = e5_bombe.turing_table()
     assert len(table) == 36 and set(table["letras"]) == set(range(8, 17))
@@ -95,3 +145,10 @@ def test_resumen_builds_from_saved_results(tmp_path) -> None:  # type: ignore[no
             "letras,lazos,diagonal,modo,n_menus,paradas_media,ic_bajo,ic_alto,exito,s_por_orden"
         )
         assert "### Diapositiva 16 · Bombe (E5)" in text
+    if (tmp_path / "e6_banburismus.parquet").is_file():
+        header = (out / "r4_banburismus.csv").read_text(encoding="utf-8").splitlines()[0]
+        assert header.startswith(
+            "puntuacion,solapamiento,n,aciertos,letras_media,ic_bajo,ic_alto,auc"
+        )
+        assert (out / "r4_roc.csv").is_file() and (out / "r4_trayectorias.csv").is_file()
+        assert "La diferencia con Wald es el sobrepaso" in text

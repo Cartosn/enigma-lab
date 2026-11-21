@@ -100,13 +100,21 @@ def update_summary(
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
+PNG_DPI = 200
+"""PNG a 2x: el doble de los 100 puntos por pulgada de la figura (spec 7)."""
+
+
 def save_figure(fig: Any, name: str, results_dir: Path | None = None) -> list[Path]:
-    """Guarda una figura de Matplotlib en PNG (a 2x), SVG y PDF en ``results/figures/``."""
+    """Guarda una figura de Matplotlib en PNG (a 2x), SVG y PDF en ``results/figures/``.
+
+    La resolución y el recorte van explícitos: la figura se guarda fuera del bloque
+    ``with`` del estilo, donde ya no rigen sus ``savefig.dpi`` y ``savefig.bbox`` (D-047).
+    """
     folder = (results_dir or paths.RESULTS) / "figures"
     folder.mkdir(parents=True, exist_ok=True)
     saved = []
     for ext in ("png", "svg", "pdf"):
         path = folder / f"{name}.{ext}"
-        fig.savefig(path)
+        fig.savefig(path, dpi=PNG_DPI, bbox_inches="tight")
         saved.append(path)
     return saved

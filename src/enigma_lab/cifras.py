@@ -9,6 +9,7 @@ pendientes, con la fase en que llegan.
 
 from __future__ import annotations
 
+import math
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import cache
@@ -140,6 +141,44 @@ def _short(value: float) -> str:
     if float(value).is_integer():
         return fmt_int(int(value))
     return fmt_dec(value, 2).rstrip("0")
+
+
+def _signed_db(value: float, decimals: int) -> str:
+    """Decibanes con signo explícito, como en las diapositivas: «+1,845 dB», «−0,093 dB»."""
+    return ("+" if value > 0 else "") + fmt_dec(value, decimals) + f"{NBSP}dB"
+
+
+def _banburismus_weight(which: str) -> str:
+    """Decibanes de Turing (1/17 frente a 1/26): por repetición, por no repetición o por letra."""
+    from enigma_lab.banburismus.scoring import TURING
+
+    values = {
+        "repeticion": (float(TURING.plus[0]), 3),
+        "no_repeticion": (float(TURING.minus[0]), 3),
+        "profundidad": (TURING.drift(True), 4),
+        "azar": (TURING.drift(False), 4),
+    }
+    return _signed_db(*values[which])
+
+
+def _wald_thresholds() -> str:
+    """Umbrales del SPRT con α = β = 1 %: «±19,96 dB»."""
+    from enigma_lab.banburismus.sprt import thresholds
+
+    upper, lower = thresholds(0.01)
+    if not math.isclose(upper, -lower):
+        raise ValueError("con α = β los umbrales son simétricos")
+    return f"±{fmt_dec(upper, 2)}{NBSP}dB"
+
+
+def _wald_letters() -> str:
+    """Letras esperadas según la aproximación de Wald: en profundidad y al azar."""
+    from enigma_lab.banburismus.scoring import TURING
+    from enigma_lab.banburismus.sprt import wald_letters
+
+    depth = wald_letters(TURING.drift(True), True, 0.01)
+    chance = wald_letters(TURING.drift(False), False, 0.01)
+    return f"{fmt_int(round(depth))} y {fmt_int(round(chance))}"
 
 
 def _turing_slide_16() -> str:
@@ -310,11 +349,37 @@ CIFRAS: tuple[Cifra, ...] = (
         "105.456 · 21.230 · 11.466",
         pending="fase 5 (P2): rejewski/; si no se hace, la diapositiva solo cita a Kuhl",
     ),
+    # Diapositivas 13 y 17 · banburismus/ (tasas 1/17 y 1/26 de Wikipedia, «Banburismus»)
     Cifra(
         "13, 17",
-        "decibanes y aproximación de Wald",
-        "+1,845 dB; +0,0211 y −0,0184 dB; ±19,96 dB; 929 y 1.062 letras",
-        pending="fase 4: banburismus/",
+        "decibanes por repetición: 10·log₁₀((1/17)/(1/26))",
+        f"+1,845{NBSP}dB",
+        lambda: _banburismus_weight("repeticion"),
+    ),
+    Cifra(
+        "5.6",
+        "decibanes por no repetición: 10·log₁₀((16/17)/(25/26))",
+        f"−0,093{NBSP}dB",
+        lambda: _banburismus_weight("no_repeticion"),
+    ),
+    Cifra(
+        "17",
+        "decibanes por letra, en promedio, en profundidad",
+        f"+0,0211{NBSP}dB",
+        lambda: _banburismus_weight("profundidad"),
+    ),
+    Cifra(
+        "17",
+        "decibanes por letra, en promedio, al azar",
+        f"−0,0184{NBSP}dB",
+        lambda: _banburismus_weight("azar"),
+    ),
+    Cifra("13, 17", "umbrales de Wald con α = β = 1 %", f"±19,96{NBSP}dB", _wald_thresholds),
+    Cifra(
+        "13, 17",
+        "letras esperadas según Wald, en profundidad y al azar",
+        "929 y 1.062",
+        _wald_letters,
     ),
     # Diapositiva 16 · data/reference/turing_stops.csv (las cifras medidas van en RESUMEN.md)
     Cifra(

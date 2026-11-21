@@ -9,7 +9,7 @@ cada fase.
 2. [La máquina y el doble paso](#2-la-máquina-y-el-doble-paso) (fase 1)
 3. [Estadística del idioma, cribs y menús](#3-estadística-del-idioma-cribs-y-menús) (fase 2)
 4. [La Bombe, el diagonal board y el verificador](#4-la-bombe-el-diagonal-board-y-el-verificador) (fase 3)
-5. Banburismus y la prueba secuencial (fase 4)
+5. [Banburismus, decibanes y la prueba secuencial](#5-banburismus-decibanes-y-la-prueba-secuencial) (fase 4)
 6. Rejewski y el ataque moderno (fase 5)
 7. [Preguntas probables](#preguntas-probables)
 
@@ -311,6 +311,122 @@ P(u) = a. El diagonal board une el hilo u del cable a con el hilo a del cable u.
   diapositiva 11, «letras del menú» son las letras distintas del grafo: sus vértices.
   E5 lo confirma (D-031).
 
+## 5. Banburismus, decibanes y la prueba secuencial
+
+**Idea.** La Enigma naval cifraba todos los indicadores del día desde la misma posición
+base. Si los indicadores cifrados de dos mensajes coinciden en las dos primeras letras, sus
+claves de mensaje tienen el mismo rotor izquierdo y el mismo central, y solo difieren en el
+derecho (VFG y VFX). Entonces las dos máquinas recorren la misma sucesión de estados,
+corridas d letras: los mensajes quedan **en profundidad**. Banburismus buscaba ese d
+comparando los dos mensajes en los 51 desplazamientos posibles, de −25 a +25.
+(`banburismus/depth.py`)
+
+**Por qué se nota la profundidad.** En un mismo estado, el cifrado es una biyección: dos
+letras cifradas coinciden si y solo si coinciden las planas. Dos textos alemanes alineados
+coinciden en una columna con probabilidad κ, el índice de coincidencia; dos letras cifradas
+en estados distintos, con 1/26. Wikipedia da 1/17 para el tráfico naval alemán.
+
+**El desplazamiento y el rotor central.** Sea δ = (derecho₂ − derecho₁) mod 26.
+- Si el central no avanza mientras el derecho del mensaje 1 recorre esos δ pasos, d = +δ.
+- Si avanza, es el mensaje 2 el que llega al arranque del 1: d = δ − 26.
+
+Pasa uno solo de los dos. De ahí salía el «scritchmus»: el signo de d decía en qué tramo
+estaba la muesca del rotor derecho, y eso descartaba rotores para la Bombe. Una vez
+alineadas, las dos máquinas avanzan igual, así que la profundidad dura todo el solapamiento
+(D-042). `true_offset` no usa la regla: compara los estados de la máquina.
+
+**Decibanes.** El peso de la evidencia a favor de una hipótesis H1 frente a H0 es
+10·log₁₀ del factor de Bayes, P(datos | H1) / P(datos | H0). El logaritmo convierte en suma
+el producto de los factores de observaciones independientes: la evidencia se suma columna
+por columna. Con las tasas de Turing:
+- repetición: 10·log₁₀((1/17)/(1/26)) = +1,845 dB;
+- no repetición: 10·log₁₀((16/17)/(25/26)) = −0,093 dB;
+- por letra, en promedio: (1/17)(+1,845) + (16/17)(−0,093) = +0,0211 dB en profundidad y
+  (1/26)(+1,845) + (25/26)(−0,093) = −0,0184 dB al azar.
+
+Las dos últimas son las divergencias de Kullback-Leibler entre las hipótesis, en decibanes:
+la evidencia que aporta cada letra, en promedio. Es muy poca.
+(`scoring.py` · `repeat_weight`, `non_repeat_weight`, `expected_weight`; el registro de
+cifras las comprueba contra las diapositivas 13 y 17)
+
+**La prueba secuencial de Wald (SPRT).** Se suman los decibanes letra por letra y se
+decide en cuanto la suma cruza un umbral:
+- A = 10·log₁₀((1 − β)/α): se acepta la profundidad;
+- B = 10·log₁₀(β/(1 − α)): se descarta;
+- entre los dos, se sigue leyendo.
+
+α es la probabilidad de aceptar una profundidad que no existe; β, la de descartar una
+verdadera. Con α = β = 1 %, ±19,96 dB. (`sprt.py` · `thresholds`)
+
+**Cuántas letras: la aproximación de Wald.** La identidad de Wald, E[S_N] = μ·E[N], dice
+que el puntaje final medio es el avance medio por letra por las letras leídas. Si el
+puntaje se detuviera justo en el umbral, en profundidad E[S_N] = (1 − β)·A + β·B =
+0,98 · 19,96 dB, y E[N] ≈ 19,56 / 0,0211 = 929 letras. Al azar, 1.062. (`wald_letters`)
+
+**El sobrepaso.** El puntaje no se detiene en el umbral: se detiene al cruzarlo, y lo pasa.
+- Arriba, una repetición suma 1,845 dB de golpe, así que el puntaje pasa A por 0,65 dB en
+  promedio.
+- Abajo, cada no repetición resta solo 0,093 dB, así que pasa B por apenas 0,045 dB.
+
+La identidad de Wald es exacta. Con el puntaje final verdadero salen 959,7 letras en
+profundidad y 1.067,4 al azar.
+- En profundidad son 30,9 letras más: 30,7 por el sobrepaso de arriba (0,65 dB / 0,0211
+  dB por letra) y 0,2 por lo demás.
+- Al azar, 5,1 más: 2,4 por el sobrepaso de abajo y 2,9 porque el error real (0,86 %) queda
+  bajo el 1 %, menos 0,3 por el sobrepaso de arriba en las pocas falsas alarmas.
+
+El sobrepaso también deja los errores reales por debajo del nominal. Estos valores no son
+una simulación: `exact_letters` propaga la probabilidad de cada número de repeticiones
+letra por letra, y `wald_gap` hace la descomposición (D-048).
+
+**La simulación con la máquina** (E6, 2.000 pares, texto con tasa 1/17 exacta). Da 983
+letras en profundidad (IC 95 % 954–1.012) y 1.090 al azar (1.061–1.120). Los valores
+exactos quedan dentro de los IC; los de Wald, 929 y 1.062, quedan por debajo o en el
+borde. Es el criterio de la fase 4.
+
+**Multigramas.** En texto real las repeticiones vienen en racimos: si dos textos alineados
+coinciden en una letra, es más probable que coincidan también en la siguiente. Turing
+puntuaba aparte los bigramas, trigramas y tetragramas repetidos. Aquí se hace con la regla
+de la cadena: la probabilidad de repetir, h_r, depende de cuántas columnas seguidas acaban
+de repetir.
+- Se calcula con ρₙ, la probabilidad de que dos n-gramas del corpus coincidan:
+  h_r = (ρ_{r+1} − ρ_{r+2}) / (ρ_r − ρ_{r+1}), y en la última racha, ρ_k / ρ_{k−1}.
+- Con el corpus completo, h = 7,5 %, 11,9 % y 25,2 % tras 0, 1 y 2 o más repeticiones.
+  Repetir pesa +2,91, +4,90 y +8,17 dB: un trigrama repetido pesa mucho más que tres letras
+  sueltas.
+- El puntaje sigue siendo un logaritmo de cociente de verosimilitudes, así que los umbrales
+  de Wald siguen valiendo (D-044).
+
+(`scoring.py` · `RepeatModel`, `corpus_model`, `column_weights`)
+
+**Lo que da el texto real** (E6, corpus alemán con la X como separador):
+- **La tasa.** El corpus repite 1 de cada 12,5 letras (κ = 0,0802; sin la X, 0,0757, 1 de
+  cada 13,2), no 1 de cada 17. Turing midió tráfico naval; el nuestro es literario.
+- **Con los pesos de Turing,** confirmar la profundidad toma 332 letras y no 929: la
+  decisión llega antes. Descartarla sigue tomando unas 1.090.
+- **Con bigramas y trigramas,** 254 y 357 letras, con errores cerca del 1 %. Letras sueltas
+  con la tasa del corpus dan 262 y 323, pero con un 1,8 % de error en profundidad: un modelo
+  de letras independientes no sabe que las repeticiones vienen en racimos.
+- **Con solapamientos de mensajes reales** (100, 200 y 400 letras), el desplazamiento
+  verdadero gana entre los 51 en el 39 %, 64 % y 88 % de los pares con letras sueltas, en el
+  42 %, 67 % y 90 % con trigramas, y en el 13 %, 22 % y 40 % con la tasa 1/17.
+
+**Preguntas que pueden salir:**
+- *¿Qué es un decibán?* La décima parte de un ban: 10·log₁₀ del factor de Bayes. Mide
+  cuánto cambia una observación las probabilidades a favor de una hipótesis. Los decibanes
+  de observaciones independientes se suman. (`scoring.decibans`)
+- *¿Por qué la simulación pide más letras que Wald?* Por el sobrepaso: Wald supone que el
+  puntaje se detiene en el umbral, y en realidad lo pasa. El cálculo exacto lo cuantifica:
+  30,9 letras más en profundidad. (`sprt.exact_letters`, `sprt.wald_gap`)
+- *¿Por qué hay que probar desplazamientos negativos?* Porque, si el central avanza entre
+  las dos claves de mensaje, el desplazamiento verdadero es δ − 26 y no +δ.
+- *¿Qué tiene que ver con lo que vimos en clase?* Es inferencia bayesiana: los decibanes son
+  log-odds, y cada observación los mueve por su factor de Bayes. La profundidad es
+  reutilizar el flujo: en AES-GCM o ChaCha20, repetir el nonce deja dos mensajes en
+  profundidad.
+- *¿Por qué 1/17, si su corpus repite 1 de cada 12,5?* Es la tasa del tráfico naval que da
+  Wikipedia. Nuestro texto es literario; no se ajustó nada para coincidir.
+
 ## Preguntas probables
 
 Las 15 más probables, con su respuesta y el código que la respalda, se completan a
@@ -332,4 +448,11 @@ medida que llegan los módulos. Las del guion («Preguntas probables») van toda
   cada menú, y E5 para todos.
 - *¿Hoy se rompería por fuerza bruta?* No hace falta (tema 1; `core/keyspace.py`). Los
   ataques modernos solo con texto cifrado llegan en la fase 5 (`attacks/`).
-- *¿Qué es un decibán?* Fase 4 (`banburismus/`).
+- *¿Qué es un decibán?* 10·log₁₀ del factor de Bayes, P(datos | profundidad) /
+  P(datos | azar). La evidencia de observaciones independientes se suma, porque el
+  logaritmo convierte el producto de los factores en una suma. Una repetición en la misma
+  columna suma +1,845 dB a favor de la profundidad, y una no repetición, −0,093
+  (`banburismus/scoring.py`; tema 5).
+- *¿Cuántas letras necesita el Banburismus?* Con letras sueltas y errores del 1 %, unas 929
+  según Wald, y 960 exactas por el sobrepaso. Por eso Turing puntuaba los multigramas
+  (`banburismus/sprt.py`; E6).

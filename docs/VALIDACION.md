@@ -16,6 +16,7 @@ validación es P0 y bloquea las demás fases: las pruebas de este documento corr
 | 6.5 | Casos deterministas de las diapositivas 10 y 11 | **Hecho** |
 | 6.5 | Caso de respaldo en la Bombe | **Hecho** (para en II-III-I; descifra las 78 letras) |
 | Fase 3 | Un orden en menos de 3 s; los 60 en menos de 2 min | **Hecho** |
+| Fase 4 | SPRT simulado frente a la aproximación de Wald (929 y 1.062 letras) | **Hecho** (983 y 1.090; exacto 959,7 y 1.067,4) |
 
 ## 6.1 · Vectores de prueba
 
@@ -199,6 +200,53 @@ dar otros (P-001).
 - **Versión vectorizada del arrastre:** hypothesis comprueba que da lo mismo que la
   escalar.
 
+## Fase 4 · Banburismus
+
+`tests/test_banburismus.py`, `tests/test_experiments.py::test_e6_banburismus_small` y la
+página (`tests/test_pages.py`).
+
+**Los mensajes en profundidad, contra la máquina.**
+- *Máquina escalar.* Con `core.machine.Enigma`, los dos mensajes de un par dan el mismo
+  cifrado que el lote (`encrypt_batch`). En el desplazamiento verdadero, la letra j del
+  mensaje 2 usa las mismas ventanas que la j + d del 1, letra por letra
+  (`test_depth_against_the_scalar_machine`).
+- *Repeticiones.* En 200 pares de texto alemán con 400 columnas, el cifrado repite
+  exactamente donde repite el texto plano. En desplazamientos falsos repite con
+  1/26 ± 0,003.
+- *Desplazamiento.* En 1.500 claves al azar, siempre hay profundidad, y el desplazamiento
+  verdadero es +δ o δ − 26. Es positivo en la mitad de los casos (±5 %), como se espera
+  con δ uniforme (D-042).
+- *Texto con tasa 1/17.* Repite con 1/17 ± 0,002 en el desplazamiento verdadero.
+
+**Decibanes y Wald.**
+- +1,845, −0,093, +0,0211 y −0,0184 dB, ±19,96 dB y 929 y 1.062 letras. Las seis cifras
+  están en `cifras.py` y las comprueba `tests/test_presentacion.py` con el formato de las
+  diapositivas.
+- *Cálculo exacto* (`sprt.exact_letters`). Cumple la identidad de Wald, E[S_N] = μ·E[N],
+  con un error relativo menor que 10⁻⁹. La probabilidad sin decidir al cortar es menor
+  que 10⁻¹². Los errores reales quedan bajo el 1 % nominal, y el sobrepaso medio está entre
+  0 y el salto de un paso.
+- *Simulación frente a cálculo exacto.* Con 2.000 secuencias de Bernoulli de 10.000 letras,
+  la media de letras cae a menos de 4 errores estándar del valor exacto, en profundidad y
+  al azar.
+- *Numba frente a Python.* El núcleo de Numba (`_sprt_kernel`) da las mismas letras, la
+  misma decisión y el mismo puntaje final que `sprt_reference` en 200 secuencias. Se probó
+  con letras sueltas y con trigramas, y con dos pares de umbrales a la vez. Sus puntajes
+  anotados coinciden con la trayectoria vectorizada (`scoring.trajectory`).
+
+**Multigramas.** La cadena de rachas reproduce, a la larga, la tasa de repetición del
+corpus (ρ₁) y la de dos columnas seguidas (ρ₂), con 1, 3 y 4 n-gramas. Un bigrama repetido
+pesa más que dos letras sueltas, y con letras sueltas da igual dónde caigan las
+repeticiones.
+
+**E6 frente a la referencia** (modo completo, 2.000 pares, semilla 2026). Con letras sueltas
+y tasa 1/17, el SPRT pide 983 letras en profundidad (IC 95 % 954–1.012) y 1.090 al azar
+(1.061–1.120).
+- *Wald* da 929 y 1.062. El primero queda fuera del IC por debajo: es la diferencia que
+  explica el sobrepaso (D-048).
+- *El cálculo exacto* da 959,7 y 1.067,4, dentro de los dos IC.
+- *La identidad de Wald* con el puntaje final medido da 963 y 1.072 letras.
+
 ## Otras comprobaciones
 
 - **Cableados:** coinciden con los de py-enigma (`tests/test_wiring.py`). Cada rotor es
@@ -212,7 +260,7 @@ dar otros (P-001).
   `Enigma.trace`, y su HTML no contiene ningún cableado: no reimplementa la máquina. En
   el navegador, la letra 1 de «Vector BDZGO» recorre A → A → C → D → F → S → S → E → B
   → B → B, como en la diapositiva 4.
-- **Cifras de la presentación (`tests/test_presentacion.py`):** comprueba las 37 que ya
+- **Cifras de la presentación (`tests/test_presentacion.py`):** comprueba las 43 que ya
   tienen código, entre ellas las de Turing de la diapositiva 16 contra
-  `data/reference/turing_stops.csv`. Las 2 restantes (Kuhl y Banburismus) aparecen como
-  pendientes, con su fase.
+  `data/reference/turing_stops.csv` y las seis del Banburismus (diapositivas 13 y 17). La
+  de Kuhl (diapositiva 9) aparece como pendiente de la fase 5.
