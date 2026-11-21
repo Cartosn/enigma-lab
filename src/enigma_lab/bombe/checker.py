@@ -62,6 +62,8 @@ WINDOW = 13
 """Letras a cada lado del crib que usa el puntaje rápido."""
 TOP = 25
 """Hipótesis que pasan del puntaje rápido al descifrado completo."""
+MAX_EXAMINED = 300
+"""Si ninguna de las ``TOP`` da un texto plausible, se siguen examinando hasta este número."""
 PLAUSIBLE = -1.5
 """log₁₀ P por letra desde el que un descifrado se acepta como alemán."""
 RING_PRIOR = True
@@ -563,12 +565,19 @@ def verify(
     top: int = TOP,
     hypotheses: Hypotheses | None = None,
 ) -> Verification:
-    """El verificador completo sobre las paradas de un barrido."""
+    """El verificador completo sobre las paradas de un barrido.
+
+    Descifra las ``top`` hipótesis con mejor puntaje rápido. Si ninguna da un texto
+    plausible, sigue bajando por el ranking, como seguía Bletchley con la parada siguiente,
+    hasta encontrar una o examinar ``MAX_EXAMINED``.
+    """
     start = time.perf_counter()
     cipher = to_codes(ciphertext)
     hypotheses, quick = ranking(run, ciphertext, crib_position, hypotheses)
-    solutions = []
-    for k in np.argsort(-quick, kind="stable")[:top]:
+    solutions: list[Solution] = []
+    for count, k in enumerate(np.argsort(-quick, kind="stable")):
+        if count >= MAX_EXAMINED or (count >= top and any(s.plausible for s in solutions)):
+            break
         solution = solve(
             hypotheses.get(int(k)),
             cipher,

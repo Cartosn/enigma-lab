@@ -297,8 +297,11 @@ en el criptoanálisis con n-gramas.
   separador. Se puntúa log₁₀ P(texto) por la regla de la cadena, incluidas las tres
   primeras letras.
 - **Puntaje rápido.** Hill climbing del plugboard sobre el crib y 13 letras a cada lado.
-  Fuera del crib se prueba cada punto donde pudo volver a avanzar el central. Pasan las
-  25 mejores hipótesis.
+  Fuera del crib se prueba cada punto donde pudo volver a avanzar el central. Se descifran
+  las 25 mejores hipótesis. Si ninguna da un texto plausible, se sigue bajando por el
+  ranking hasta encontrar una, con un máximo de 300, como seguía Bletchley con la parada
+  siguiente. Así se resolvió el único fallo del primer banco de la demo 2: la hipótesis
+  verdadera había quedado 34.ª en el puntaje rápido.
 - **Anillos.** Se prueban los 676 pares (central, derecho) y los arranques que llevan a
   la parada. El hill climbing se hace para cada secuencia distinta de posiciones, y luego
   se alterna: con el mejor plugboard se vuelve a elegir la secuencia y se sube otra vez.
