@@ -1,10 +1,10 @@
 # Resumen de resultados para la presentación
 
-- **Fecha:** 2026-11-21 03:33 UTC
-- **Commit:** 6bd632e
+- **Fecha:** 2026-11-21 18:31 UTC
+- **Commit:** 66213fd
 - **Semilla:** 2026
 - **Modo:** completo
-- **Corridas:** E1: modo completo, 2026-11-21 03:33 UTC, commit 6bd632e; E2: modo completo, 2026-11-21 03:33 UTC, commit 6bd632e; E3: modo completo, 2026-11-21 03:33 UTC, commit 6bd632e; E4: modo completo, 2026-11-21 03:33 UTC, commit 6bd632e
+- **Corridas:** E1: modo completo, 2026-11-21 18:28 UTC, commit 66213fd; E2: modo completo, 2026-11-21 18:28 UTC, commit 66213fd; E3: modo completo, 2026-11-21 18:28 UTC, commit 66213fd; E4: modo completo, 2026-11-21 18:28 UTC, commit 66213fd; E5: modo completo, 2026-11-21 18:31 UTC, commit 66213fd
 
 Generado por `make resumen` a partir de `results/summary.json` y los Parquet, sin volver a correr experimentos. Cada cifra sale del código.
 
@@ -28,7 +28,16 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 
 ### Diapositiva 16 · Bombe (E5)
 
-Pendiente (fase 3).
+- **Cifra para la diapositiva** (menús de 12 letras, con diagonal board, modo Bletchley): paradas falsas por orden de rotores con 0, 1, 2 y 3 lazos: 678 · 26,3 · 0,99 · 0,11. Turing: 820 · 31 · 1,2 · 0,04. IC 95 %: 672–684; 25,1–27,4; 0,766–1,21; 0,0484–0,172. N = 100 menús por celda, un orden de rotores por menú, semilla 2026.
+- **En 60 órdenes:** con 2 lazos, unas 59,4 paradas falsas (Turing: 72); con 3 lazos, 6,6 (Turing: 2,4).
+- **Cada lazo divide las paradas** por 25,8, 26,5, 9,0 (de 0 a 1, de 1 a 2 y de 2 a 3 lazos; Turing: por unas 26). Con las letras fijas, un lazo más es una arista más con las mismas letras. Con 3 lazos hubo solo 11 paradas falsas en 100 menús, así que el último cociente es impreciso.
+- **Sin diagonal board** (los mismos menús): 17.575 · 17.040 · 729 · 27,4 paradas falsas por orden con 0 a 3 lazos. Sin lazos, la Bombe para en casi todas las 17.576 posiciones: sin el diagonal board un menú sin lazos no descarta nada.
+- **Toda la tabla de Turing** (8 a 16 letras): en 15 de 17 celdas con valor exacto, las hipótesis abiertas por orden que medimos están entre la mitad y el doble de la estimación de Turing. Detalle por celda en `r3_bombe.csv` (columnas `paradas_media`, `hipotesis_media` y `turing`).
+- **Pocas letras y sin lazos:** con 8 letras Turing da 40.000 paradas por orden, más que las 17.576 posiciones. Su cifra cuenta hipótesis abiertas, no posiciones: medimos 37.546 hipótesis en 17.219 posiciones.
+- **Éxito:** en modo Bletchley aparece la parada verdadera en el 55,0 % de los menús. El central se movió dentro del tramo en el 45,0 %; sin esa vuelta, en el 100,0 %.
+- **Modo robusto** (menús de 12 y 16 letras): éxito 98,0 %, 13,9 veces el tiempo y 10,9 veces las paradas del modo Bletchley.
+- **Tiempo por orden** (17.576 posiciones, en el equipo de `make reproduce`): 0,006 s en modo Bletchley y 0,099 s en modo robusto.
+- **«Letras» son vértices** (P-002, D-031): las letras distintas del menú. Con esa lectura la columna de 12 letras queda cerca de la de Turing (entre 0,8 y 2,8 veces su valor); contando aristas no.
 
 ### Diapositiva 17 · Banburismus (E6)
 
@@ -84,19 +93,32 @@ Pendiente (fase 4).
 | 6.5 | letra de prueba del caso de respaldo | T, grado 4 | T, grado 4 | sí |
 | 9 | Kuhl: 105.456 · 21.230 · 11.466 | 105.456 · 21.230 · 11.466 | — | pendiente (fase 5 (P2): rejewski/; si no se hace, la diapositiva solo cita a Kuhl) |
 | 13, 17 | decibanes y aproximación de Wald | +1,845 dB; +0,0211 y −0,0184 dB; ±19,96 dB; 929 y 1.062 letras | — | pendiente (fase 4: banburismus/) |
-| 16 | Turing, 12 letras: paradas por orden | 820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60 | — | pendiente (fase 3: turing_stops.csv y E5) |
+| 16 | Turing, 12 letras: paradas por orden con 0, 1, 2 y 3 lazos; en 60 órdenes con 2 y 3 | 820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60 | 820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60 | sí |
 
-36 de 36 cifras calculadas coinciden; 3 llegan en fases siguientes.
+37 de 37 cifras calculadas coinciden; 2 llegan en fases siguientes.
 
 ## 3. Demos
 
 - **Demo 1 (diapositiva 4):** el cálculo es instantáneo. La traza de «Vector BDZGO» tarda 0,2 ms y la de «Portada» 0,6 ms en el equipo donde corrió `make resumen` (Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos). Los 45 s del guion los pone la interacción. Falta cronometrar el recorrido completo en el portátil del autor.
-- **Demo 2 (diapositiva 12):** pendiente (fase 3), con `make bench-demo`. Riesgo conocido: con WETTERBERICHT, el rotor central se mueve dentro del tramo en casi la mitad de las claves, y la mayoría de los menús tienen 0 o 1 lazos.
+- **Demo 2 (diapositiva 12):** `make bench-demo` del 2026-11-21 18:25 UTC (commit 5b34896) en Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos, Windows 11. Casos de compañero: clave como la de «Clave aleatoria» (10 cables), mensaje alemán de 78 letras que empieza por el crib, crib en la posición 0. Flujo completo de la página La Bombe: barrido, máquina de verificación y «Verificar». Éxito: el descifrado es el mensaje letra por letra.
+
+| Configuración | Éxito (IC 95 %) | p50 | p95 | Barrido p95 | ¿Cumple? |
+| --- | --- | --- | --- | --- | --- |
+| 60 órdenes, modo robusto | 60 de 60 (94 %–100 %) | 6,4 s | 9,8 s | 7,3 s | sí |
+| Rotores I, II y III (6 órdenes), modo robusto | 60 de 60 (94 %–100 %) | 1,3 s | 1,7 s | 0,8 s | sí |
+| Crib WETTERBERICHTXFUER, 60 órdenes, modo robusto | 59 de 60 (91 %–100 %) | 8,9 s | 10,4 s | 10,4 s | sí |
+
+- **Recomendada (la más simple con éxito ≥ 95% y p95 ≤ 30 s):** 60 órdenes, modo robusto: el compañero usa «Clave aleatoria» sin restricciones y empieza su mensaje por WETTERBERICHT (con X entre palabras). En la demo: «Rotores I a V (60 órdenes)», modo robusto. Éxito 100,0 %, p95 9,8 s.
+- Estos tiempos son del equipo indicado. Este equipo es un escritorio; el presupuesto de 30 s es del portátil del autor (P-001): corre `make bench-demo` allí antes de ensayar y usa la configuración que recomiende.
 
 ## 4. Discrepancias
 
 Ninguna contradicción con las diapositivas ni con el guion. Notas:
 
+- Diapositiva 16: la tabla de Turing cuenta «letras del menú» como letras distintas (vértices del grafo), igual que la diapositiva 11 (11 letras, 13 aristas). Con esa lectura, nuestra Bombe da 678 · 26,3 · 0,99 · 0,11 paradas falsas por orden con 12 letras y 0 a 3 lazos, frente a 820 · 31 · 1,2 · 0,04 de Turing. Si «letras» fueran aristas (letras del crib), no coincidirían (ver D-031).
+- Guion, diapositiva 16: «en los 60 órdenes quedan unas 2 paradas falsas en total; con dos lazos serían unas 72» son cifras de Turing (0,04 y 1,2 por 60). Nuestra Bombe da 6,6 y 59,4. El mensaje del guion se sostiene (con 3 lazos, unas pocas paradas en los 60 órdenes; con 2, decenas).
+- Verificador (spec 6.4, «siempre»): recupera una clave equivalente en 200 de 200 de los casos de la prueba, que se usaron para ajustar su diseño, y en 198 de 200 casos nuevos. Las 2 fallas tienen el plugboard exacto y difieren en una sola letra, la segunda o la última del mensaje: un doble paso del central justo en el borde que el texto no alcanza a decidir. La parada verdadera aparece siempre (400 de 400).
+- Diapositiva 12 y guion: la configuración de la demo 2 es la recomendada en «Demos»; el guion la tiene pendiente.
 - Diapositiva 15: con alemán real, el 60 % de 13 letras pasa a 61,6 %, por encima de (25/26)^13 y fuera de su IC. No es un error del filtro: es el efecto del IC del idioma, y la corrección (1 − (1 − κ)/25)^13 = 61,4 % lo explica. La diapositiva puede seguir diciendo «60 %» para la teoría y agregar el valor real.
 - py-enigma admite como máximo 10 cables: la comparación de 10.000 claves usa de 0 a 10 cables, y las pruebas con hypothesis cubren de 0 a 13.
 - Mensaje histórico: no se encontró una fuente verificable del mensaje de Barbarossa (1941). Se usa el del U-264 (M4), publicado con clave, cifrado y texto por D. Rijmenants.
@@ -104,7 +126,7 @@ Ninguna contradicción con las diapositivas ni con el guion. Notas:
 
 ## 5. Pendientes
 
-- Fase 3 · Bombe (E5) y configuración de la demo 2: semana 2.
 - Fase 4 · Banburismus (E6): semana 3.
 - Fase 5 · Rejewski (E7) y ataque moderno (E8), opcionales: semana 3.
 - Fase 6 · modo demo completo, Docker, informe y entrega: fin de la semana 3.
+- Demo 2 · correr `make bench-demo` en el portátil del autor (P-001) y confirmar la configuración: antes de ensayar.

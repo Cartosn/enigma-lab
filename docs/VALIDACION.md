@@ -163,11 +163,17 @@ otros 20 casos corren en cada `make test`.
   da la parada verdadera
   (`test_robust_mode_covers_a_turnover_in_the_crib`).
 
-**Rendimiento (criterio de la fase 3).** En este equipo (i5-9400F, 6 núcleos), con un menú
-de 14 letras, un orden tarda unos 0,03 s en modo Bletchley y los 60 órdenes unos 2 a 3 s;
-el criterio es un orden en menos de 3 s y los 60 en menos de 2 minutos
-(`test_performance_one_order_and_sixty`). El modo robusto con WETTERBERICHT, 13
-variantes, tarda unos 0,2 s por orden.
+**Rendimiento (criterio de la fase 3: un orden en menos de 3 s y los 60 en menos de 2
+minutos).** Medido en este equipo (i5-9400F, 6 núcleos), sin otros procesos pesados:
+- E5 (solo el barrido, con las tablas precalculadas): 0,006 s por orden en modo
+  Bletchley y 0,10 s en robusto;
+- página La Bombe, caso de respaldo: los 60 órdenes en modo Bletchley tardaron 1,9 s;
+- banco de la demo 2: con WETTERBERICHT, en modo robusto, los 60 órdenes tardan 5,6 s
+  (p50) y 7,3 s (p95).
+
+`test_performance_one_order_and_sixty` lo comprueba en cada `make test`. Con la máquina
+ocupada en otras tareas, los tiempos llegaron a triplicarse; el portátil del autor puede
+dar otros (P-001).
 
 ## 6.5 · Casos de las diapositivas 10 y 11
 

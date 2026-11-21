@@ -4,8 +4,8 @@
       "experimento": "e1",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 03:33 UTC",
-      "commit": "6bd632e"
+      "fecha": "2026-11-21 18:28 UTC",
+      "commit": "66213fd"
     },
     "vectores_ok": 9,
     "vectores_total": 9,
@@ -36,15 +36,15 @@
     "puntos_fijos": 0,
     "involucion_ok": 2000,
     "lotes_igual_escalar": 2000,
-    "segundos": 19.3
+    "segundos": 17.9
   },
   "e2": {
     "corrida": {
       "experimento": "e2",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 03:33 UTC",
-      "commit": "6bd632e"
+      "fecha": "2026-11-21 18:28 UTC",
+      "commit": "66213fd"
     },
     "total_sin_anillos": "158962555217826360000",
     "bits_sin_anillos": 67.10724886600143,
@@ -70,8 +70,8 @@
       "experimento": "e4",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 03:33 UTC",
-      "commit": "6bd632e"
+      "fecha": "2026-11-21 18:28 UTC",
+      "commit": "66213fd"
     },
     "n_por_L": 1000,
     "longitudes": [
@@ -283,15 +283,15 @@
         }
       }
     },
-    "segundos": 3.4
+    "segundos": 3.2
   },
   "e3": {
     "corrida": {
       "experimento": "e3",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 03:33 UTC",
-      "commit": "6bd632e"
+      "fecha": "2026-11-21 18:28 UTC",
+      "commit": "66213fd"
     },
     "n_por_condicion": 1000,
     "longitudes": [
@@ -345,6 +345,228 @@
       "frecuencia_e_plano": 0.13970995711067913,
       "frecuencia_e_cifrado_esperada": 0.03441160171557284
     },
-    "segundos": 3.1
+    "segundos": 3.0
+  },
+  "e5": {
+    "corrida": {
+      "experimento": "e5",
+      "modo": "completo",
+      "semilla": 2026,
+      "fecha": "2026-11-21 18:31 UTC",
+      "commit": "66213fd"
+    },
+    "n_por_celda": 100,
+    "letras": [
+      8,
+      10,
+      12,
+      14,
+      16
+    ],
+    "lazos": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "letras_robusto": [
+      12,
+      16
+    ],
+    "fuente": "completo",
+    "cobertura": [
+      {
+        "letras": 8,
+        "lazos": 0,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 8,
+        "lazos": 1,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 8,
+        "lazos": 2,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 8,
+        "lazos": 3,
+        "encontrados": 100,
+        "candidatos": 2000000
+      },
+      {
+        "letras": 10,
+        "lazos": 0,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 10,
+        "lazos": 1,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 10,
+        "lazos": 2,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 10,
+        "lazos": 3,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 12,
+        "lazos": 0,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 12,
+        "lazos": 1,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 12,
+        "lazos": 2,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 12,
+        "lazos": 3,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 14,
+        "lazos": 0,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 14,
+        "lazos": 1,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 14,
+        "lazos": 2,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 14,
+        "lazos": 3,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 16,
+        "lazos": 0,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 16,
+        "lazos": 1,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 16,
+        "lazos": 2,
+        "encontrados": 100,
+        "candidatos": 1000000
+      },
+      {
+        "letras": 16,
+        "lazos": 3,
+        "encontrados": 100,
+        "candidatos": 1000000
+      }
+    ],
+    "doce_letras": {
+      "0": {
+        "paradas": 677.6,
+        "ic": [
+          671.579767952322,
+          683.6202320476781
+        ],
+        "hipotesis": 679.82,
+        "en_60_ordenes": 40656.0,
+        "turing": 820.0,
+        "turing_cota": "",
+        "turing_en_60": 49200.0,
+        "sin_diagonal": 17575.39,
+        "robusto": 7435.56,
+        "n": 100
+      },
+      "1": {
+        "paradas": 26.28,
+        "ic": [
+          25.125641363796646,
+          27.434358636203356
+        ],
+        "hipotesis": 26.3,
+        "en_60_ordenes": 1576.8000000000002,
+        "turing": 31.0,
+        "turing_cota": "",
+        "turing_en_60": 1860.0,
+        "sin_diagonal": 17040.05,
+        "robusto": 318.42,
+        "n": 100
+      },
+      "2": {
+        "paradas": 0.99,
+        "ic": [
+          0.7662780917061542,
+          1.2137219082938457
+        ],
+        "hipotesis": 0.99,
+        "en_60_ordenes": 59.4,
+        "turing": 1.2,
+        "turing_cota": "",
+        "turing_en_60": 72.0,
+        "sin_diagonal": 728.68,
+        "robusto": 13.5,
+        "n": 100
+      },
+      "3": {
+        "paradas": 0.11,
+        "ic": [
+          0.04836578916779549,
+          0.1716342108322045
+        ],
+        "hipotesis": 0.11,
+        "en_60_ordenes": 6.6,
+        "turing": 0.04,
+        "turing_cota": "",
+        "turing_en_60": 2.4,
+        "sin_diagonal": 27.38,
+        "robusto": 0.95,
+        "n": 100
+      }
+    },
+    "exito_bletchley": 0.55,
+    "exito_bletchley_sin_vuelta": 1.0,
+    "vuelta_frac": 0.45,
+    "exito_robusto": 0.98,
+    "robusto_tiempo_relativo": 13.921818570325927,
+    "robusto_paradas_relativas": 10.91435616515124,
+    "s_por_orden_bletchley": 0.00636156909854617,
+    "s_por_orden_robusto": 0.09881551937534823,
+    "menus": 2000,
+    "segundos": 164.0
   }
 }

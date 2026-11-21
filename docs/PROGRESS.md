@@ -1,16 +1,112 @@
 # Progreso
 
-Última actualización: 20-11-2026 · fase 2 cerrada.
+Última actualización: 21-11-2026 · fase 3 cerrada.
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
 | 0 · Andamiaje | Cerrada (20-11-2026) | 1 |
 | 1 · Núcleo Enigma | Cerrada (20-11-2026) | 1 |
 | 2 · Estadística y cribs | Cerrada (20-11-2026) | 1–2 (reunión con el profe) |
-| 3 · Bombe | Siguiente | 2 |
-| 4 · Banburismus | Pendiente | 3 |
+| 3 · Bombe | Cerrada (21-11-2026) | 2 |
+| 4 · Banburismus | Siguiente | 3 |
 | 5 · Extensiones P2 | Pendiente | 3 |
 | 6 · Pulido y entrega | Pendiente | Fin de la 3 |
+
+## Fase 3 · Bombe
+
+**Criterios de aceptación:** se cumplen.
+
+| Criterio | Resultado |
+| --- | --- |
+| Pruebas de 6.4 (200 casos) | Parada verdadera 200 de 200; clave equivalente 200 de 200 |
+| Un orden en menos de 3 s | 0,006 s en modo Bletchley y 0,10 s en robusto (E5, solo el barrido) |
+| Los 60 órdenes en menos de 2 min | 1,9 s en modo Bletchley (página La Bombe, caso de respaldo); en robusto con WETTERBERICHT, p50 5,6 s y p95 7,3 s (banco de la demo 2) |
+| Paradas comparadas con la tabla de Turing | E5: con 12 letras, 678 · 26,3 · 0,99 · 0,11 por orden (Turing: 820 · 31 · 1,2 · 0,04); 15 de 17 celdas entre la mitad y el doble |
+
+Además:
+- **6.3:** la Bombe en Numba coincide con la de referencia en 24 casos.
+- **Caso de respaldo (6.5):** en modo Bletchley para en II-III-I y el verificador
+  descifra las 78 letras.
+- **CyberChef (P-003):** da las mismas paradas en 3 de 3 casos; en el más largo, 84 con su
+  stecker. Su máquina de verificación deja las mismas paradas, con los mismos steckers,
+  que nuestra etapa 1.
+
+`make test` da 248 pruebas que pasan y 2 cifras pendientes (fases 4 y 5), en unos 2 min,
+con las lentas incluidas. `make lint` pasa sin errores. `make reproduce` completo
+(corpus y E1 a E5) tarda 3 min 23 s en este equipo; E5, 2 min 44 s.
+
+**Qué quedó:**
+- **`bombe/`:**
+  - `scrambler.py`: el aleatorizador de las 17.576 posiciones, por orden.
+  - `wiring.py`: el menú como cables, aristas y pares del diagonal board.
+  - `bombe_numba.py`: el barrido con union-find, con salida temprana, y la máquina de
+    verificación.
+  - `sweep.py`: ajustes, modos Bletchley y robusto, paradas como arreglos y la parada
+    verdadera de una clave conocida.
+  - `bombe_reference.py`: la misma Bombe en Python puro, para las pruebas.
+  - `checker.py`: el verificador. Hace el puntaje rápido, prueba los 676 anillos, completa
+    el plugboard por hill climbing y da la clave equivalente.
+  - `cases.py`: los casos de prueba compartidos.
+- **`stats/ngrams.py`:** modelo de 4 letras interpolado y puntaje por la regla de la
+  cadena.
+- **E5,** con la tabla de Turing completa en `data/reference/turing_stops.csv`.
+  «Letras del menú» son vértices (D-031, resuelve P-002).
+- **App:**
+  - página La Bombe, con menú, configuración, barrido con barra, contador, cronómetro y
+    tambores; tabla de paradas, «Verificar» y comparación con y sin diagonal board; todo
+    revisado en el navegador;
+  - pestaña E5 en Experimentos;
+  - rotores permitidos en «Clave aleatoria»;
+  - precalentado de Numba al arrancar.
+- **Demo 2:** `scripts/bench_demo2.py` y `make bench-demo`.
+- **Documentos:**
+  - guía de estudio (tema 4 y respuestas del guion);
+  - VALIDACION (6.2 a 6.5 de la Bombe);
+  - DECISIONES (D-031 a D-041);
+  - ARQUITECTURA y FUENTES.
+
+**Cifras obtenidas** (modo completo, semilla 2026, commit `66213fd`; el banco de la demo 2,
+commit `5b34896`, con el mismo código de la Bombe):
+- **E5, 12 letras, con diagonal board y en modo Bletchley:**
+  - Paradas falsas por orden con 0 a 3 lazos: 678 · 26,3 · 0,99 · 0,11.
+  - IC 95 %: 672–684; 25,1–27,4; 0,77–1,21; 0,05–0,17.
+  - Turing: 820 · 31 · 1,2 · 0,04.
+  - En 60 órdenes: 59,4 con 2 lazos (Turing: 72) y 6,6 con 3 (Turing: 2,4).
+- **Toda la tabla de Turing:** en 15 de 17 celdas con valor exacto, las hipótesis
+  abiertas por orden quedan entre la mitad y el doble de la estimación de Turing. Con 8
+  letras y sin lazos: 37.546 hipótesis por orden (Turing: 40.000) en 17.219 posiciones.
+- **Sin diagonal board** (12 letras, 0 a 3 lazos): 17.575 · 17.040 · 729 · 27,4 paradas
+  por orden.
+- **Éxito:**
+  - El modo Bletchley encuentra la parada verdadera en el 55,0 % de los menús: el central
+    se movió dentro del tramo en el 45,0 %, y sin esa vuelta la encuentra en el 100 %.
+  - El modo robusto la encuentra en el 98,0 %, con 13,9 veces el tiempo y 10,9 veces las
+    paradas.
+- **Tiempo por orden** (solo el barrido, con las tablas precalculadas): 0,006 s en modo
+  Bletchley y 0,10 s en robusto.
+- **Demo 2** (`make bench-demo`, 60 casos por configuración, en este escritorio):
+
+  | Configuración | Éxito (IC 95 %) | p50 | p95 |
+  | --- | --- | --- | --- |
+  | 60 órdenes, modo robusto | 60 de 60 (94 %–100 %) | 6,4 s | 9,8 s |
+  | Rotores I–III, modo robusto | 60 de 60 (94 %–100 %) | 1,3 s | 1,7 s |
+  | Crib WETTERBERICHTXFUER, 60 órdenes | 59 de 60 (91 %–100 %) | 8,9 s | 10,4 s |
+
+  La falla del crib largo tuvo dos movimientos del central dentro del tramo, que ningún
+  modo cubre. Recomendada, por ser la más simple que cumple: los 60 órdenes en modo
+  robusto. Si en el portátil su p95 se acerca a 30 s, la de rotores I–III dio el mismo
+  éxito en menos de 2 s. Falta medir en el portátil (P-001).
+- **Cifras de la presentación:** 37 de 37 coinciden; 2 llegan en las fases 4 y 5.
+
+**Qué falta (fase 4):**
+- `banburismus/`: decibanes y SPRT;
+- la página Banburismus;
+- E6, con la simulación del SPRT frente a la aproximación de Wald (929 y 1.062 letras).
+
+**Pendiente del autor:**
+- correr `make bench-demo` en el portátil y confirmar la configuración de la demo 2
+  (P-001);
+- crear el repositorio remoto.
 
 ## Fase 2 · Estadística y cribs
 
