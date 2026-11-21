@@ -369,13 +369,11 @@ def summary(df: pd.DataFrame, params: dict[str, Any]) -> dict[str, Any]:
 def figure(df: pd.DataFrame, theme: str = "enigma_print") -> Any:
     """Mapa de calor letras × lazos de las paradas falsas por orden, con y sin diagonal board."""
     import matplotlib.pyplot as plt
-    from matplotlib.colors import ListedColormap, LogNorm
+    from matplotlib.colors import ListedColormap, LogNorm, to_hex
 
     from enigma_lab.viz.numfmt import fmt_dec, fmt_int
-    from enigma_lab.viz.static_figs import tokens
-    from enigma_lab.viz.theme import SEQUENTIAL_DARK, SEQUENTIAL_PRINT, mpl_style_context
+    from enigma_lab.viz.theme import SEQUENTIAL_DARK, SEQUENTIAL_PRINT, ink_on, mpl_style_context
 
-    t = tokens(theme)
     table = aggregate(df)
     table = table[table["modo"] == "bletchley"]
     letters = sorted(table["letras"].unique())
@@ -384,11 +382,18 @@ def figure(df: pd.DataFrame, theme: str = "enigma_print") -> Any:
     cmap = ListedColormap(list(ramp))
 
     def short(value: float) -> str:
+        """Lo medido: entero desde 100, un decimal desde 1, dos debajo."""
         if value >= 100:
             return fmt_int(round(value))
         if value >= 1:
             return fmt_dec(value, 1)
         return fmt_dec(value, 2)
+
+    def as_given(value: float) -> str:
+        """La cifra de Turing como la da la tabla: 40.000 · 58 · 1,2 · 0,42."""
+        if float(value).is_integer():
+            return fmt_int(int(value))
+        return fmt_dec(value, 2).rstrip("0")
 
     with mpl_style_context(theme):
         fig, axes = plt.subplots(1, 2, figsize=(12, 4.8), sharey=True)
@@ -399,12 +404,12 @@ def figure(df: pd.DataFrame, theme: str = "enigma_print") -> Any:
             for r in part.itertuples():
                 grid[loops.index(r.lazos), letters.index(r.letras)] = max(r.paradas_media, 0.01)
             image = ax.imshow(grid, cmap=cmap, norm=norm, aspect="auto")
+            ax.grid(False)
             for r in part.itertuples():
                 y, x = loops.index(r.lazos), letters.index(r.letras)
                 label = short(r.paradas_media)
                 if diagonal == "si" and not np.isnan(r.turing):
-                    label += f"\n({r.turing_cota}{short(r.turing)})"
-                light = grid[y, x] > 30
+                    label += f"\n({r.turing_cota}{as_given(r.turing)})"
                 ax.text(
                     x,
                     y,
@@ -412,7 +417,7 @@ def figure(df: pd.DataFrame, theme: str = "enigma_print") -> Any:
                     ha="center",
                     va="center",
                     fontsize="small",
-                    color=t.background if light else t.text,
+                    color=ink_on(to_hex(cmap(norm(grid[y, x])))),
                 )
             ax.set_xticks(range(len(letters)), [str(v) for v in letters])
             ax.set_yticks(range(len(loops)), [str(v) for v in loops])
@@ -429,7 +434,7 @@ def figure(df: pd.DataFrame, theme: str = "enigma_print") -> Any:
         if cell is not None:
             title = (
                 f"Con 12 letras y 3 lazos, {short(cell['paradas_media'])} paradas falsas por orden "
-                f"(Turing: {short(cell['turing'])})"
+                f"(Turing: {as_given(cell['turing'])})"
             )
         fig.suptitle(title)
     return fig
