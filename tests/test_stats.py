@@ -69,6 +69,22 @@ def test_enigma_pair_matrix_has_zero_diagonal() -> None:
     assert matrix.sum() == 100 * 200
 
 
+def test_antifrequency() -> None:
+    """q_c = (1 − f_c)/25 suma 1; con frecuencias uniformes, la χ² rechaza en α."""
+    from enigma_lab.stats.frequencies import (
+        chi2_power,
+        enigma_cipher_frequencies,
+        frequencies,
+    )
+
+    german = frequencies(load_codes("aleman"))
+    q = enigma_cipher_frequencies(german)
+    assert q.sum() == pytest.approx(1.0)
+    assert q[4] < 1 / 26 < german[4]  # la E sale menos en el cifrado
+    assert chi2_power(1000, np.full(26, 1 / 26)) == pytest.approx(0.05)
+    assert chi2_power(1000, q) > chi2_power(100, q) > 0.05
+
+
 def test_ngram_scores_separate_german_from_noise() -> None:
     quad = model("aleman", 4)
     german = load_codes("aleman")[:300]

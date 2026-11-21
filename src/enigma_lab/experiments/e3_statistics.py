@@ -27,11 +27,21 @@ import pandas as pd
 from enigma_lab import SEED
 from enigma_lab.core.batch import encrypt_batch, random_key_batch
 from enigma_lab.experiments.common import Mode, RunInfo, save_figure, save_table, update_summary
-from enigma_lab.stats.corpus import ALL_LANGUAGES, LANGUAGES, Source, load_codes, random_excerpts
+from enigma_lab.stats.corpus import (
+    ALL_LANGUAGES,
+    LANGUAGES,
+    Language,
+    Source,
+    load_codes,
+    random_excerpts,
+)
 from enigma_lab.stats.frequencies import (
     GERMAN_IC_REFERENCE,
     RANDOM_IC,
+    chi2_power,
     chi2_uniform,
+    enigma_cipher_frequencies,
+    frequencies,
     index_of_coincidence,
     pair_matrix,
 )
@@ -79,10 +89,20 @@ def run_with_pairs(params: dict[str, Any], seed: int = SEED) -> tuple[pd.DataFra
     return pd.concat(frames, ignore_index=True), pairs
 
 
-def by_condition(df: pd.DataFrame) -> pd.DataFrame:
-    """Medias con IC 95 % y tasas de rechazo de la uniformidad, por idioma y longitud."""
+def expected_cipher_frequencies(language: Language, source: Source = "muestra") -> np.ndarray:
+    """Frecuencias esperadas del cifrado del idioma: q_c = (1 − f_c)/25 (antifrecuencia)."""
+    return enigma_cipher_frequencies(frequencies(load_codes(language, source)))
+
+
+def by_condition(df: pd.DataFrame, source: Source = "muestra") -> pd.DataFrame:
+    """Medias con IC 95 % y tasas de rechazo de la uniformidad, por idioma y longitud.
+
+    ``rechaza_cifrado_teoria`` es la probabilidad de rechazo que predice la antifrecuencia
+    q_c = (1 − f_c)/25 (χ² no central), con las frecuencias del corpus ``source``.
+    """
     rows = []
     for (language, length), group in df.groupby(["idioma", "L"]):
+        expected = expected_cipher_frequencies(language, source)
         ic_p = mean_ci(group["ic_plano"].to_numpy())
         ic_c = mean_ci(group["ic_cifrado"].to_numpy())
         rows.append(
@@ -98,6 +118,7 @@ def by_condition(df: pd.DataFrame) -> pd.DataFrame:
                 "ic_cifrado_alto": ic_c[2],
                 "rechaza_plano": float((group["p_plano"] < ALPHA).mean()),
                 "rechaza_cifrado": float((group["p_cifrado"] < ALPHA).mean()),
+                "rechaza_cifrado_teoria": chi2_power(int(length), expected, ALPHA),
                 "puntos_fijos": int(group["puntos_fijos"].sum()),
                 "distinguidor": no_fixed_point_probability(int(length)),
             }
@@ -116,9 +137,9 @@ def pairs_table(matrix: np.ndarray) -> pd.DataFrame:
 
 def summary(df: pd.DataFrame, params: dict[str, Any]) -> dict[str, Any]:
     """Cifras clave de E3."""
-    table = by_condition(df)
-    longest = table[table["L"] == table["L"].max()].set_index("idioma")
     source: Source = params["source"]
+    table = by_condition(df, source)
+    longest = table[table["L"] == table["L"].max()].set_index("idioma")
     figures: dict[str, Any] = {
         "n_por_condicion": params["n"],
         "longitudes": params["lengths"],
@@ -137,6 +158,11 @@ def summary(df: pd.DataFrame, params: dict[str, Any]) -> dict[str, Any]:
             "ic_cifrado": [row["ic_cifrado"], row["ic_cifrado_bajo"], row["ic_cifrado_alto"]],
             "rechaza_plano": row["rechaza_plano"],
             "rechaza_cifrado": row["rechaza_cifrado"],
+            "rechaza_cifrado_teoria": row["rechaza_cifrado_teoria"],
+            "frecuencia_e_plano": float(frequencies(load_codes(language, source))[4]),
+            "frecuencia_e_cifrado_esperada": float(
+                expected_cipher_frequencies(language, source)[4]
+            ),
         }
     return figures
 
@@ -223,7 +249,7 @@ def main(mode: Mode = "completo", seed: int = SEED) -> dict[str, Any]:
     df, pairs = run_with_pairs(params, seed)
     figures = summary(df, params) | {"segundos": round(time.perf_counter() - started, 1)}
     save_table(df, "e3_estadistica")
-    save_table(by_condition(df), "e3_condiciones")
+    save_table(by_condition(df, params["source"]), "e3_condiciones")
     save_table(pairs_table(pairs), "e3_pares")
     update_summary("e3", figures, RunInfo("e3", mode, seed))
 

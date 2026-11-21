@@ -150,9 +150,16 @@ letras del texto, tomadas al azar, sean iguales.
 (`stats/frequencies.py` · `index_of_coincidence`; experimento E3)
 
 **Prueba χ².** χ² = Σ (Oᵢ − Eᵢ)²/Eᵢ, con Eᵢ = N/26 y 25 grados de libertad. Con
-mensajes de cientos de letras, rechaza la uniformidad de prácticamente todos los textos
-planos. En los cifrados de Enigma la rechaza en ≈ 5 % de los casos, lo que se espera con
-α = 5 % si el cifrado es uniforme. (`chi2_uniform`; cifras de E3 en `RESUMEN.md`)
+mensajes de 50 letras o más rechaza la uniformidad de casi todos los textos planos; en
+los cifrados de Enigma la rechaza pocas veces (`chi2_uniform`; cifras de E3 en
+`RESUMEN.md`).
+
+**La antifrecuencia.** El cifrado no es del todo uniforme. Una letra plana p sale como
+cualquiera de las otras 25 con la misma probabilidad, nunca como sí misma. Por eso la
+letra c aparece en el cifrado con probabilidad (1 − f_c)/25: las letras frecuentes del
+idioma salen un poco *menos* que 1/26. Con mensajes de 1.000 letras, la χ² ya lo detecta
+más veces que el 5 % de un cifrado uniforme, y la χ² no central predice cuántas
+(`enigma_cipher_frequencies`, `chi2_power`).
 
 **El distinguidor.** Lo que Enigma no puede esconder es que ninguna letra se cifra a sí
 misma: la diagonal de la matriz plano × cifrado es cero. Con una sustitución al azar,

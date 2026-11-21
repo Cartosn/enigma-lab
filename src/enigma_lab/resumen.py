@@ -177,11 +177,25 @@ def _other_results(e2: dict[str, Any], e3: dict[str, Any]) -> list[str]:
             f"pasa de {fmt_dec(de['ic_plano'][0], 4)} en el plano a "
             f"{fmt_dec(de['ic_cifrado'][0], 4)} en el cifrado (1/26 = "
             f"{fmt_dec(e3['ic_azar'], 4)}).",
-            f"- La prueba χ² rechaza la uniformidad del {fmt_pct(de['rechaza_plano'], 0)} de los "
-            f"textos planos en alemán y del {fmt_pct(de['rechaza_cifrado'], 1)} de los cifrados "
-            "(con α = 5 %, se espera un 5 % de rechazos si el cifrado es uniforme). Puntos fijos: "
-            f"{fmt_int(e3['puntos_fijos'])} en {fmt_int(e3['letras'])} letras.",
+            f"- La prueba χ² (α = 5 %), con {de['L']} letras, rechaza la uniformidad del "
+            f"{fmt_pct(de['rechaza_plano'], 0)} de los textos planos en alemán y del "
+            f"{fmt_pct(de['rechaza_cifrado'], 1)} de los cifrados (un cifrado uniforme daría "
+            "5 %).",
         ]
+        if "rechaza_cifrado_teoria" in de:
+            lines.append(
+                "- **Antifrecuencia:** como ninguna letra se cifra a sí misma, la letra c sale "
+                "cifrada con probabilidad (1 − f_c)/25. Las letras comunes del idioma salen un "
+                f"poco menos: la E, el {fmt_pct(de['frecuencia_e_plano'])} del alemán, debería "
+                f"ser el {fmt_pct(de['frecuencia_e_cifrado_esperada'], 2)} del cifrado y no el "
+                f"{fmt_pct(1 / 26, 2)}. Con esa distribución, la χ² no central predice un "
+                f"{fmt_pct(de['rechaza_cifrado_teoria'], 1)} de rechazos con {de['L']} letras; "
+                f"se midió {fmt_pct(de['rechaza_cifrado'], 1)}. Las frecuencias del idioma se "
+                "filtran débiles y al revés."
+            )
+        lines.append(
+            f"- Puntos fijos: {fmt_int(e3['puntos_fijos'])} en {fmt_int(e3['letras'])} letras."
+        )
     if e2:
         lines.append(
             f"- **E2 (diapositiva 7):** {e2['texto']}; máximo de N(k) con "
