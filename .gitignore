@@ -1,0 +1,34 @@
+# Entorno de Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Herramientas de calidad
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.coverage
+htmlcov/
+
+# Configuración local (Streamlit)
+.streamlit/secrets.toml
+
+# Salida del piloto (scripts/piloto_enigma.py)
+crib_montecarlo.csv
+
+# Compilación del informe
+report/*.aux
+report/*.log
+report/*.out
+report/*.fls
+report/*.fdb_latexmk
+report/*.synctex.gz
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini

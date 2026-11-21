@@ -1,0 +1,55 @@
+# Enigma Lab · configuración de Streamlit
+#
+# Tema «Bletchley nocturno» (spec 8.1). Los mismos colores están en
+# src/enigma_lab/viz/theme.py; si cambias uno, cambia el otro (tests/test_app.py
+# comprueba que coincidan).
+
+[server]
+# Sirve app/static/ (fuentes): la app funciona sin internet.
+enableStaticServing = true
+runOnSave = false
+
+[browser]
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"
+showErrorDetails = "full"
+
+[theme]
+base = "dark"
+primaryColor = "#F2B134"
+backgroundColor = "#0F1216"
+secondaryBackgroundColor = "#171B21"
+textColor = "#E8E6E3"
+borderColor = "#2A3038"
+linkColor = "#4FB3BF"
+redColor = "#E5534B"
+greenColor = "#57AB5A"
+font = "Inter, sans-serif"
+codeFont = "JetBrains Mono, monospace"
+baseFontSize = 16
+baseRadius = "0.5rem"
+showWidgetBorder = true
+
+[[theme.fontFaces]]
+family = "Inter"
+url = "app/static/fonts/InterVariable.woff2"
+weight = "100 900"
+style = "normal"
+
+[[theme.fontFaces]]
+family = "JetBrains Mono"
+url = "app/static/fonts/JetBrainsMono-Regular.woff2"
+weight = "400"
+style = "normal"
+
+[[theme.fontFaces]]
+family = "JetBrains Mono"
+url = "app/static/fonts/JetBrainsMono-Bold.woff2"
+weight = "700"
+style = "normal"
+
+[theme.sidebar]
+backgroundColor = "#171B21"
+secondaryBackgroundColor = "#0F1216"

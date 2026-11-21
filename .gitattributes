@@ -1,0 +1,15 @@
+# Fin de línea normalizado en el repositorio; cada sistema usa el suyo al sacar copia.
+* text=auto
+
+# Los scripts de shell necesitan LF; los de PowerShell, CRLF.
+*.sh text eol=lf
+Makefile text eol=lf
+*.ps1 text eol=crlf
+
+# Binarios
+*.pdf binary
+*.png binary
+*.woff2 binary
+*.ttf binary
+*.parquet binary
+*.zip binary
