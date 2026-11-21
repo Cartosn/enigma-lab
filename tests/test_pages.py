@@ -39,3 +39,22 @@ def test_keyspace_page_figures() -> None:
     values = {m.label: m.value for m in app.metric}
     assert values["Barrido de la Bombe"] == "1.054.560"
     assert re.match(r"70,2\s%", values["Parte del plugboard"])
+
+
+def test_bombe_page_backup_case_decrypts() -> None:
+    """La Bombe con el caso de respaldo: menú de 3 lazos, barrido, «Verificar» y las 78 letras."""
+    import json
+
+    from enigma_lab.core.machine import groups_of_five
+
+    data = json.loads((paths.DEMO / "respaldo_bombe.json").read_text(encoding="utf-8"))
+    app = AppTest.from_file(str(paths.APP / "pages" / "bombe.py"), default_timeout=300).run()
+    assert not app.exception
+    values = {m.label: m.value for m in app.metric}
+    assert values["Lazos"] == "3" and values["Letra de prueba"] == "T"
+    next(b for b in app.button if b.label == "Correr la Bombe").click().run()
+    assert not app.exception
+    next(b for b in app.button if b.label == "Verificar").click().run()
+    assert not app.exception
+    text = " ".join(str(block.value) for block in app.markdown)
+    assert groups_of_five(data["plaintext"]) in text

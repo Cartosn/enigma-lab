@@ -280,6 +280,99 @@ def e4_survival(table: pd.DataFrame, demo: bool = False) -> go.Figure:
     return fig
 
 
+E5_FLOOR = 0.003
+"""Piso de la escala logarítmica de E5: un promedio de 0 paradas se dibuja aquí."""
+
+
+def e5_vs_turing(table: pd.DataFrame, demo: bool = False) -> go.Figure:
+    """E5: paradas falsas por orden (con diagonal board) según letras y lazos, frente a Turing."""
+    part = table[(table["diagonal"] == "si") & (table["modo"] == "bletchley")]
+    fig = go.Figure()
+    for color, loops in zip(CATEGORICAL, sorted(part["lazos"].unique()), strict=False):
+        rows = part[part["lazos"] == loops].sort_values("letras")
+        fig.add_scatter(
+            x=rows["letras"],
+            y=np.maximum(rows["turing"], E5_FLOOR),
+            mode="lines",
+            line={"color": color, "dash": "dash", "width": 1.5},
+            name=f"Turing, {loops} lazo{'s' if loops != 1 else ''}",
+            hovertemplate="%{x} letras: %{y} (Turing)<extra></extra>",
+        )
+        fig.add_scatter(
+            x=rows["letras"],
+            y=np.maximum(rows["paradas_media"], E5_FLOOR),
+            mode="markers",
+            marker={"color": color, "size": 10},
+            error_y={
+                "type": "data",
+                "symmetric": False,
+                "array": rows["ic_alto"] - rows["paradas_media"],
+                "arrayminus": np.maximum(rows["paradas_media"] - rows["ic_bajo"], 0),
+                "color": color,
+            },
+            name=f"medido, {loops} lazo{'s' if loops != 1 else ''}",
+            customdata=rows["paradas_media"],
+            hovertemplate="%{x} letras: %{customdata:.3g} paradas falsas<extra></extra>",
+        )
+    title = "Paradas falsas por orden de rotores frente a la tabla de Turing"
+    row = part[(part["letras"] == 12) & (part["lazos"] == 3)]
+    if not row.empty:
+        r = row.iloc[0]
+        title = (
+            f"Con 12 letras y 3 lazos: {fmt_dec(r['paradas_media'], 2)} paradas por orden "
+            f"(Turing: {fmt_dec(r['turing'], 2)})"
+        )
+    fig.update_layout(
+        template=_template(demo),
+        title=title,
+        height=480,
+        xaxis_title="letras (vértices) del menú",
+        yaxis_title="paradas falsas por orden (escala log)",
+        yaxis_type="log",
+        xaxis={"dtick": 2},
+    )
+    return fig
+
+
+def e5_heatmap(table: pd.DataFrame, diagonal: str = "si", demo: bool = False) -> go.Figure:
+    """E5: mapa de calor letras × lazos de las paradas falsas por orden (escala log)."""
+    part = table[(table["diagonal"] == diagonal) & (table["modo"] == "bletchley")]
+    letters = sorted(part["letras"].unique())
+    loops = sorted(part["lazos"].unique(), reverse=True)
+    grid = np.full((len(loops), len(letters)), np.nan)
+    turing = np.full_like(grid, np.nan)
+    for r in part.itertuples():
+        y, x = loops.index(r.lazos), letters.index(r.letras)
+        grid[y, x] = r.paradas_media
+        turing[y, x] = r.turing
+    fig = go.Figure(
+        go.Heatmap(
+            z=np.log10(np.maximum(grid, E5_FLOOR)),
+            x=[str(v) for v in letters],
+            y=[str(v) for v in loops],
+            customdata=np.stack([grid, turing], axis=-1),
+            text=[[f"{v:.3g}" for v in row] for row in grid],
+            texttemplate="%{text}",
+            colorscale=[[i / (len(SEQUENTIAL_DARK) - 1), c] for i, c in enumerate(SEQUENTIAL_DARK)],
+            zmin=np.log10(E5_FLOOR),
+            zmax=np.log10(20_000),
+            xgap=2,
+            ygap=2,
+            colorbar={"title": "log₁₀"},
+            hovertemplate="%{x} letras, %{y} lazos: %{customdata[0]:.3g} paradas "
+            "(Turing: %{customdata[1]})<extra></extra>",
+        )
+    )
+    fig.update_layout(
+        template=_template(demo),
+        title=f"Paradas falsas por orden, {'con' if diagonal == 'si' else 'sin'} diagonal board",
+        height=380,
+        xaxis_title="letras (vértices) del menú",
+        yaxis_title="lazos",
+    )
+    return fig
+
+
 def plotly_config() -> dict[str, Any]:
     """Configuración de la barra de herramientas (descarga de la imagen a 2x)."""
     from enigma_lab.viz.theme import PLOTLY_CONFIG

@@ -69,3 +69,86 @@ def model(
 ) -> NgramModel:
     """El modelo de n-gramas de un idioma (en caché: se construye una vez por proceso)."""
     return NgramModel.from_codes(load_codes(language, source, mode), n)
+
+
+INTERPOLATION = (0.6, 0.25, 0.1, 0.05)
+"""Pesos λ₄, λ₃, λ₂, λ₁ del modelo interpolado (suman 1)."""
+
+
+def interpolated_log_probs(
+    codes: np.ndarray, weights: tuple[float, ...] = INTERPOLATION
+) -> np.ndarray:
+    """log₁₀ P(d | a b c) para los 26⁴ cuadrigramas, interpolando de 4 a 1 letras.
+
+    Con c(·) los conteos del corpus:
+
+        P(d | abc) = λ₄ c(abcd)/c(abc) + λ₃ c(bcd)/c(bc) + λ₂ c(cd)/c(c) + λ₁ c(d)/N.
+
+    A diferencia de la suma de cuadrigramas, cada letra se puntúa una sola vez, por la
+    probabilidad de que siga a las tres anteriores, y un cuadrigrama que no apareció en
+    el corpus hereda la probabilidad de los trigramas, bigramas y letras. Así el modelo
+    distingue mejor textos que difieren en una sola letra (lo usa el verificador de la
+    Bombe; ver D-036). Devuelve un arreglo (26⁴,) float32 indexado como
+    :func:`ngram_index`.
+    """
+    counts = [
+        np.bincount(ngram_index(codes, k), minlength=26**k).astype(np.float64) for k in (1, 2, 3, 4)
+    ]
+    c1, c2, c3, c4 = counts
+    index = np.arange(26**4)
+    a, b, c, d = index // 17576, (index // 676) % 26, (index // 26) % 26, index % 26
+
+    def ratio(num: np.ndarray, den: np.ndarray) -> np.ndarray:
+        return np.divide(num, den, out=np.zeros_like(num), where=den > 0)
+
+    p4 = ratio(c4, c3[a * 676 + b * 26 + c])
+    p3 = ratio(c3[b * 676 + c * 26 + d], c2[b * 26 + c])
+    p2 = ratio(c2[c * 26 + d], c1[c])
+    p1 = c1[d] / c1.sum()
+    l4, l3, l2, l1 = weights
+    return np.log10(l4 * p4 + l3 * p3 + l2 * p2 + l1 * p1).astype(np.float32)
+
+
+def interpolated_head(codes: np.ndarray, weights: tuple[float, ...] = INTERPOLATION) -> np.ndarray:
+    """log₁₀ P(a) + log₁₀ P(b | a) + log₁₀ P(c | ab) para las 26³ primeras letras de un texto.
+
+    Las tres primeras letras no tienen tres anteriores. Con ellas la puntuación de un
+    texto es la regla de la cadena completa:
+
+        log P(x₀…x_{N−1}) = log P(x₀ x₁ x₂) + Σ_{j ≥ 3} log P(x_j | x_{j−3} x_{j−2} x_{j−1}),
+
+    con P(b | a) y P(c | ab) interpolados con los mismos pesos, renormalizados.
+    """
+    c1, c2, c3 = (
+        np.bincount(ngram_index(codes, k), minlength=26**k).astype(np.float64) for k in (1, 2, 3)
+    )
+    _, l3, l2, l1 = weights
+    index = np.arange(26**3)
+    a, b, c = index // 676, (index // 26) % 26, index % 26
+
+    def ratio(num: np.ndarray, den: np.ndarray) -> np.ndarray:
+        return np.divide(num, den, out=np.zeros_like(num), where=den > 0)
+
+    p1 = c1 / c1.sum()
+    p_b = (l2 * ratio(c2[a * 26 + b], c1[a]) + l1 * p1[b]) / (l2 + l1)
+    p_c = (l3 * ratio(c3, c2[a * 26 + b]) + l2 * ratio(c2[b * 26 + c], c1[b]) + l1 * p1[c]) / (
+        l3 + l2 + l1
+    )
+    return (np.log10(p1[a]) + np.log10(p_b) + np.log10(p_c)).astype(np.float32)
+
+
+@cache
+def interpolated(
+    language: Language = "aleman", source: Source = "muestra", mode: Mode = "letras"
+) -> tuple[np.ndarray, np.ndarray]:
+    """El modelo interpolado de un idioma, en caché: (tabla de las 3 primeras letras, de 4)."""
+    codes = load_codes(language, source, mode)
+    return interpolated_head(codes), interpolated_log_probs(codes)
+
+
+def chain_score(text: np.ndarray, head: np.ndarray, log_probs: np.ndarray) -> np.ndarray | float:
+    """log₁₀ P(texto) con la regla de la cadena del modelo interpolado (un texto o (N, L))."""
+    codes = np.asarray(text, dtype=np.int64)
+    first = codes[..., 0] * 676 + codes[..., 1] * 26 + codes[..., 2]
+    scores = head[first] + log_probs[ngram_index(codes, 4)].sum(axis=-1, dtype=np.float64)
+    return float(scores) if np.ndim(scores) == 0 else scores

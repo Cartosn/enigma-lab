@@ -1,0 +1,45 @@
+# Estimaciones de Alan Turing de las paradas de la Bombe por orden de rotores, según las letras
+# y los lazos del menú. Transcripción completa de la tabla «Estimated number of bombe stops per
+# rotor order» de Wikipedia, artículo «Bombe», revisión 1385546242 (13-11-2026), consultada el
+# 21-11-2026: https://en.wikipedia.org/w/index.php?title=Bombe&oldid=1385546242
+# Wikipedia la atribuye a Turing y la cita de Carter, F., «From Bombe 'stops' to Enigma keys»,
+# Bletchley Park Trust, Technical Papers, p. 3.
+# letras: «Number of letters on the menu», las letras (vértices) del grafo del menú (D-031).
+# cota: «<» cuando la tabla da una cota superior («<0.01»); entonces paradas es esa cota.
+letras,lazos,paradas,cota
+8,3,2.2,
+9,3,1.1,
+10,3,0.42,
+11,3,0.14,
+12,3,0.04,
+13,3,0.01,<
+14,3,0.01,<
+15,3,0.01,<
+16,3,0.01,<
+8,2,58,
+9,2,28,
+10,2,11,
+11,2,3.8,
+12,2,1.2,
+13,2,0.30,
+14,2,0.06,
+15,2,0.01,<
+16,2,0.01,<
+8,1,1500,
+9,1,720,
+10,1,280,
+11,1,100,
+12,1,31,
+13,1,7.7,
+14,1,1.6,
+15,1,0.28,
+16,1,0.04,
+8,0,40000,
+9,0,19000,
+10,0,7300,
+11,0,2700,
+12,0,820,
+13,0,200,
+14,0,43,
+15,0,7.3,
+16,0,1.0,

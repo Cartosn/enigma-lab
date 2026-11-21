@@ -236,20 +236,144 @@ en el criptoanálisis con n-gramas.
 - **Descargas:** las figuras se generan con el estilo `enigma_print`, de modo que el PNG
   o SVG descargado es el del informe. Así no hace falta kaleido.
 
+## Fase 3 · Bombe (21-11-2026)
+
+### D-031 · «Letras del menú» son vértices (resuelve P-002)
+- **La fuente.** La tabla de Wikipedia «Bombe» (revisión 1385546242) se titula por el
+  «Number of letters on the menu», y el artículo llama menú al grafo de las letras del crib
+  y del cifrado: sus letras son los nodos. Es la misma convención de 6.5 (11 letras, 13
+  aristas). Otra frase del artículo usa «letras» para las letras del crib («con 12 letras
+  o menos caben tres órdenes en una Bombe», una pila de tambores por letra), pero esa no
+  es la de la tabla.
+- **La comprobación.** E5 mide las dos lecturas sin proponérselo. Con vértices, la
+  columna de 12 letras queda cerca de la de Turing (820 · 31 · 1,2 · 0,04); contando
+  aristas, con 3 lazos sale unas diez veces más.
+- **Consecuencia.** Una celda de E5 con V letras y k lazos son menús conexos de cribs de
+  V − 1 + k letras.
+
+### D-032 · Modos Bletchley y robusto
+- **Posición candidata.** La de las ventanas antes de la primera letra del crib, con
+  anillos AAA. Los rotores avanzan antes de cada letra: el paso i del crib usa el
+  derecho en C + i + 1. Es la convención de CyberChef, que informa las paradas igual.
+- **Bletchley.** Dentro del tramo solo gira el derecho. Un movimiento del central justo
+  en la primera pulsación queda absorbido en la posición candidata.
+- **Robusto.** Variante k = 1, …, L − 1: el central avanza al cifrar la letra k del crib
+  (las aristas con paso i ≥ k usan el central + 1). Son L variantes con la de Bletchley.
+- **Lo que no cubre.** Dos movimientos dentro del tramo: una vuelta seguida de un doble
+  paso, o un doble paso con el izquierdo. Pasa en cerca de 1 de cada 26 vueltas.
+  `sweep.true_stop` dice qué variante debe dar la parada verdadera, o que ninguna.
+
+### D-033 · Criterio de parada y stecker candidato
+- **Parada.** Hay parada si los 26 hilos del cable de prueba no quedan en una sola
+  componente. No depende del hilo que se energice (por omisión, el A).
+- **Candidatos.** Los hilos del cable de prueba que quedan solos en su componente. Con 1
+  encendido es T↔x; con 25, el apagado; con otros conteos puede haber varios o ninguno.
+  El verificador los prueba todos, y descarta la parada que no tiene ninguno.
+- **Letra de prueba.** La de `menu_stats` (mayor grado en la componente con más lazos),
+  y se puede cambiar en la página.
+
+### D-034 · Qué conexiones usa la Bombe
+- **Aristas.** Todas las del menú, de todas sus componentes; el diagonal board las
+  acopla.
+- **Diagonal board.** Solo entre cables de letras del menú. Lo que conecta en un cable sin
+  aleatorizadores queda colgando y no cambia ninguna parada; la máquina de verificación sí
+  revisa esas deducciones.
+- **CyberChef.** Usa solo la componente con más lazos. Por eso los casos de comparación
+  tienen menús conexos, donde las dos reglas coinciden (D-041).
+
+### D-035 · Máquina de verificación (etapa 1)
+- **La hipótesis T↔x.** Se leen todos los hilos que enciende: cada uno es un stecker
+  P(a) = u, y también P(u) = a. Cae si una letra queda con dos parejas.
+- **Las demás componentes.** Cada una necesita al menos una hipótesis compatible. En la
+  posición verdadera siempre la hay: la verdadera. Si tiene exactamente una, sus
+  steckers se suman al plugboard parcial.
+- **Por qué.** Con WETTERBERICHT los menús suelen tener 3 componentes, y la letra de
+  prueba ve solo la suya. En 8 casos de la demo 2 en modo robusto (60 órdenes), esta
+  revisión bajó las hipótesis de hasta 241.155 a menos de 800.
+
+### D-036 · Verificador (etapa 2)
+- **Modelo del idioma.** Cuadrigramas interpolados con trigramas, bigramas y letras
+  (λ = 0,6 · 0,25 · 0,1 · 0,05), entrenados con la muestra alemana con la X como
+  separador. Se puntúa log₁₀ P(texto) por la regla de la cadena, incluidas las tres
+  primeras letras.
+- **Puntaje rápido.** Hill climbing del plugboard sobre el crib y 13 letras a cada lado.
+  Fuera del crib se prueba cada punto donde pudo volver a avanzar el central. Pasan las
+  25 mejores hipótesis.
+- **Anillos.** Se prueban los 676 pares (central, derecho) y los arranques que llevan a
+  la parada. El hill climbing se hace para cada secuencia distinta de posiciones, y luego
+  se alterna: con el mejor plugboard se vuelve a elegir la secuencia y se sube otra vez.
+- **Elección bayesiana.** A priori toda clave (anillos y arranque) es igual de probable:
+  una secuencia que dan k claves suma log₁₀ k.
+- **Plausible.** Si el log₁₀ P por letra supera −1,5. El alemán da cerca de −0,67 y las
+  letras al azar, −2,66.
+- **Cómo se eligió.** Primero se probó la suma de cuadrigramas, sin interpolar y sin el
+  término de las claves. Fallaba en 1 o 2 de los 200 casos de la prueba 6.4, siempre con
+  el plugboard exacto y 1 o 2 letras distintas, por un anillo mal elegido. El diseño final
+  se ajustó con esos 200 casos (200 de 200) y se comprobó con 200 casos nuevos (198 de 200;
+  ver VALIDACION).
+
+### D-037 · Rendimiento, Numba y Streamlit
+- **Union-find.** Con compresión por mitades. Las paradas se guardan como arreglos de
+  NumPy, no como objetos: con menús de pocos lazos puede haber cientos de miles.
+- **Salida temprana.** El barrido deja de unir en cuanto los 26 hilos del cable de prueba
+  quedan juntos.
+- **Paralelismo.** Las 17.576 posiciones se reparten en 676 bloques con `prange`. En
+  Windows la capa de hilos de Numba es OpenMP (MS).
+- **Streamlit.** Cada sesión corre en su propio hilo, y la capa «workqueue» no admite
+  lanzamientos simultáneos. Por eso un candado (`sweep._LOCK`) deja un solo barrido a la
+  vez, con cualquier capa.
+- **Precalentado.** Los núcleos llevan `cache=True`. La app los compila o carga, y
+  precalcula el aleatorizador de los 60 órdenes (27 MB), en `_setup_once` al arrancar.
+
+### D-038 · Diseño de E5
+- **Menús.** Conexos, de cribs alemanes reales (X como separador), con clave aleatoria de
+  Enigma I con 10 cables. Las celdas se llenan por muestreo con rechazo.
+- **Medición.** Un orden por menú, el verdadero. Las paradas falsas excluyen la verdadera.
+  La vuelta del central dentro del tramo queda como sale de la clave al azar: así se mide
+  cuánto falla el modo Bletchley.
+- **Hipótesis abiertas.** También se cuentan las hipótesis (hilos aislados) de cada parada.
+  La tabla de Turing da 40.000 paradas por orden con 8 letras sin lazos, más que las
+  17.576 posiciones: cuenta hipótesis, no posiciones.
+- **Modo robusto.** Solo en menús de 12 y 16 letras, con diagonal board.
+- **Modos de corrida.** Rápido: 8, 12 y 16 letras, 10 menús por celda. Completo: 8 a 16
+  letras de dos en dos, 100 menús por celda.
+
+### D-039 · Banco de la demo 2
+- **Casos.** Clave como «Clave aleatoria» (10 cables) y mensaje alemán de 78 letras, como
+  el caso de respaldo, que empieza por el crib, con X entre palabras. Crib en la
+  posición 0.
+- **Flujo.** El de la página: barrido, máquina de verificación y «Verificar». Éxito: el
+  descifrado es el mensaje letra por letra.
+- **Configuraciones, de la más simple a la menos:**
+  1. 60 órdenes en modo robusto;
+  2. rotores I, II y III en modo robusto;
+  3. el crib acordado WETTERBERICHTXFUER (18 letras: «Wetterbericht für») con 60 órdenes.
+- **Criterio.** El spec: éxito de al menos 95 % y p95 del tiempo total de 30 s o menos.
+- **Rotores permitidos.** «Clave aleatoria» de la página Máquina ahora admite rotores
+  permitidos, para la configuración 2.
+
+### D-040 · Página La Bombe
+- **Entrada.** Lo que deja la página Cribs (`bombe_input`) o el botón «Caso de respaldo»,
+  que fija el modo Bletchley y los 60 órdenes.
+- **Tambores.** Durante el barrido, una tripleta por conexión del menú gira como un
+  odómetro: es una animación, no la posición en curso, que la muestran la barra y el
+  contador. Al terminar, cada tripleta muestra las letras de la parada que manda Python.
+- **Tabla.** Hasta 300 paradas, primero las consistentes. Si se conoce la clave (caso de
+  respaldo), se marca la verdadera.
+- **Verificar.** Reutiliza las hipótesis de la etapa 1, calculadas al terminar el barrido.
+
+### D-041 · CyberChef para la Bombe, a mano en la web (resuelve P-003)
+Docker Desktop seguía apagado. Se aplicó el respaldo del spec:
+- `scripts/cyberchef_urls.py` arma las URL con la receta «Bombe», sin y con máquina de
+  verificación.
+- Hay tres casos con menú conexo: el de respaldo (3 lazos), uno de 2 lazos y uno de 1
+  lazo con el crib en la posición 3.
+- Resultado en VALIDACION (6.2).
+
 ## Pendientes de decidir
 
-### P-001 · Equipo de las mediciones de la demo 2 (fase 3)
+### P-001 · Equipo de las mediciones de la demo 2
 Este equipo es un escritorio (i5-9400F, 6 núcleos, 16 GB). El presupuesto de 30 s de la
-demo 2 es del portátil del autor. `make bench-demo` (fase 3) se correrá en el portátil,
-y `RESUMEN.md` dirá en qué equipo se midió cada tiempo. Falta que el autor confirme qué
-equipo se usará.
-
-### P-002 · «Letras del menú» (fase 3)
-En 6.5 «letras» son vértices: 11 letras y 13 aristas. En E5 y en la tabla de Turing no
-queda claro si cuentan vértices o aristas. Se resolverá con la fuente original al
-transcribir `data/reference/turing_stops.csv`.
-
-### P-003 · CyberChef para la Bombe (fase 3)
-La parte de la máquina se resolvió en D-018. Para los 3 casos de la Bombe, la idea es
-correr la API de Node de CyberChef dentro de Docker (imagen oficial `node`) si Docker
-Desktop está encendido; si no, se harán a mano en la web.
+demo 2 es del portátil del autor. `make bench-demo` ya existe; `RESUMEN.md` dice en qué
+equipo se midió cada tiempo. Falta que el autor lo corra en el portátil y confirme la
+configuración.

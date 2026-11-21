@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<!--
+  Enigma Lab · los tambores de la Bombe (spec 8.2, punto 6).
+  Una tripleta de tambores (izquierdo, central y derecho) por cada conexión del menú, como
+  las 36 de la Bombe británica. Solo dibuja lo que calcula Python (enigma_lab.bombe):
+  - "running": el barrido en curso; los tambores giran como un odómetro (el de abajo en
+    cada paso, el del medio al completar una vuelta), cada columna corrida su paso i + 1;
+  - "done": la parada elegida, con las letras de cada tambor que manda Python.
+  Respeta prefers-reduced-motion: sin animación, solo el estado.
+-->
+<style>
+  @font-face { font-family: "Inter"; src: url("/app/static/fonts/InterVariable.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "JetBrains Mono"; src: url("/app/static/fonts/JetBrainsMono-Bold.woff2") format("woff2"); font-weight: 700; }
+  html, body { margin: 0; background: var(--background); color: var(--text); font-family: Inter, system-ui, sans-serif; }
+  .wrap { padding: 6px 4px 0; }
+  .head { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: baseline; font-size: 15px; margin: 0 4px 8px; }
+  .head .title { font-weight: 650; }
+  .head .muted { color: var(--text_muted); }
+  .head .amber { color: var(--accent); font-family: "JetBrains Mono", monospace; letter-spacing: 0.06em; }
+  body.demo .head { font-size: 19px; }
+  svg { display: block; width: 100%; height: auto; }
+  .frame { fill: var(--surface); stroke: var(--border); stroke-width: 1.5; }
+  .drum { fill: var(--background); stroke: var(--border); stroke-width: 2; }
+  .drum.right { stroke: var(--accent_2); }
+  .done .drum { stroke: var(--accent); }
+  .letter { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 17px; fill: var(--text);
+            text-anchor: middle; dominant-baseline: central; }
+  .done .letter { fill: var(--accent); }
+  .tick { stroke: var(--text_muted); stroke-width: 2; stroke-linecap: round; }
+  .label { font-size: 12px; fill: var(--text_muted); text-anchor: middle; }
+  .label.pair { font-family: "JetBrains Mono", monospace; font-weight: 700; fill: var(--text); font-size: 13px; }
+  .row { font-size: 12px; fill: var(--text_muted); text-anchor: end; dominant-baseline: central; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head" id="head"></div>
+  <svg id="g" role="img" aria-label="Tambores de la Bombe"></svg>
+</div>
+<script id="payload" type="application/json">__PAYLOAD__</script>
+<script>
+(() => {
+  "use strict";
+  const P = JSON.parse(document.getElementById("payload").textContent);
+  for (const [k, v] of Object.entries(P.theme)) document.documentElement.style.setProperty("--" + k, v);
+  if (P.demo) document.body.classList.add("demo");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const A = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("g");
+  const el = (tag, attrs, text, parent = svg) => { const n = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (text != null) n.textContent = text;
+    parent.appendChild(n); return n; };
+
+  const head = document.getElementById("head");
+  const span = (cls, text) => { const s = document.createElement("span"); s.className = cls; s.textContent = text; head.appendChild(s); };
+  span("title", P.title);
+  if (P.subtitle) span("muted", P.subtitle);
+  if (P.position) span("amber", P.position);
+
+  const cols = P.columns, n = cols.length;
+  const W = 52, R = 19, top = 14, gap = 48, left = 88;
+  const width = left + n * W + 12, height = top + 3 * gap + 46;
+  svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+  svg.style.maxWidth = (width * (P.demo ? 1.35 : 1.15)) + "px";
+  const group = el("g", { class: P.state === "done" ? "done" : "" });
+  el("rect", { class: "frame", x: left - 10, y: 2, width: n * W + 16, height: 3 * gap + 6, rx: 10 }, null, group);
+  ["izquierdo", "central", "derecho"].forEach((name, r) =>
+    el("text", { class: "row", x: left - 16, y: top + R + 6 + r * gap }, name, group));
+  const letters = [];
+  cols.forEach((c, i) => {
+    const cx = left + i * W + W / 2;
+    const triple = [];
+    for (let r = 0; r < 3; r++) {
+      const cy = top + R + 6 + r * gap;
+      el("circle", { class: "drum" + (r === 2 ? " right" : ""), cx, cy, r: R }, null, group);
+      el("line", { class: "tick", x1: cx, y1: cy - R + 3, x2: cx, y2: cy - R + 8 }, null, group);
+      triple.push(el("text", { class: "letter", x: cx, y: cy }, c.drums ? c.drums[r] : "A", group));
+    }
+    letters.push(triple);
+    el("text", { class: "label pair", x: cx, y: top + 3 * gap + 20 }, c.pair, group);
+    el("text", { class: "label", x: cx, y: top + 3 * gap + 36 }, String(c.offset), group);
+  });
+
+  if (P.state !== "running" || reduced) return;
+  // Odómetro de la animación: abajo gira en cada paso; el del medio, al completar una vuelta.
+  let step = 0;
+  const draw = () => {
+    const right = step % 26, middle = Math.floor(step / 26) % 26, leftDrum = Math.floor(step / 676) % 26;
+    cols.forEach((c, i) => {
+      letters[i][0].textContent = A[leftDrum];
+      letters[i][1].textContent = A[(middle + (c.middle_shift || 0)) % 26];
+      letters[i][2].textContent = A[(right + c.shift) % 26];
+    });
+    step = (step + 1) % 17576;
+  };
+  draw();
+  setInterval(draw, 45);
+})();
+</script>
+</body>
+</html>

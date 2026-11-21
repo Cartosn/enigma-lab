@@ -76,3 +76,15 @@ def test_component_does_not_reimplement_enigma() -> None:
         assert spec.wiring not in template
     for wiring in REFLECTORS.values():
         assert wiring not in template
+
+
+def test_random_key_respects_allowed_rotors() -> None:
+    """Demo 2: si se acuerdan los rotores I, II y III, «Clave aleatoria» solo usa esos."""
+    for _ in range(5):
+        app = AppTest.from_file(str(PAGE), default_timeout=60)
+        app.session_state["maq_allowed"] = ["I", "II", "III"]
+        app.run()
+        app = _click(app, "Clave aleatoria")
+        assert not app.exception
+        rotors = {app.session_state[f"maq_rotor_{i}"] for i in range(3)}
+        assert rotors == {"I", "II", "III"}

@@ -21,7 +21,7 @@ flowchart LR
         core["core<br/>máquina · espacio de claves"]
         stats["stats<br/>frecuencias · IC · n-gramas"]
         cribs["cribs<br/>arrastre · menú"]
-        bombe["bombe<br/>Numba · verificador"]
+        bombe["bombe<br/>aleatorizador · Numba · verificador"]
         banb["banburismus<br/>decibanes · SPRT"]
         rej["rejewski<br/>características"]
         att["attacks<br/>Gillogly · hill climbing"]
@@ -53,8 +53,8 @@ flowchart LR
 
     classDef done fill:#171B21,stroke:#F2B134,color:#E8E6E3
     classDef todo fill:#0F1216,stroke:#2A3038,color:#9AA3AD,stroke-dasharray: 4 3
-    class core,viz,app,exp,results,pres,ref,demo,stats,cribs,corp done
-    class bombe,banb,rej,att,report todo
+    class core,viz,app,exp,results,pres,ref,demo,stats,cribs,corp,bombe done
+    class banb,rej,att,report todo
 ```
 
 ## Estado por fase
@@ -74,7 +74,14 @@ flowchart LR
 | `cribs/` | Arrastre del crib (escalar y vectorizado) y menú con lazos y letra de prueba | 2 |
 | `experiments/` E2–E4 | Espacio de claves, estadística del cifrado y supervivencia de cribs | 2 |
 | `app/pages/` | Espacio de claves, Estadística, Cribs y menús (con dos animaciones) y Experimentos | 2 |
-| `bombe/` | Bombe en Numba, versión de referencia y verificador | 3 |
+| `bombe/scrambler.py`, `wiring.py` | Aleatorizador precalculado por orden; el menú como cables, aristas y diagonal board | 3 |
+| `bombe/bombe_numba.py`, `sweep.py` | Barrido con union-find en Numba, modos Bletchley y robusto, paradas como arreglos | 3 |
+| `bombe/bombe_reference.py` | La misma Bombe en Python puro (propaga hilo por hilo), solo para las pruebas | 3 |
+| `bombe/checker.py`, `cases.py` | Máquina de verificación, descifrado de prueba y clave equivalente; casos de prueba | 3 |
+| `stats/ngrams.py` (interpolado) | Modelo de 4 letras interpolado y puntaje por la regla de la cadena | 3 |
+| `experiments/` E5 | Paradas falsas por letras y lazos, con y sin diagonal board, frente a Turing | 3 |
+| `app/pages/bombe.py`, `components/bombe_drums.html` | Página La Bombe y los tambores | 3 |
+| `scripts/bench_demo2.py` | `make bench-demo`: éxito y tiempos de la demo 2 | 3 |
 | `banburismus/` | Decibanes y SPRT | 4 |
 | `rejewski/`, `attacks/` | Extensiones P2 | 5 |
 
@@ -93,6 +100,31 @@ sequenceDiagram
     P->>V: render_machine(clave, trazas)
     V->>J: JSON incrustado en el HTML
     J-->>U: animación (solo dibuja; no cifra)
+```
+
+## Flujo de la página La Bombe
+
+```mermaid
+sequenceDiagram
+    participant U as Persona
+    participant P as pages/bombe.py
+    participant W as bombe.wiring
+    participant S as bombe.sweep (Numba)
+    participant C as bombe.checker
+    participant J as bombe_drums.html (JS)
+    U->>P: cifrado, crib y alineación (o «Caso de respaldo»)
+    P->>W: wiring_from_menu(crib, tramo)
+    W-->>P: cables, aristas y pares del diagonal board
+    loop por orden de rotores
+        P->>S: run_order: union-find en las 17.576 posiciones
+        S-->>P: paradas (arreglos) → barra, contador y cronómetro
+    end
+    P->>C: consistent_stops (máquina de verificación)
+    U->>P: «Verificar»
+    P->>C: verify: puntaje rápido, anillos, hill climbing
+    C-->>P: clave equivalente y texto descifrado
+    P->>J: JSON con las letras de cada tambor en la parada
+    J-->>U: tambores (solo dibuja; no calcula)
 ```
 
 ## Convenciones de código

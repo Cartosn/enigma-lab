@@ -6,38 +6,15 @@ que calcula Python.
 
 from __future__ import annotations
 
-import json
 from typing import Any
 
 import networkx as nx
 import streamlit.components.v1 as components
 
-from enigma_lab import paths
 from enigma_lab.cribs.dragging import Alignment
 from enigma_lab.cribs.menu import layout, menu_edges, menu_stats
-from enigma_lab.viz.theme import DARK
-
-COMPONENTS = paths.APP / "components"
-
-
-def _theme() -> dict[str, str]:
-    return {
-        "background": DARK.background,
-        "surface": DARK.surface,
-        "border": DARK.border,
-        "text": DARK.text,
-        "text_muted": DARK.text_muted,
-        "accent": DARK.accent,
-        "accent_2": DARK.accent_2,
-        "error": DARK.error,
-        "success": DARK.success,
-        "ink": "#111418",
-    }
-
-
-def _html(name: str, payload: dict[str, Any]) -> str:
-    data = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
-    return (COMPONENTS / name).read_text(encoding="utf-8").replace("__PAYLOAD__", data)
+from ui.components import component_html as _html
+from ui.components import theme_payload as _theme
 
 
 def drag_payload(

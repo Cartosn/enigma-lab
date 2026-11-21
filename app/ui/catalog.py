@@ -61,6 +61,7 @@ MODULES: tuple[Module, ...] = (
         "Barrido de los rotores, paradas y verificación de la clave.",
         "Fase 3",
         ":material/settings:",
+        page="pages/bombe.py",
     ),
     Module(
         "experimentos",

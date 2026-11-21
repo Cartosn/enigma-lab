@@ -8,7 +8,7 @@ cada fase.
 1. [El espacio de claves](#1-el-espacio-de-claves) (fase 0)
 2. [La máquina y el doble paso](#2-la-máquina-y-el-doble-paso) (fase 1)
 3. [Estadística del idioma, cribs y menús](#3-estadística-del-idioma-cribs-y-menús) (fase 2)
-4. La Bombe, el diagonal board y el verificador (fase 3)
+4. [La Bombe, el diagonal board y el verificador](#4-la-bombe-el-diagonal-board-y-el-verificador) (fase 3)
 5. Banburismus y la prueba secuencial (fase 4)
 6. Rejewski y el ataque moderno (fase 5)
 7. [Preguntas probables](#preguntas-probables)
@@ -205,16 +205,131 @@ porque la misma pareja puede repetirse en dos pasos (`cribs/menu.py`).
   plugboard que debe volver a cerrar en la letra de partida. Con una hipótesis falsa
   casi nunca cierra, y cada lazo divide las paradas falsas por unas 26 (fase 3).
 
+## 4. La Bombe, el diagonal board y el verificador
+
+**Idea.** La Bombe no prueba claves: prueba hipótesis sobre el plugboard. Para cada orden
+de rotores y cada una de sus 17.576 posiciones supone que la letra de prueba T va con una
+letra x del plugboard y saca todas las consecuencias. Si llevan a una contradicción,
+descarta la posición. Así recorre 60 × 17.576 = 1.054.560 configuraciones (20,01 bits) y no
+las 1,6 × 10²⁰ claves: el plugboard queda fuera de la búsqueda.
+
+**El aleatorizador.** Sin el plugboard, en cada pulsación la máquina es
+S = R⁻¹ · M⁻¹ · L⁻¹ · U · L · M · R. Con el plugboard P la máquina completa es
+E = P · S · P, porque P es su propia inversa. La Bombe busca con anillos AAA: una posición
+es el corrimiento de cada rotor, s = ventana − anillo. El aleatorizador de las 17.576
+posiciones de un orden se precalcula una vez, en una tabla (17.576 × 26).
+(`bombe/scrambler.py` · `scrambler_table`)
+
+**El menú como circuito.** (`bombe/wiring.py`)
+- Cada letra del menú es un cable de 26 hilos. El hilo u del cable a es la hipótesis
+  «P(a) = u».
+- La arista (a, b, i) del menú dice que en el paso i del crib la máquina lleva a hasta b:
+  Sᵢ(P(a)) = P(b). Por eso une el hilo u del cable a con el hilo Sᵢ(u) del cable b, para
+  las 26 hipótesis a la vez.
+- **Desfase.** Los rotores avanzan antes de cifrar cada letra. Si C es la posición antes de
+  la primera letra del crib, el paso i usa el rotor derecho en C + i + 1.
+
+**La corriente: union-find.** Energizar un hilo enciende todos los conectados con él: su
+componente. Union-find las calcula todas a la vez. Cada hilo apunta a un «padre» hasta
+llegar a la raíz de su componente; unir dos componentes es colgar una raíz de la otra.
+Con compresión de caminos (cada nodo salta a su abuelo al subir), los caminos quedan
+cortos. (`bombe/bombe_numba.py` · `_find`, `_union`, `_wire_up`)
+
+**La parada.** Se energiza el hilo x del cable de prueba T.
+- Si se encienden los 26 hilos de T, cada hipótesis T↔u lleva a otra: todas se
+  contradicen, y se pasa a la siguiente posición.
+- Si no, la Bombe se detiene: es una **parada**.
+- La hipótesis verdadera, en la posición verdadera, solo enciende hipótesis verdaderas,
+  un hilo por cable. Por eso el stecker candidato es un hilo que queda **solo**: con 1
+  hilo encendido es T↔x; con 25, el apagado.
+- Que haya parada no depende de qué hilo se energice.
+
+(`bombe_numba.py` · `sweep`, `_test_register`; `bombe/sweep.py` · `run_bombe`)
+
+**Por qué cada lazo divide las paradas por unas 26.** Un lazo es un camino del menú que
+vuelve a su letra: a → b → … → a. La composición de los aleatorizadores del camino es una
+permutación π. La hipótesis P(a) = u sobrevive solo si π(u) = u: si al dar la vuelta la
+corriente vuelve al mismo hilo. En una posición falsa, π es como una permutación al azar,
+y una letra es punto fijo con probabilidad 1/26. Cada lazo independiente multiplica por
+1/26. La tabla de Turing (diapositiva 16) lo muestra: con 12 letras, 820 → 31 → 1,2 →
+0,04 paradas por orden con 0 a 3 lazos. E5 lo mide con nuestra Bombe.
+(`experiments/e5_bombe.py`; `data/reference/turing_stops.csv`)
+
+**El diagonal board (Welchman).** El plugboard es simétrico: si P(a) = u, entonces
+P(u) = a. El diagonal board une el hilo u del cable a con el hilo a del cable u.
+- Así una deducción en un cable salta a otro, y las contradicciones se propagan por todo
+  el menú.
+- Sin él, un menú sin lazos nunca se contradice: cada hipótesis solo enciende un hilo por
+  cable, y la Bombe para en casi todas las posiciones.
+- Solo importan los cables de letras del menú: lo que el diagonal board conecta en un
+  cable sin aleatorizadores no lleva la corriente a ningún otro lado.
+
+(`wiring.py` · `_diagonal_pairs`; la página La Bombe compara las paradas con y sin él.)
+
+**Modos.** (D-032)
+- *Bletchley:* dentro del tramo del crib solo gira el rotor derecho. Falla si el central
+  avanza dentro del tramo, cerca de (L − 1)/26 de las claves.
+- *Robusto:* prueba además una variante por cada letra k del crib en que pudo avanzar el
+  central. Son L variantes: unas L veces el tiempo y las paradas.
+- `sweep.true_stop` dice, con la clave conocida, en qué posición y variante debe parar.
+
+**El verificador.** Lo que se hacía después de cada parada. (`bombe/checker.py`)
+1. **Máquina de verificación.** Lee todos los hilos que enciende cada hipótesis: son
+   steckers deducidos. Si una letra queda con dos parejas, la hipótesis cae. Si el menú
+   tiene varias componentes, cada una necesita una hipótesis compatible.
+   (`bombe_numba.py` · `check_hypotheses`)
+2. **Puntaje rápido.** Descifra con esos steckers las letras vecinas del crib, completa el
+   plugboard de esas letras y mide cuánto se parece al alemán.
+3. **Anillos.** Los anillos derecho y central deciden cuándo avanza el central fuera del
+   crib. Se prueban los 676 pares y se queda con los que reproducen la parada.
+4. **Plugboard.** Se completa por *hill climbing*: se prueba cada cambio de un cable y se
+   aplica el que más mejora la probabilidad del texto, hasta que nada mejore.
+5. **Elección.** El idioma se mide con un modelo de 4 letras interpolado:
+   log₁₀ P(texto) por la regla de la cadena (`stats/ngrams.py` · `interpolated`,
+   `chain_score`). Entre secuencias de posiciones, pesa también cuántas claves dan cada
+   una (D-036).
+6. **Clave equivalente.** El anillo izquierdo se fija en A. Un anillo y su posición se
+   compensan, así que la clave puede tener otros anillos y dar el mismo cifrado.
+
+**Preguntas que pueden salir:**
+- *¿Por qué la Bombe no necesita los anillos?* El aleatorizador depende de cada rotor
+  solo por s = ventana − anillo, así que buscar s con anillos AAA cubre todas las
+  posibilidades. Los anillos solo deciden cuándo avanza el central, y eso lo resuelve el
+  verificador.
+- *¿Qué pasa si el central avanza dentro del crib?* En modo Bletchley no aparece la parada
+  verdadera. El modo robusto prueba una variante por cada letra donde pudo avanzar. En E5
+  se mide cuánto falla uno y cuánto cuesta el otro.
+- *¿Cómo sabes que tu Bombe está bien?*
+  - Una versión de referencia, que propaga la corriente hilo por hilo, da lo mismo en
+    24 casos.
+  - CyberChef da exactamente las mismas paradas en 3 casos: 84 en el más largo.
+  - La clave verdadera da parada en 200 de 200 casos (6.4).
+  - E5 reproduce la tabla de Turing.
+
+  (`tests/test_bombe.py`; `docs/VALIDACION.md`)
+- *¿Por qué con 12 letras y no con 12 aristas?* En la tabla de Turing, como en la
+  diapositiva 11, «letras del menú» son las letras distintas del grafo: sus vértices.
+  E5 lo confirma (D-031).
+
 ## Preguntas probables
 
 Las 15 más probables, con su respuesta y el código que la respalda, se completan a
-medida que llegan los módulos. Las del guion («Preguntas probables») van todas:
+medida que llegan los módulos. Las del guion («Preguntas probables») van todas.
 
-| Pregunta | Fase en que queda respondida con código |
-| --- | --- |
-| ¿Y la máquina de Turing? | 3 (contexto de la Bombe) |
-| ¿Y si el crib está mal? | 3 (`bombe/`) |
-| ¿Por qué cada lazo divide por 26? | 3 (E5) |
-| ¿Qué hace el diagonal board? | 3 (`bombe/`) |
-| ¿Hoy se rompería por fuerza bruta? | 0 y 5 (`core/keyspace.py`, `attacks/`) |
-| ¿Qué es un decibán? | 4 (`banburismus/`) |
+- *¿Y la máquina de Turing?* Es el modelo teórico de computación de 1936. La Bombe es una
+  máquina electromecánica de 1940, hecha para una búsqueda concreta: probar hipótesis de
+  plugboard en cada posición de los rotores. Nuestra Bombe está en `src/enigma_lab/bombe/`.
+- *¿Y si el crib está mal?* La Bombe solo da paradas falsas, o ninguna, y el verificador
+  no encuentra un descifrado que parezca alemán. La página La Bombe lo dice: «Ninguna
+  parada da un texto que parezca alemán» (`checker.Verification.plausible`, con el umbral
+  `PLAUSIBLE`). Entonces se prueba otra posición del crib u otro crib.
+- *¿Por qué cada lazo divide por 26?* La letra supuesta debe ser un punto fijo de la
+  permutación que da la vuelta al lazo; al azar eso pasa con probabilidad 1/26 (tema 4).
+  E5 lo mide frente a la tabla de Turing (`experiments/e5_bombe.py`).
+- *¿Qué hace el diagonal board?* Impone la simetría del plugboard: une el hilo u del cable
+  a con el hilo a del cable u (`bombe/wiring.py` · `_diagonal_pairs`). Así las
+  contradicciones se propagan. La página La Bombe compara las paradas con y sin él para
+  cada menú, y E5 para todos.
+- *¿Hoy se rompería por fuerza bruta?* No hace falta (tema 1; `core/keyspace.py`). Los
+  ataques modernos solo con texto cifrado llegan en la fase 5 (`attacks/`).
+- *¿Qué es un decibán?* Fase 4 (`banburismus/`).

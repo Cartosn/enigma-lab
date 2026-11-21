@@ -299,6 +299,14 @@ class Enigma:
         self.step()
         return self._signal(key)
 
+    def permutation(self) -> tuple[int, ...]:
+        """La sustitución completa en la posición actual, sin avanzar los rotores.
+
+        Sin plugboard es el aleatorizador de la Bombe; ``bombe_reference`` la usa para
+        comprobar las tablas precalculadas de ``bombe/scrambler.py``.
+        """
+        return tuple(self._signal(x) for x in range(26))
+
     def encrypt(self, text: str) -> str:
         """Cifra (o descifra: es la misma operación) un texto de letras A–Z."""
         return "".join(to_letter(self.press(to_index(c))) for c in clean(text, strict=True))

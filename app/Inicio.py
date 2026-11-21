@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import streamlit as st
 
+from enigma_lab.bombe.sweep import warm_up
 from enigma_lab.viz.theme import register_plotly_templates
 from ui.catalog import MODULES
 from ui.layout import apply_global_style, demo_mode_toggle
@@ -21,10 +22,16 @@ st.set_page_config(
 )
 
 
-@st.cache_resource
+@st.cache_resource(show_spinner="Preparando la Bombe…")
 def _setup_once() -> bool:
-    """Preparativos de una sola vez por proceso (en la fase 3, también precalentar Numba)."""
+    """Preparativos de una sola vez por proceso.
+
+    Registra la plantilla de Plotly y precalienta la Bombe: compila los núcleos de Numba
+    (o los carga de su caché en disco, ``cache=True``) y precalcula el aleatorizador de
+    los 60 órdenes. Así la demo 2 no espera al compilador, aunque el salón no tenga red.
+    """
     register_plotly_templates()
+    warm_up(all_tables=True)
     return True
 
 

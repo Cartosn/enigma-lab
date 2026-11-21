@@ -135,6 +135,25 @@ def _test_letter(which: str) -> str:
     return f"{s.test_letter}, grado {s.test_degree}"
 
 
+def _short(value: float) -> str:
+    """Número con los decimales justos y coma: 820 → «820», 1,2 → «1,2», 0,04 → «0,04»."""
+    if float(value).is_integer():
+        return fmt_int(int(value))
+    return fmt_dec(value, 2).rstrip("0")
+
+
+def _turing_slide_16() -> str:
+    """Turing con 12 letras (diapositiva 16): paradas por orden y, con 2 y 3 lazos, en 60."""
+    from enigma_lab.experiments.e5_bombe import ORDERS_PER_DAY, turing_value
+
+    per_order = [turing_value(12, loops)[0] for loops in (0, 1, 2, 3)]
+    in_sixty = [round(v * ORDERS_PER_DAY, 6) for v in per_order[2:]]
+    return (
+        " · ".join(_short(v) for v in per_order)
+        + f"; {_short(in_sixty[0])} y {_short(in_sixty[1])} en {ORDERS_PER_DAY}"
+    )
+
+
 # ---------------------------------------------------------------- registro
 
 CIFRAS: tuple[Cifra, ...] = (
@@ -297,11 +316,12 @@ CIFRAS: tuple[Cifra, ...] = (
         "+1,845 dB; +0,0211 y −0,0184 dB; ±19,96 dB; 929 y 1.062 letras",
         pending="fase 4: banburismus/",
     ),
+    # Diapositiva 16 · data/reference/turing_stops.csv (las cifras medidas van en RESUMEN.md)
     Cifra(
         "16",
-        "Turing, 12 letras: paradas por orden",
+        "Turing, 12 letras: paradas por orden con 0, 1, 2 y 3 lazos; en 60 órdenes con 2 y 3",
         "820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60",
-        pending="fase 3: turing_stops.csv y E5",
+        _turing_slide_16,
     ),
 )
 """Todas las cifras de la tabla 11.3, en el orden de las diapositivas."""

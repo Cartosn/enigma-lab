@@ -13,5 +13,6 @@ EXPERIMENTS = {
     "e2": "enigma_lab.experiments.e2_keyspace",
     "e3": "enigma_lab.experiments.e3_statistics",
     "e4": "enigma_lab.experiments.e4_cribs",
+    "e5": "enigma_lab.experiments.e5_bombe",
 }
 """Experimentos disponibles, por identificador (crecen con cada fase)."""

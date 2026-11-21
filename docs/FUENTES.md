@@ -33,6 +33,16 @@ de una de estas fuentes (spec, sección 0). Las de la sección 12 del spec van t
 - **Validación a mano:** CyberChef, versión web (GCHQ), consultada el 20-11-2026.
   https://gchq.github.io/CyberChef/
 
+- **Tabla de Turing (E5, diapositiva 16):** Wikipedia, «Bombe», tabla «Estimated number of
+  bombe stops per rotor order», revisión 1385546242 (13-11-2026), consultada el 21-11-2026.
+  https://en.wikipedia.org/w/index.php?title=Bombe&oldid=1385546242 · Transcrita completa en
+  `data/reference/turing_stops.csv`. Wikipedia la cita de Carter, F., «From Bombe 'stops'
+  to Enigma keys», Bletchley Park Trust, Technical Papers, p. 3.
+- **Bombe de CyberChef (referencia de diseño y validación):** código fuente de GCHQ,
+  `src/core/lib/Bombe.mjs`, `src/core/operations/Bombe.mjs` y `MultipleBombe.mjs`
+  (licencia Apache 2.0), leído el 21-11-2026. https://github.com/gchq/CyberChef · La
+  validación a mano usó la versión web el mismo día.
+
 ## Corpus (Project Gutenberg, dominio público)
 
 Los descarga `scripts/fetch_corpora.py` del espejo oficial

@@ -27,6 +27,7 @@ def random_config(
     model: str = "I",
     cables: int = 10,
     reflectors: Sequence[str] | None = None,
+    rotors: Sequence[str] | None = None,
 ) -> EnigmaConfig:
     """Una clave aleatoria del modelo dado.
 
@@ -35,16 +36,21 @@ def random_config(
         model: "I", "M3" o "M4".
         cables: cables del plugboard (0 a 13).
         reflectors: reflectores entre los que elegir; por defecto, B (o B-Thin en la M4).
+        rotors: rotores permitidos (al menos 3 del modelo); por defecto, todos. La demo 2
+            puede acordar con el compañero un subconjunto, como I, II y III.
     """
     spec = MODELS[model]
     default = ("B-Thin",) if model == "M4" else ("B",)
     choices = list(reflectors) if reflectors else list(default)
-    rotors = tuple(str(r) for r in rng.choice(spec.rotors, size=3, replace=False))
+    allowed = list(rotors) if rotors else list(spec.rotors)
+    if len(allowed) < 3 or any(r not in spec.rotors for r in allowed):
+        raise ValueError(f"se necesitan al menos 3 rotores de {spec.name}")
+    names = tuple(str(r) for r in rng.choice(allowed, size=3, replace=False))
     if spec.greek:
-        rotors = (str(rng.choice(spec.greek)), *rotors)
+        names = (str(rng.choice(spec.greek)), *names)
     n = spec.n_rotors
     return EnigmaConfig(
-        rotors=rotors,
+        rotors=names,
         reflector=str(rng.choice(choices)),
         rings=tuple(int(v) for v in rng.integers(0, 26, size=n)),
         positions=tuple(int(v) for v in rng.integers(0, 26, size=n)),

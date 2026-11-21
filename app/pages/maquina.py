@@ -58,10 +58,21 @@ def _preset_historical() -> None:
 
 
 def _random_key() -> None:
-    """Clave al azar de verdad (sin semilla fija): la usa el compañero de la demo 2."""
+    """Clave al azar de verdad (sin semilla fija): la usa el compañero de la demo 2.
+
+    Si se marcaron rotores permitidos (por ejemplo I, II y III, lo que se acuerde para la
+    demo 2), los tres rotores salen de ellos.
+    """
     model = st.session_state.get(K + "model", "I")
     text = st.session_state.get(K + "text", "") or "WETTERBERICHT"
-    _load(random_config(np.random.default_rng(), model=model, cables=10), text)
+    allowed = [r for r in st.session_state.get(K + "allowed", []) if r in MODELS[model].rotors]
+    config = random_config(
+        np.random.default_rng(),
+        model=model,
+        cables=10,
+        rotors=allowed if len(allowed) >= 3 else None,
+    )
+    _load(config, text)
 
 
 def _reset_positions() -> None:
@@ -166,6 +177,17 @@ with settings:
         key=K + "plugboard",
         placeholder="AV BS CG DL FU HZ IN KM OW RX",
         help="Parejas de letras separadas por espacios; hasta 13 cables.",
+    )
+    chosen = st.session_state.get(K + "allowed") or []
+    if any(r not in spec.rotors for r in chosen):  # cambió el modelo
+        st.session_state[K + "allowed"] = [r for r in chosen if r in spec.rotors]
+    st.multiselect(
+        "Rotores permitidos en «Clave aleatoria»",
+        spec.rotors,
+        key=K + "allowed",
+        placeholder="Todos los del modelo",
+        help="Para la demo 2: si se acuerda que el compañero use solo los rotores I, II y III, "
+        "márcalos aquí antes de pulsar «Clave aleatoria». Con menos de 3, se usan todos.",
     )
 
 try:

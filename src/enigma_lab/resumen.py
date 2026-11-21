@@ -5,8 +5,10 @@ volver a correr experimentos:
 
 - ``RESUMEN.md``: se entiende por sí solo (fecha, commit, semilla y modo al inicio).
 - ``cifras.json``: las mismas cifras, para máquina.
-- Un CSV por diapositiva de resultados, en formato largo: ``r1_validacion.csv`` (14) y
-  ``r2_cribs.csv`` (15); ``r3_bombe.csv`` y ``r4_banburismus.csv`` llegan en las fases 3 y 4.
+- Un CSV por diapositiva de resultados, en formato largo: ``r1_validacion.csv`` (14),
+  ``r2_cribs.csv`` (15) y ``r3_bombe.csv`` (16); ``r4_banburismus.csv`` llega en la fase 4.
+
+La sección «Demos» toma la demo 2 de ``results/bench_demo2.json`` (``make bench-demo``).
 
 Uso:  python -m enigma_lab.resumen
 """
@@ -32,12 +34,29 @@ from enigma_lab.experiments.common import git_commit, read_summary
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 
 PHASES_LEFT = [
-    ("Fase 3 · Bombe (E5) y configuración de la demo 2", "semana 2"),
     ("Fase 4 · Banburismus (E6)", "semana 3"),
     ("Fase 5 · Rejewski (E7) y ataque moderno (E8), opcionales", "semana 3"),
     ("Fase 6 · modo demo completo, Docker, informe y entrega", "fin de la semana 3"),
+    (
+        "Demo 2 · correr `make bench-demo` en el portátil del autor (P-001) y confirmar la "
+        "configuración",
+        "antes de ensayar",
+    ),
 ]
 R2_COLUMNS = ["L", "texto", "n", "sobreviven", "p", "ic_bajo", "ic_alto", "teorico"]
+R3_COLUMNS = [
+    "letras",
+    "lazos",
+    "diagonal",
+    "modo",
+    "n_menus",
+    "paradas_media",
+    "ic_bajo",
+    "ic_alto",
+    "exito",
+    "s_por_orden",
+]
+BENCH_FILE = "bench_demo2.json"
 
 
 # ---------------------------------------------------------------- CSV
@@ -81,6 +100,25 @@ def r2_table(results_dir: Path) -> pd.DataFrame:
     """
     table = pd.read_parquet(results_dir / "e4_cribs.parquet")
     return table[R2_COLUMNS + [c for c in table.columns if c not in R2_COLUMNS]]
+
+
+def r3_table(results_dir: Path) -> pd.DataFrame:
+    """Diapositiva 16: paradas falsas por orden (E5), con las columnas del spec.
+
+    Se agregan al final, entre otras, ``turing`` (la tabla de Turing para esa celda),
+    ``hipotesis_media`` (hipótesis T↔x abiertas por orden) y ``aristas`` (letras del crib).
+    """
+    table = pd.read_parquet(results_dir / "e5_bombe.parquet")
+    return table[R3_COLUMNS + [c for c in table.columns if c not in R3_COLUMNS]]
+
+
+def read_bench(results_dir: Path) -> dict[str, Any]:
+    """Las mediciones de la demo 2 (``make bench-demo``), o vacío si no hay."""
+    path = results_dir / BENCH_FILE
+    if not path.is_file():
+        return {}
+    data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    return data
 
 
 # ---------------------------------------------------------------- secciones
@@ -166,6 +204,178 @@ def _slide_15(e4: dict[str, Any], table: pd.DataFrame | None) -> list[str]:
     return lines
 
 
+def _stops(value: float) -> str:
+    """Paradas por orden con tres cifras significativas: 667 · 25,4 · 1,22 · 0,04."""
+    if value >= 1000:
+        return fmt_int(round(value))
+    if value == 0:
+        return "0"
+    return f"{value:.3g}".replace(".", ",")
+
+
+def _and(values: list[int]) -> str:
+    """[12, 16] → «12 y 16»."""
+    words = [str(v) for v in values]
+    return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " y " + words[-1]
+
+
+def _cell(table: pd.DataFrame, letters: int, loops: int, diagonal: str, mode: str) -> Any:
+    match = table[
+        (table["letras"] == letters)
+        & (table["lazos"] == loops)
+        & (table["diagonal"] == diagonal)
+        & (table["modo"] == mode)
+    ]
+    return None if match.empty else match.iloc[0]
+
+
+def _slide_16(e5: dict[str, Any], table: pd.DataFrame | None) -> list[str]:
+    if not e5 or table is None:
+        return ["Sin resultados de E5: corre `make reproduce` y luego `make resumen`."]
+    on = [_cell(table, 12, k, "si", "bletchley") for k in range(4)]
+    off = [_cell(table, 12, k, "no", "bletchley") for k in range(4)]
+    if any(c is None for c in on):
+        return ["E5 no tiene la columna de 12 letras con 0 a 3 lazos."]
+    n = int(on[0]["n_menus"])
+    lines = [
+        "- **Cifra para la diapositiva** (menús de 12 letras, con diagonal board, modo "
+        "Bletchley): paradas falsas por orden de rotores con 0, 1, 2 y 3 lazos: "
+        + " · ".join(_stops(c["paradas_media"]) for c in on)
+        + ". Turing: "
+        + " · ".join(_stops(c["turing"]) for c in on)
+        + ". IC 95 %: "
+        + "; ".join(f"{_stops(c['ic_bajo'])}–{_stops(c['ic_alto'])}" for c in on)
+        + f". N = {n} menús por celda, un orden de rotores por menú, semilla "
+        f"{e5['corrida']['semilla']}.",
+        f"- **En 60 órdenes:** con 2 lazos, unas {_stops(60 * on[2]['paradas_media'])} "
+        f"paradas falsas (Turing: {_stops(60 * on[2]['turing'])}); con 3 lazos, "
+        f"{_stops(60 * on[3]['paradas_media'])} (Turing: {_stops(60 * on[3]['turing'])}).",
+    ]
+    ratios = [
+        on[k]["paradas_media"] / on[k + 1]["paradas_media"]
+        for k in range(3)
+        if on[k + 1]["paradas_media"] > 0
+    ]
+    if ratios:
+        lines.append(
+            "- **Cada lazo divide las paradas** por "
+            + ", ".join(fmt_dec(r, 1) for r in ratios)
+            + " (de 0 a 1, de 1 a 2 y de 2 a 3 lazos; Turing: por unas 26). Con las letras "
+            "fijas, un lazo más es una arista más con las mismas letras."
+        )
+    if all(c is not None for c in off):
+        lines.append(
+            "- **Sin diagonal board** (los mismos menús): "
+            + " · ".join(_stops(c["paradas_media"]) for c in off)
+            + " paradas falsas por orden con 0 a 3 lazos. Sin lazos, la Bombe para en casi "
+            "todas las 17.576 posiciones: sin el diagonal board un menú sin lazos no descarta "
+            "nada."
+        )
+    within = table[(table["diagonal"] == "si") & (table["modo"] == "bletchley")].dropna(
+        subset=["turing"]
+    )
+    exact = within[within["turing_cota"] == ""]
+    if len(exact):
+        ratio = exact["paradas_media"].clip(lower=1e-9) / exact["turing"]
+        close = int(((ratio >= 0.5) & (ratio <= 2)).sum())
+        lines.append(
+            f"- **Toda la tabla de Turing** (8 a 16 letras): en {close} de {len(exact)} celdas "
+            "con valor exacto, la media medida está entre la mitad y el doble de la de Turing. "
+            "Detalle por celda en `r3_bombe.csv` (columnas `turing` y `hipotesis_media`)."
+        )
+    eight = _cell(table, 8, 0, "si", "bletchley")
+    if eight is not None:
+        lines.append(
+            f"- **Pocas letras y sin lazos:** con 8 letras Turing da {_stops(eight['turing'])} "
+            "paradas por orden, más que las 17.576 posiciones. Su cifra cuenta hipótesis "
+            f"abiertas, no posiciones: medimos {_stops(eight['hipotesis_media'])} hipótesis "
+            f"en {_stops(eight['paradas_media'])} posiciones."
+        )
+    lines.append(
+        f"- **Éxito:** en modo Bletchley aparece la parada verdadera en el "
+        f"{fmt_pct(e5['exito_bletchley'])} de los menús. El central se movió dentro del tramo "
+        f"en el {fmt_pct(e5['vuelta_frac'])}; sin esa vuelta, en el "
+        f"{fmt_pct(e5['exito_bletchley_sin_vuelta'])}."
+    )
+    if e5.get("exito_robusto") is not None:
+        lines.append(
+            f"- **Modo robusto** (menús de {_and(e5.get('letras_robusto', [12]))} letras): "
+            f"éxito {fmt_pct(e5['exito_robusto'])}, "
+            f"{fmt_dec(e5['robusto_tiempo_relativo'], 1)} veces el tiempo y "
+            f"{fmt_dec(e5['robusto_paradas_relativas'], 1)} veces las paradas del modo Bletchley."
+        )
+    lines.append(
+        f"- **Tiempo por orden** (17.576 posiciones, en el equipo de `make reproduce`): "
+        f"{fmt_dec(e5['s_por_orden_bletchley'], 3)} s en modo Bletchley"
+        + (
+            f" y {fmt_dec(e5['s_por_orden_robusto'], 3)} s en modo robusto."
+            if e5.get("s_por_orden_robusto")
+            else "."
+        )
+    )
+    lines.append(
+        "- **«Letras» son vértices** (P-002, D-031): las letras distintas del menú. Con esa "
+        "lectura la columna de 12 letras coincide con Turing; contando aristas no."
+    )
+    return lines
+
+
+def _demo_2(bench: dict[str, Any]) -> list[str]:
+    if not bench:
+        return [
+            "- **Demo 2 (diapositiva 12):** sin mediciones; corre `make bench-demo` en el "
+            "portátil del autor."
+        ]
+    team = bench["equipo"]
+    where = f"{team['procesador']}, {team['nucleos_logicos']} núcleos lógicos, {team['sistema']}"
+    lines = [
+        f"- **Demo 2 (diapositiva 12):** `make bench-demo` del {bench['fecha']} (commit "
+        f"{bench['commit']}) en {where}. Casos de compañero: clave como la de «Clave "
+        f"aleatoria» (10 cables), mensaje alemán de {bench['letras_mensaje']} letras que "
+        "empieza por el crib, crib en la posición 0. Flujo completo de la página La Bombe: "
+        "barrido, máquina de verificación y «Verificar». Éxito: el descifrado es el mensaje "
+        "letra por letra.",
+        "",
+        "| Configuración | Éxito (IC 95 %) | p50 | p95 | Barrido p95 | ¿Cumple? |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
+    for c in bench["configuraciones"]:
+        low, high = c["exito_ic"]
+        lines.append(
+            f"| {c['nombre']} | {c['exitos']} de {c['n']} ({fmt_pct(low, 0)}–"
+            f"{fmt_pct(high, 0)}) | {fmt_dec(c['p50'], 1)} s | {fmt_dec(c['p95'], 1)} s | "
+            f"{fmt_dec(c['p95_barrido'], 1)} s | {'sí' if c['cumple'] else 'no'} |"
+        )
+    chosen = next((c for c in bench["configuraciones"] if c["id"] == bench["recomendada"]), None)
+    lines.append("")
+    if chosen is None:
+        lines.append(
+            f"- **Recomendación:** ninguna configuración cumple {bench['criterio']} en este equipo."
+        )
+    else:
+        how = {
+            "60_robusto": "el compañero usa «Clave aleatoria» sin restricciones y empieza su "
+            "mensaje por WETTERBERICHT (con X entre palabras). En la demo: «Rotores I a V "
+            "(60 órdenes)», modo robusto.",
+            "6_robusto": "antes de cifrar, el compañero marca los rotores I, II y III en "
+            "«Rotores permitidos en «Clave aleatoria»» (página Máquina), pulsa «Clave "
+            "aleatoria» y empieza su mensaje por WETTERBERICHT (con X entre palabras). En la "
+            "demo: «Rotores I, II y III (6 órdenes)», modo robusto; dilo en voz alta.",
+            "crib_largo": "el compañero empieza su mensaje por WETTERBERICHTXFUER. En la demo: "
+            "crib WETTERBERICHTXFUER, «Rotores I a V (60 órdenes)», modo robusto.",
+        }[chosen["id"]]
+        lines.append(
+            f"- **Recomendada ({bench['criterio']}):** {chosen['nombre']}: {how} Éxito "
+            f"{fmt_pct(chosen['exito'])}, p95 {fmt_dec(chosen['p95'], 1)} s."
+        )
+    lines.append(
+        "- Estos tiempos son del equipo indicado. Este equipo es un escritorio; el presupuesto "
+        "de 30 s es del portátil del autor (P-001): corre `make bench-demo` allí antes de "
+        "ensayar y usa la configuración que recomiende."
+    )
+    return lines
+
+
 def _other_results(e2: dict[str, Any], e3: dict[str, Any]) -> list[str]:
     lines = []
     if e3:
@@ -205,11 +415,40 @@ def _other_results(e2: dict[str, Any], e3: dict[str, Any]) -> list[str]:
     return lines or ["Sin resultados de E2 ni E3."]
 
 
-def _discrepancies(e4: dict[str, Any], table: pd.DataFrame | None) -> list[str]:
+def _discrepancies(
+    e4: dict[str, Any],
+    table: pd.DataFrame | None,
+    e5_table: pd.DataFrame | None = None,
+    bench: dict[str, Any] | None = None,
+) -> list[str]:
     lines = [
         "Ninguna contradicción con las diapositivas ni con el guion. Notas:",
         "",
     ]
+    if e5_table is not None:
+        on = [_cell(e5_table, 12, k, "si", "bletchley") for k in range(4)]
+        if all(c is not None for c in on):
+            lines.append(
+                "- Diapositiva 16: la tabla de Turing cuenta «letras del menú» como letras "
+                "distintas (vértices del grafo), igual que la diapositiva 11 (11 letras, 13 "
+                "aristas). Con esa lectura, nuestra Bombe da "
+                + " · ".join(_stops(c["paradas_media"]) for c in on)
+                + " paradas falsas por orden con 12 letras y 0 a 3 lazos, frente a 820 · 31 · "
+                "1,2 · 0,04 de Turing. Si «letras» fueran aristas (letras del crib), no "
+                "coincidirían (ver D-031)."
+            )
+    lines.append(
+        "- Verificador (spec 6.4, «siempre»): recupera una clave equivalente en 200 de 200 de "
+        "los casos de la prueba, que se usaron para ajustar su diseño, y en 198 de 200 casos "
+        "nuevos. Las 2 fallas tienen el plugboard exacto y difieren en una sola letra, la "
+        "segunda o la última del mensaje: un doble paso del central justo en el borde que el "
+        "texto no alcanza a decidir. La parada verdadera aparece siempre (400 de 400)."
+    )
+    if bench and bench.get("recomendada"):
+        lines.append(
+            "- Diapositiva 12 y guion: la configuración de la demo 2 es la recomendada en "
+            "«Demos»; el guion la tiene pendiente."
+        )
     if e4 and table is not None:
         g = _row(table, "aleman", 13)
         if g is not None:
@@ -243,7 +482,11 @@ def _runs(summary: dict[str, Any]) -> list[str]:
 
 
 def build_markdown(
-    summary: dict[str, Any], cifras: list[dict[str, Any]], e4_table: pd.DataFrame | None
+    summary: dict[str, Any],
+    cifras: list[dict[str, Any]],
+    e4_table: pd.DataFrame | None,
+    e5_table: pd.DataFrame | None = None,
+    bench: dict[str, Any] | None = None,
 ) -> str:
     """El texto de ``RESUMEN.md``."""
     timing = _demo1_timing()
@@ -272,7 +515,7 @@ def build_markdown(
         "",
         "### Diapositiva 16 · Bombe (E5)",
         "",
-        "Pendiente (fase 3).",
+        *_slide_16(summary.get("e5", {}), e5_table),
         "",
         "### Diapositiva 17 · Banburismus (E6)",
         "",
@@ -310,13 +553,11 @@ def build_markdown(
         f"{fmt_dec(timing['portada'], 1)} ms en el equipo donde corrió `make resumen` "
         f"({cpu}). Los 45 s del guion los pone la interacción. Falta cronometrar el "
         "recorrido completo en el portátil del autor.",
-        "- **Demo 2 (diapositiva 12):** pendiente (fase 3), con `make bench-demo`. Riesgo "
-        "conocido: con WETTERBERICHT, el rotor central se mueve dentro del tramo en casi la "
-        "mitad de las claves, y la mayoría de los menús tienen 0 o 1 lazos.",
+        *_demo_2(bench or {}),
         "",
         "## 4. Discrepancias",
         "",
-        *_discrepancies(summary.get("e4", {}), e4_table),
+        *_discrepancies(summary.get("e4", {}), e4_table, e5_table, bench),
         "",
         "## 5. Pendientes",
         "",
@@ -342,11 +583,26 @@ def main(results_dir: Path | None = None) -> Path:
     if (results / "e4_cribs.parquet").is_file():
         e4_table = r2_table(results)
         e4_table.to_csv(out / "r2_cribs.csv", index=False)
+    e5_table = None
+    if (results / "e5_bombe.parquet").is_file():
+        e5_table = r3_table(results)
+        e5_table.to_csv(out / "r3_bombe.csv", index=False)
+    bench = read_bench(results)
+    demo2 = {k: v for k, v in bench.items() if k != "configuraciones"}
+    if bench:
+        demo2["configuraciones"] = [
+            {k: v for k, v in c.items() if k != "casos"} for c in bench["configuraciones"]
+        ]
     (out / "cifras.json").write_text(
-        json.dumps({"cifras": cifras, "experimentos": summary}, ensure_ascii=False, indent=2),
+        json.dumps(
+            {"cifras": cifras, "experimentos": summary, "demo2": demo2},
+            ensure_ascii=False,
+            indent=2,
+        ),
         encoding="utf-8",
     )
-    (out / "RESUMEN.md").write_text(build_markdown(summary, cifras, e4_table), encoding="utf-8")
+    markdown = build_markdown(summary, cifras, e4_table, e5_table, bench)
+    (out / "RESUMEN.md").write_text(markdown, encoding="utf-8")
     print(f"Listo: {out}")
     return out
 

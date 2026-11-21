@@ -14,7 +14,13 @@ import pandas as pd
 import streamlit as st
 
 from enigma_lab import SEED, paths
-from enigma_lab.experiments import e1_validation, e2_keyspace, e3_statistics, e4_cribs
+from enigma_lab.experiments import (
+    e1_validation,
+    e2_keyspace,
+    e3_statistics,
+    e4_cribs,
+    e5_bombe,
+)
 from enigma_lab.experiments.common import read_summary
 from enigma_lab.viz import plotly_figs
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
@@ -50,9 +56,17 @@ INFO: dict[str, dict[str, str]] = {
         "posición al azar: qué fracción de las alineaciones falsas sobrevive.",
         "referencia": "Teoría (25/26)^L; piloto: 60,0 % con L = 13.",
     },
+    "e5": {
+        "tab": "E5 · Bombe",
+        "pregunta": "¿Cuántas paradas falsas deja la Bombe?",
+        "metodo": "Menús conexos de cribs alemanes reales, por letras (vértices) y lazos, con "
+        "clave aleatoria: se barre el orden verdadero en modo Bletchley con y sin diagonal "
+        "board, y en modo robusto un subconjunto. Paradas falsas, éxito y tiempo por orden.",
+        "referencia": "Tabla de Turing (Wikipedia «Bombe»): con 12 letras, 820, 31, 1,2 y 0,04 "
+        "paradas por orden con 0, 1, 2 y 3 lazos.",
+    },
 }
 PENDING = {
-    "e5": ("E5 · Bombe", 3),
     "e6": ("E6 · Banburismus", 4),
     "e7": ("E7 · Rejewski", 5),
     "e8": ("E8 · Ataque moderno", 5),
@@ -77,6 +91,8 @@ def _run_quick(experiment: str) -> dict[str, Any]:
         return {"df": df, "pares": pairs}
     if experiment == "e4":
         return {"df": e4_cribs.run(e4_cribs.PARAMS["rapido"], SEED)}
+    if experiment == "e5":
+        return {"df": e5_bombe.run(e5_bombe.PARAMS["rapido"], SEED)}
     return {"df": e2_keyspace.run()}
 
 
@@ -269,6 +285,43 @@ for tab, (experiment, info) in zip(tabs, INFO.items(), strict=False):
                 )
             st.dataframe(table, hide_index=True, width="stretch")
             _downloads("e4_cribs", table, e4_cribs.figure(df, source=source))
+
+        elif experiment == "e5":
+            df = quick["df"] if quick else _saved("e5_bombe_menus")
+            if df is None:
+                st.info("Aún no hay resultados guardados: corre  make reproduce.")
+                continue
+            table = e5_bombe.aggregate(df)
+            st.plotly_chart(
+                plotly_figs.e5_vs_turing(table, demo),
+                theme=None,
+                config=plotly_figs.plotly_config(),
+                width="stretch",
+            )
+            maps = st.columns(2)
+            for column, diagonal in zip(maps, ("si", "no"), strict=True):
+                column.plotly_chart(
+                    plotly_figs.e5_heatmap(table, diagonal, demo),
+                    theme=None,
+                    config=plotly_figs.plotly_config(),
+                    width="stretch",
+                )
+            figures = e5_bombe.summary(df, e5_bombe.PARAMS["rapido" if quick else "completo"])
+            robust = figures.get("robusto_tiempo_relativo")
+            st.caption(
+                f"Éxito del modo Bletchley: {fmt_pct(figures['exito_bletchley'])} (el central se "
+                f"movió dentro del tramo en el {fmt_pct(figures['vuelta_frac'])} de los menús); "
+                f"sin esa vuelta, {fmt_pct(figures['exito_bletchley_sin_vuelta'])}."
+                + (
+                    f" Modo robusto: éxito {fmt_pct(figures['exito_robusto'])}, "
+                    f"{fmt_dec(robust, 1)} veces el tiempo y "
+                    f"{fmt_dec(figures['robusto_paradas_relativas'], 1)} veces las paradas."
+                    if robust
+                    else ""
+                )
+            )
+            st.dataframe(table, hide_index=True, width="stretch")
+            _downloads("e5_bombe", table, e5_bombe.figure(df))
 
 for tab, (name, phase) in zip(tabs[len(INFO) :], PENDING.values(), strict=True):
     with tab:

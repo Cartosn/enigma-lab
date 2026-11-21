@@ -17,8 +17,10 @@ STREAMLIT_FLAGS ?=
 SEMILLA ?= 2026
 MODO ?= completo
 E ?= todos
+# Casos por configuración en make bench-demo
+N ?= 30
 
-.PHONY: help install test test-rapido lint format app requirements corpus experimento reproduce rapido resumen
+.PHONY: help install test test-rapido lint format app requirements corpus experimento reproduce rapido resumen bench-demo
 
 help: ## Muestra esta lista
 	@$(UV) run --no-project python scripts/make_help.py Makefile
@@ -59,6 +61,9 @@ rapido: ## Corre todos los experimentos en modo rápido (para la app)
 
 resumen: ## Arma results/presentacion/ (RESUMEN.md, cifras.json, CSV) sin correr nada
 	$(UV) run python -m enigma_lab.resumen
+
+bench-demo: ## Mide la demo 2 en este equipo: éxito y tiempos (make bench-demo N=30)
+	$(UV) run python scripts/bench_demo2.py --n $(N)
 
 requirements: ## Regenera requirements.txt a partir de uv.lock
 	$(UV) export --format requirements-txt --no-hashes --all-groups --output-file requirements.txt
