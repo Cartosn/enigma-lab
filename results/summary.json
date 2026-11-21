@@ -1,0 +1,41 @@
+{
+  "e1": {
+    "corrida": {
+      "experimento": "e1",
+      "modo": "completo",
+      "semilla": 2026,
+      "fecha": "2026-11-21 02:56 UTC",
+      "commit": "6b032e0"
+    },
+    "vectores_ok": 9,
+    "vectores_total": 9,
+    "pyenigma_casos": 10000,
+    "pyenigma_coincidencias": 10000,
+    "pyenigma_tasa": 1.0,
+    "pyenigma_ic95": [
+      0.9996160016293234,
+      1.0
+    ],
+    "pyenigma_por_modelo": {
+      "I": {
+        "casos": 4945,
+        "coincidencias": 4945
+      },
+      "M3": {
+        "casos": 2568,
+        "coincidencias": 2568
+      },
+      "M4": {
+        "casos": 2487,
+        "coincidencias": 2487
+      }
+    },
+    "pyenigma_letras": 1007710,
+    "propiedades_claves": 2000,
+    "propiedades_letras": 200000,
+    "puntos_fijos": 0,
+    "involucion_ok": 2000,
+    "lotes_igual_escalar": 2000,
+    "segundos": 18.2
+  }
+}

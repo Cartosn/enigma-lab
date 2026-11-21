@@ -1,0 +1,317 @@
+{
+  "cifras": [
+    {
+      "diapositivas": "2, 7, 20",
+      "cifra": "claves sin anillos",
+      "esperado": "158.962.555.217.826.360.000",
+      "obtenido": "158.962.555.217.826.360.000",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "2, 7, 20",
+      "cifra": "claves sin anillos, redondeado",
+      "esperado": "1,6 × 10²⁰",
+      "obtenido": "1,6 × 10²⁰",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "7, 8",
+      "cifra": "bits sin anillos",
+      "esperado": "67,11",
+      "obtenido": "67,11",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "7",
+      "cifra": "claves con anillos",
+      "esperado": "1,0746 × 10²³",
+      "obtenido": "1,0746 × 10²³",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "7",
+      "cifra": "claves con anillos, redondeado",
+      "esperado": "1,07 × 10²³",
+      "obtenido": "1,07 × 10²³",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "7",
+      "cifra": "bits con anillos",
+      "esperado": "76,51",
+      "obtenido": "76,51",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "7",
+      "cifra": "bits del orden de rotores",
+      "esperado": "5,91",
+      "obtenido": "5,91",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "7",
+      "cifra": "bits de las posiciones",
+      "esperado": "14,10",
+      "obtenido": "14,10",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "7",
+      "cifra": "bits de los anillos",
+      "esperado": "9,40",
+      "obtenido": "9,40",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "7",
+      "cifra": "bits del plugboard",
+      "esperado": "47,10",
+      "obtenido": "47,10",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "7",
+      "cifra": "fracción del plugboard en los 67,11 bits",
+      "esperado": "70,2 %",
+      "obtenido": "70,2 %",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "8, 20",
+      "cifra": "configuraciones que barre la Bombe",
+      "esperado": "1.054.560",
+      "obtenido": "1.054.560",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "8, 20",
+      "cifra": "bits del barrido de la Bombe",
+      "esperado": "20,01",
+      "obtenido": "20,01",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "7",
+      "cifra": "años de fuerza bruta a 10⁹ claves por segundo",
+      "esperado": "5.037",
+      "obtenido": "5.037",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "3, 5, 14",
+      "cifra": "periodo del odómetro I-II-III",
+      "esperado": "16.900",
+      "obtenido": "16.900",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "5",
+      "cifra": "posiciones fuera del ciclo",
+      "esperado": "676",
+      "obtenido": "676",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "5, 14",
+      "cifra": "doble paso desde ADU",
+      "esperado": "ADU → ADV → AEW → BFX",
+      "obtenido": "ADU → ADV → AEW → BFX",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "1",
+      "cifra": "mensaje cifrado de la portada",
+      "esperado": "LGNEV YPYZQ DVKES NPUYY QVWSK YNZJH E",
+      "obtenido": "LGNEV YPYZQ DVKES NPUYY QVWSK YNZJH E",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "1, 4",
+      "cifra": "la portada descifrada",
+      "esperado": "ROMPERXENIGMAXCRIPTOGRAFIAXUNAL",
+      "obtenido": "ROMPERXENIGMAXCRIPTOGRAFIAXUNAL",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "4",
+      "cifra": "traza de la letra A",
+      "esperado": "plugboard A → III C → II D → I F → reflector S → I S → II E → III B → plugboard B",
+      "obtenido": "plugboard A → III C → II D → I F → reflector S → I S → II E → III B → plugboard B",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "14",
+      "cifra": "AAAAA con I-II-III y anillos AAA",
+      "esperado": "BDZGO",
+      "obtenido": "BDZGO",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "14",
+      "cifra": "lo mismo con anillos BBB",
+      "esperado": "EWTYX",
+      "obtenido": "EWTYX",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "14",
+      "cifra": "ejemplo de py-enigma (10 cables)",
+      "esperado": "THEXRUSSIANSXAREXCOMINGX",
+      "obtenido": "THEXRUSSIANSXAREXCOMINGX",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "6",
+      "cifra": "(25/26)¹⁰⁰: ningún punto fijo en 100 letras al azar",
+      "esperado": "1,98 %",
+      "obtenido": "1,98 %",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "6, 14",
+      "cifra": "claves con involución (de 2.000)",
+      "esperado": "2.000",
+      "obtenido": "2.000",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "6, 14",
+      "cifra": "letras cifradas con esas 2.000 claves",
+      "esperado": "200.000",
+      "obtenido": "200.000",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "6, 14",
+      "cifra": "puntos fijos en esas 200.000 letras",
+      "esperado": "0",
+      "obtenido": "0",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "15, 20",
+      "cifra": "(25/26)¹³: sobreviven a un crib de 13 letras",
+      "esperado": "60,1 %",
+      "obtenido": "60,1 %",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "15",
+      "cifra": "(25/26)⁵⁰: sobreviven a un crib de 50 letras",
+      "esperado": "14,1 %",
+      "obtenido": "14,1 %",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "9",
+      "cifra": "Kuhl: 105.456 · 21.230 · 11.466",
+      "esperado": "105.456 · 21.230 · 11.466",
+      "obtenido": null,
+      "coincide": null,
+      "pendiente": "fase 5 (P2): rejewski/; si no se hace, la diapositiva solo cita a Kuhl"
+    },
+    {
+      "diapositivas": "10, 11",
+      "cifra": "casos deterministas de 6.5 (arrastre y menú)",
+      "esperado": "6 alineaciones; menú de 11 letras, 13 aristas y 3 lazos",
+      "obtenido": null,
+      "coincide": null,
+      "pendiente": "fase 2: cribs/"
+    },
+    {
+      "diapositivas": "13, 17",
+      "cifra": "decibanes y aproximación de Wald",
+      "esperado": "+1,845 dB; +0,0211 y −0,0184 dB; ±19,96 dB; 929 y 1.062 letras",
+      "obtenido": null,
+      "coincide": null,
+      "pendiente": "fase 4: banburismus/"
+    },
+    {
+      "diapositivas": "15",
+      "cifra": "E4: fracción simulada con texto alemán real",
+      "esperado": "dentro del IC de (25/26)^L",
+      "obtenido": null,
+      "coincide": null,
+      "pendiente": "fase 2: E4"
+    },
+    {
+      "diapositivas": "16",
+      "cifra": "Turing, 12 letras: paradas por orden",
+      "esperado": "820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60",
+      "obtenido": null,
+      "coincide": null,
+      "pendiente": "fase 3: turing_stops.csv y E5"
+    }
+  ],
+  "experimentos": {
+    "e1": {
+      "corrida": {
+        "experimento": "e1",
+        "modo": "completo",
+        "semilla": 2026,
+        "fecha": "2026-11-21 02:56 UTC",
+        "commit": "6b032e0"
+      },
+      "vectores_ok": 9,
+      "vectores_total": 9,
+      "pyenigma_casos": 10000,
+      "pyenigma_coincidencias": 10000,
+      "pyenigma_tasa": 1.0,
+      "pyenigma_ic95": [
+        0.9996160016293234,
+        1.0
+      ],
+      "pyenigma_por_modelo": {
+        "I": {
+          "casos": 4945,
+          "coincidencias": 4945
+        },
+        "M3": {
+          "casos": 2568,
+          "coincidencias": 2568
+        },
+        "M4": {
+          "casos": 2487,
+          "coincidencias": 2487
+        }
+      },
+      "pyenigma_letras": 1007710,
+      "propiedades_claves": 2000,
+      "propiedades_letras": 200000,
+      "puntos_fijos": 0,
+      "involucion_ok": 2000,
+      "lotes_igual_escalar": 2000,
+      "segundos": 18.2
+    }
+  }
+}
