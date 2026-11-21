@@ -1,16 +1,81 @@
 # Progreso
 
-Última actualización: 20-11-2026 · fase 1 cerrada.
+Última actualización: 20-11-2026 · fase 2 cerrada.
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
 | 0 · Andamiaje | Cerrada (20-11-2026) | 1 |
 | 1 · Núcleo Enigma | Cerrada (20-11-2026) | 1 |
-| 2 · Estadística y cribs | Siguiente | 1–2 (reunión con el profe) |
-| 3 · Bombe | Pendiente | 2 |
+| 2 · Estadística y cribs | Cerrada (20-11-2026) | 1–2 (reunión con el profe) |
+| 3 · Bombe | Siguiente | 2 |
 | 4 · Banburismus | Pendiente | 3 |
 | 5 · Extensiones P2 | Pendiente | 3 |
 | 6 · Pulido y entrega | Pendiente | Fin de la 3 |
+
+## Fase 2 · Estadística y cribs
+
+**Criterios de aceptación:** se cumplen.
+
+| Criterio | Resultado |
+| --- | --- |
+| Cifras de 5.2 exactas | Todas (desde la fase 0; E2 las reúne) |
+| E4 coincide con (25/26)^L dentro del IC | Texto aleatorio: dentro del IC 95 % en 10 de 10 longitudes |
+
+Además, los casos de 6.5 (diapositivas 10 y 11 y caso de respaldo) pasan exactos.
+`make test` da 189 pruebas que pasan y 3 cifras pendientes (fases 3 a 5), en unos 40 s.
+`make lint` pasa sin errores. `make reproduce` completo (corpus y E1 a E4) tarda 39 s en
+este equipo.
+
+**Qué quedó:**
+- **Corpus:**
+  - alemán: Fontane y Kafka, 578.365 letras;
+  - español: Cervantes, 1.620.450 letras;
+  - se descarga de un espejo de Gutenberg con SHA-256 verificado;
+  - el repo trae muestras de unos 200 KB por idioma.
+- **`stats/`:** normalización según el spec, frecuencias, IC, χ², la antifrecuencia del
+  cifrado y su potencia teórica, matriz plano × cifrado, cuadrigramas e intervalos.
+- **`cribs/`:** arrastre del crib, escalar y vectorizado, y menú con lazos, aristas en
+  lazos y letra de prueba.
+- **Experimentos:** E2, E3 y E4, con figuras para el informe. El resumen agrega la
+  diapositiva 15 y `r2_cribs.csv`.
+- **App:**
+  - páginas Espacio de claves, Estadística del cifrado, Cribs y menús, y Experimentos;
+  - dos componentes nuevos, el arrastre del crib y el grafo del menú, que solo dibujan
+    datos de Python;
+  - todo revisado en el navegador.
+- **Documentos:** guía de estudio (tema 3), VALIDACION (6.5), DECISIONES (D-024 a
+  D-030), FUENTES (corpus) y ARQUITECTURA.
+
+**Cifras obtenidas** (modo completo, semilla 2026, commit `6bd632e`):
+- **E3:**
+  - El IC del corpus alemán es 0,0757 (Pommerening: 0,0758) y el del español, 0,0750.
+  - Con 1.000 letras, el IC del alemán baja de 0,0760 en el plano a 0,0385 en el
+    cifrado.
+  - La χ² rechaza la uniformidad del 100 % de los planos y del 10,0 % de los cifrados.
+    La antifrecuencia (1 − f_c)/25 predice 8,0 %: el cifrado no es del todo uniforme.
+  - No hubo ningún punto fijo en 3.850.000 letras.
+- **E4, texto aleatorio:**
+  - L = 13: sobrevive el 60,1 % de las alineaciones falsas (IC 59,9 %–60,3 %; teoría
+    60,1 %).
+  - L = 50: el 14,1 % (teoría 14,1 %).
+- **E4, alemán real:**
+  - L = 13: el 61,6 % (61,4 %–61,8 %); L = 50: el 15,4 %.
+  - (25/26)^L queda fuera del IC en las 10 longitudes. La teoría corregida
+    (1 − (1 − κ)/25)^L, con κ = 0,0802, queda dentro en las 10.
+- **Cifras de la presentación:** 36 de 36 coinciden; 3 llegan en las fases 3 a 5.
+
+**Qué falta (fase 3):**
+- la Bombe: aleatorizador precalculado, versión en Numba y versión de referencia;
+- el verificador;
+- la página La Bombe;
+- E5, con la tabla de Turing;
+- `make bench-demo` para la demo 2;
+- CyberChef para la Bombe.
+
+**Pendiente del autor:**
+- confirmar el equipo de la demo 2 (P-001);
+- crear el repositorio remoto;
+- encender Docker Desktop si quiere la validación automática con CyberChef (P-003).
 
 ## Fase 1 · Núcleo Enigma
 
