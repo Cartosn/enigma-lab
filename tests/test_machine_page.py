@@ -1,0 +1,78 @@
+"""Página Máquina y su animación: preajustes de la demo 1 y la regla de la traza."""
+
+from __future__ import annotations
+
+import json
+import re
+
+from streamlit.testing.v1 import AppTest
+
+from enigma_lab import paths
+from enigma_lab.core.machine import Enigma, EnigmaConfig
+from enigma_lab.core.wiring import REFLECTORS, ROTORS
+from ui.machine_view import COMPONENT, MAX_ANIMATED, machine_html, machine_payload
+
+PAGE = paths.APP / "pages" / "maquina.py"
+
+
+def _page() -> AppTest:
+    return AppTest.from_file(str(PAGE), default_timeout=60).run()
+
+
+def _output(app: AppTest) -> str:
+    blocks = [m.value for m in app.markdown if 'class="el-cipher"' in m.value]
+    return re.sub(r"<[^>]+>", "", blocks[0]).strip()
+
+
+def _click(app: AppTest, label: str) -> AppTest:
+    button = next(b for b in app.button if b.label == label)
+    return button.click().run()
+
+
+def test_default_is_vector_bdzgo() -> None:
+    app = _page()
+    assert not app.exception
+    assert _output(app) == "BDZGO"
+
+
+def test_cover_preset_decrypts_slide_1() -> None:
+    """Demo 1: «Portada» descifra en un clic el mensaje de la diapositiva 1."""
+    app = _click(_page(), "Portada")
+    assert not app.exception
+    assert _output(app).replace(" ", "") == "ROMPERXENIGMAXCRIPTOGRAFIAXUNAL"
+
+
+def test_historical_preset_decrypts_u264() -> None:
+    app = _click(_page(), "Ejemplo histórico")
+    assert not app.exception
+    assert _output(app).replace(" ", "").startswith("VONVONJLOOKS")
+
+
+def test_payload_is_the_python_trace() -> None:
+    """La animación recibe exactamente la traza de Enigma.trace (spec, fase 1)."""
+    config = EnigmaConfig.from_strings("I II III", positions="ADU")
+    traces = Enigma(config).trace("AAAA")
+    payload = machine_payload(config, traces)
+    assert payload["letters"] == [t.to_dict() for t in traces]
+    assert payload["start"] == "ADU"
+    assert [letter["double_step"] for letter in payload["letters"]] == [False, False, True, False]
+    html = machine_html(payload)
+    embedded = html.split('<script id="payload" type="application/json">')[1].split("</script>")[0]
+    assert json.loads(embedded) == json.loads(json.dumps(payload))
+
+
+def test_long_texts_are_truncated_for_the_animation() -> None:
+    config = EnigmaConfig.from_strings("I II III")
+    traces = Enigma(config).trace("A" * (MAX_ANIMATED + 10))
+    payload = machine_payload(config, traces)
+    assert len(payload["letters"]) == MAX_ANIMATED
+    assert payload["truncated"] and payload["total"] == MAX_ANIMATED + 10
+
+
+def test_component_does_not_reimplement_enigma() -> None:
+    """Regla clave (spec 3): el JavaScript no trae cableados; solo anima la traza."""
+    template = COMPONENT.read_text(encoding="utf-8")
+    for spec in ROTORS.values():
+        assert spec.wiring not in template
+    for wiring in REFLECTORS.values():
+        assert wiring not in template

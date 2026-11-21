@@ -7,7 +7,11 @@ necesita cada ataque?** Enigma Lab es una app que simula la máquina Enigma, la 
 Turing-Welchman y experimentos estadísticos sobre los ataques. Sirve para la demo en
 vivo de la presentación y produce las cifras de sus diapositivas.
 
-> **Estado:** fase 0 de 6, el andamiaje: entorno, pruebas, tema visual y página Inicio.
+> **Estado:** fase 1 de 6 cerrada.
+> - **Núcleo:** Enigma I, M3 y M4 validadas contra los vectores publicados, py-enigma
+>   (10.000 claves) y CyberChef.
+> - **App:** página Máquina con animación.
+>
 > El detalle está en [`docs/PROGRESS.md`](docs/PROGRESS.md).
 
 ## Inicio rápido (local)
@@ -20,6 +24,12 @@ vivo de la presentación y produce las cifras de sus diapositivas.
 
 Sin make: `uv run streamlit run app/Inicio.py` y `uv run pytest`. `make help` lista
 todos los objetivos.
+
+## Reproducir los resultados
+
+`make reproduce` corre los experimentos en modo completo, con semilla 2026, y arma
+`results/presentacion/`. Hoy solo existe E1, la validación, que tarda unos 20 s.
+`make resumen` rehace el resumen sin volver a correr nada.
 
 ## Estructura
 

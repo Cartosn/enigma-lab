@@ -248,10 +248,15 @@ def register_fonts() -> None:
     global _fonts_registered
     if _fonts_registered:
         return
+    import logging
+
     from matplotlib import font_manager
 
     for path in sorted(FONT_DIR.glob("*.ttf")):
         font_manager.fontManager.addfont(str(path))
+    # DejaVu Sans es solo el respaldo para glifos que Inter no tenga; sin esto,
+    # Matplotlib avisa en cada título que DejaVu no tiene peso «semibold».
+    logging.getLogger("matplotlib.font_manager").setLevel(logging.ERROR)
     _fonts_registered = True
 
 

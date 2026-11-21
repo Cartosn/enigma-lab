@@ -16,6 +16,8 @@ dependencies = [
     "plotly>=5.24",
     "matplotlib>=3.9",
     "networkx>=3.3",
+    # Implementación independiente para validar el simulador (experimento E1).
+    "py-enigma>=1.0",
 ]
 
 [dependency-groups]
@@ -24,7 +26,6 @@ dev = [
     "hypothesis>=6.100",
     "ruff>=0.6",
     "mypy>=1.11",
-    "py-enigma>=0.1",
 ]
 
 [build-system]

@@ -199,6 +199,7 @@ dependencies = [
     { name = "numpy" },
     { name = "pandas" },
     { name = "plotly" },
+    { name = "py-enigma" },
     { name = "pyarrow" },
     { name = "scipy" },
     { name = "statsmodels" },
@@ -209,7 +210,6 @@ dependencies = [
 dev = [
     { name = "hypothesis" },
     { name = "mypy" },
-    { name = "py-enigma" },
     { name = "pytest" },
     { name = "ruff" },
 ]
@@ -222,6 +222,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.0" },
     { name = "pandas", specifier = ">=2.2" },
     { name = "plotly", specifier = ">=5.24" },
+    { name = "py-enigma", specifier = ">=1.0" },
     { name = "pyarrow", specifier = ">=17" },
     { name = "scipy", specifier = ">=1.13" },
     { name = "statsmodels", specifier = ">=0.14" },
@@ -232,7 +233,6 @@ requires-dist = [
 dev = [
     { name = "hypothesis", specifier = ">=6.100" },
     { name = "mypy", specifier = ">=1.11" },
-    { name = "py-enigma", specifier = ">=0.1" },
     { name = "pytest", specifier = ">=8.3" },
     { name = "ruff", specifier = ">=0.6" },
 ]

@@ -6,7 +6,7 @@ cada fase.
 
 **Temas:**
 1. [El espacio de claves](#1-el-espacio-de-claves) (fase 0)
-2. La máquina y el doble paso (fase 1)
+2. [La máquina y el doble paso](#2-la-máquina-y-el-doble-paso) (fase 1)
 3. Cribs y menús (fase 2)
 4. La Bombe, el diagonal board y el verificador (fase 3)
 5. Banburismus y la prueba secuencial (fase 4)
@@ -57,6 +57,81 @@ en menos de 2 minutos. (`KeySpace.bombe_sweep` y `brute_force_years`)
   prueba con hypothesis verifica para todo k la recurrencia
   N(k) · k = N(k − 1) · C(26 − 2(k − 1), 2): cada plugboard de k cables sale de uno de
   k − 1 cables agregando una pareja, de k maneras. (`tests/test_keyspace.py`)
+
+## 2. La máquina y el doble paso
+
+**Idea.** Enigma es una sustitución que cambia con cada letra. La tecla cierra un
+circuito que recorre:
+1. el plugboard (P);
+2. los tres rotores de derecha a izquierda (R, M, L);
+3. el reflector (U);
+4. los mismos rotores de vuelta;
+5. otra vez el plugboard, hasta encender una lámpara.
+
+Antes de cada letra, el rotor derecho avanza un paso, así que la sustitución de la
+siguiente letra ya es otra.
+
+**Fórmula del camino.** lámpara = P⁻¹ · R⁻¹ · M⁻¹ · L⁻¹ · U · L · M · R · P (tecla).
+
+**Fórmula de un rotor desplazado.** Si la ventana muestra p y el anillo está en r, el
+cableado W queda corrido s = p − r lugares. La salida para la entrada x es
+W[(x + s) mod 26] − s (mod 26). El anillo solo cambia dónde queda el cableado respecto
+a la letra de la ventana. (`core/machine.py` · `Enigma._rotor`)
+
+**Por qué cifrar es descifrar y nunca hay puntos fijos.** El reflector U es una
+involución sin puntos fijos: U(U(x)) = x y U(x) ≠ x. La permutación completa es una
+conjugación de U, E = C⁻¹ · U · C con C = L · M · R · P, y conjugar conserva ambas
+propiedades:
+- E(E(x)) = x, así que cifrar dos veces devuelve el original;
+- E(x) ≠ x, así que ninguna letra se cifra a sí misma.
+
+La segunda propiedad es la grieta que usan los cribs y la Bombe.
+(`core/wiring.py` · `is_reflector`; pruebas en `tests/test_properties.py`)
+
+**El paso de los rotores y el doble paso.** (`core/stepping.py` · `step`)
+- El derecho avanza siempre.
+- El central avanza si el derecho está en su muesca.
+- El izquierdo avanza si el central está en su muesca.
+- **El doble paso:** cuando el central está en su muesca, también avanza él mismo,
+  porque el trinquete del izquierdo empuja esa muesca. Por eso el central se mueve en
+  dos pulsaciones seguidas: ADU → ADV → AEW → BFX.
+
+**El periodo: 16.900, no 17.576.** El paso es una función de las 26³ posiciones en sí
+mismas.
+- Con I-II-III, toda trayectoria cae en un único ciclo de 26 · 25 · 26 = 16.900
+  posiciones.
+- Quedan 676 posiciones fuera, por las que se pasa a lo sumo una vez.
+- `cycle_structure` lo calcula aplicando el paso al conjunto de todas las posiciones
+  hasta que deja de cambiar.
+
+**La traza.** `Enigma.trace` devuelve, por letra:
+- las ventanas antes y después del paso;
+- qué rotores avanzaron y si hubo doble paso;
+- la letra que sale de cada etapa.
+
+Con I-II-III en AAA, la A sale B por el camino A → A → C → D → F → S → S → E → B →
+B → B (diapositiva 4). La animación de la página Máquina dibuja esa traza y no calcula
+nada.
+
+**Cifrado por lotes.** Para los Monte Carlo, `core/batch.py` · `encrypt_batch` cifra N
+mensajes a la vez. Precalcula la tabla T[r, s, x] de cada rotor r con cada
+desplazamiento s, así cada etapa es una sola búsqueda en NumPy. Una prueba exige que
+dé lo mismo que la versión escalar.
+
+**La M4.** Agrega a la izquierda un rotor griego (Beta o Gamma) que nunca gira y usa un
+reflector delgado. Con ella el simulador descifra un mensaje real del U-264 (1942).
+
+**Preguntas que pueden salir:**
+- *¿Por qué ninguna letra se cifra a sí misma?* Porque el reflector no tiene puntos
+  fijos y la máquina completa es una conjugación del reflector.
+- *¿Para qué sirve el anillo si no cambia el cableado?* Mueve el cableado respecto a la
+  letra de la ventana, y con él el punto en que el rotor arrastra al siguiente: la
+  muesca está en el anillo. Por eso la Bombe puede buscar con anillos AAA, y el
+  verificador recupera después los anillos derecho y central.
+- *¿Cómo sé que el simulador está bien?*
+  - Reproduce los 9 vectores publicados (BDZGO, EWTYX, el doble paso…).
+  - Coincide con py-enigma en 10.000 claves aleatorias y con CyberChef en 6 casos.
+  - Descifra un mensaje real de 1942.
 
 ## Preguntas probables
 

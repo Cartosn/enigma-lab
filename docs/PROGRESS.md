@@ -1,16 +1,83 @@
 # Progreso
 
-Última actualización: 20-11-2026 · fase 0 cerrada.
+Última actualización: 20-11-2026 · fase 1 cerrada.
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
 | 0 · Andamiaje | Cerrada (20-11-2026) | 1 |
-| 1 · Núcleo Enigma | Siguiente | 1 |
-| 2 · Estadística y cribs | Pendiente | 1–2 (reunión con el profe) |
+| 1 · Núcleo Enigma | Cerrada (20-11-2026) | 1 |
+| 2 · Estadística y cribs | Siguiente | 1–2 (reunión con el profe) |
 | 3 · Bombe | Pendiente | 2 |
 | 4 · Banburismus | Pendiente | 3 |
 | 5 · Extensiones P2 | Pendiente | 3 |
 | 6 · Pulido y entrega | Pendiente | Fin de la 3 |
+
+## Fase 1 · Núcleo Enigma
+
+**Criterios de aceptación:** se cumplen todos.
+
+| Criterio | Resultado |
+| --- | --- |
+| Vectores de 6.1 | 9 de 9, con un mensaje real del U-264 (1942) |
+| 100 % frente a py-enigma en 10.000 claves | 10.000 de 10.000 (IC 95 % de Wilson 99,96 %–100 %) |
+| Propiedades | Involución, sin puntos fijos y lotes = escalar, con hypothesis |
+| Periodo 16.900 y 676 fuera del ciclo | Un solo ciclo de 16.900; 676 fuera |
+| La animación reproduce la traza | Lo comprueba una prueba (el JSON es la traza) y se vio en el navegador |
+
+`make test` da 150 pruebas que pasan y 5 cifras pendientes, en unos 35 s en este equipo.
+`make lint` (ruff y mypy) pasa sin errores.
+
+**Qué quedó:**
+- **Núcleo (`core/`):**
+  - `wiring.py`: cableados I–VIII, Beta, Gamma y los reflectores A, B, C, B delgado y C
+    delgado, tomados de Wikipedia.
+  - `stepping.py`: paso con doble paso y estructura de ciclos.
+  - `machine.py`:
+    - `EnigmaConfig` inmutable, que lee hojas de claves;
+    - `Enigma` con `encrypt` y `trace`, para Enigma I, M3 y M4.
+  - `batch.py`: cifrado por lotes con tablas precalculadas.
+  - `random_keys.py`: claves aleatorias con semilla.
+  - `vectors.py`: los vectores de 6.1.
+- **Validación:**
+  - py-enigma en 10.000 claves (E1 y `tests/test_pyenigma.py`);
+  - CyberChef a mano en 6 casos, todos iguales;
+  - hypothesis.
+
+  Detalle en `docs/VALIDACION.md`.
+- **Experimentos:** marco común, E1 y `make reproduce`, `make rapido`,
+  `make experimento` y `make resumen`. El registro único de cifras está en `cifras.py`.
+- **App:**
+  - Página Máquina, con:
+    - los preajustes «Vector BDZGO», «Portada» y «Ejemplo histórico»;
+    - los botones «Clave aleatoria» y «Reiniciar posición»;
+    - salida en grupos de 5;
+    - comprobaciones en vivo: cifrar la salida devuelve la entrada y no hay puntos fijos;
+    - la animación SVG de la traza.
+  - En Inicio, el estado de la validación en vivo.
+- **Documentos:** VALIDACION, la guía de estudio (tema 2), DECISIONES (D-015 a D-023),
+  FUENTES y ARQUITECTURA.
+
+**Cifras obtenidas** (E1 en modo completo, semilla 2026, 19 s):
+- **py-enigma:** 10.000 de 10.000 casos con 1.007.710 letras: Enigma I 4.945 de 4.945,
+  M3 2.568 de 2.568 y M4 2.487 de 2.487.
+- **Propiedades:** 2.000 claves de Enigma I con 200.000 letras dan 0 puntos fijos,
+  involución en las 2.000 claves y lotes iguales al escalar en las 2.000.
+- **CyberChef:** 6 de 6, incluido el U-264 (232 letras) y una clave M3 con el rotor VI y
+  el reflector C.
+- **Cifras de la presentación:** 29 de 29 coinciden; 5 llegan en las fases 2 a 5.
+- **Demo 1:** el cálculo de la traza de «Vector BDZGO» y de «Portada» tarda menos de
+  1 ms en este equipo.
+
+**Qué falta (fase 2):**
+- `keyspace` completo y la página «Espacio de claves» (E2);
+- el corpus alemán y español, y `stats/` (E3);
+- `cribs/` con los casos de 6.5 (E4);
+- las páginas 3 a 5 y la página Experimentos.
+
+**Pendiente del autor:**
+- confirmar en qué equipo se hará la demo 2 (P-001);
+- crear el repositorio remoto, para la CI y el enlace de la diapositiva 21;
+- encender Docker Desktop cuando quiera la validación automática con CyberChef (P-003).
 
 ## Fase 0 · Andamiaje
 

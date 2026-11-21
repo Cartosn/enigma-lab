@@ -1,0 +1,7 @@
+{
+  "description": "Mensaje de la portada (diapositiva 1). El preajuste «Portada» de la página Máquina carga esta clave con el cifrado ya escrito: descifrarlo devuelve el texto.",
+  "key": {"model": "I", "rotors": "II V III", "reflector": "B", "rings": "ENI", "positions": "GMA", "plugboard": "BQ CR DI EJ KW MT OS PX UZ GH"},
+  "plaintext": "ROMPERXENIGMAXCRIPTOGRAFIAXUNAL",
+  "ciphertext": "LGNEVYPYZQDVKESNPUYYQVWSKYNZJHE",
+  "reading": "ROMPER ENIGMA CRIPTOGRAFÍA UNAL"
+}

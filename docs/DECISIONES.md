@@ -111,6 +111,70 @@ El interruptor de la barra lateral ya sube la letra base a 20 px. El modo demo c
 llega en la fase 6: ocultar lo que la demo no usa, resultados en grande y Numba
 precalentado.
 
+## Fase 1 · Núcleo Enigma (20-11-2026)
+
+### D-015 · Mensaje histórico: el del U-264, y con él la M4
+No se encontró una fuente verificable del mensaje de Barbarossa (1941). Se revisaron
+Wikipedia en alemán e inglés, Crypto Museum y las páginas de D. Rijmenants. La única
+fuente con un mensaje real y su clave completa fue el M4 Project: el mensaje del U-264,
+de 1942. Para descifrarlo, el núcleo incluye la Enigma M4, que el spec marca como
+opcional: un rotor griego fijo a la izquierda y un reflector delgado. El cifrado por
+lotes sigue siendo solo para tres rotores.
+
+### D-016 · py-enigma como dependencia normal
+E1 forma parte de `make reproduce` y compara con py-enigma. Por eso py-enigma pasó de
+las dependencias de desarrollo a las normales; es un paquete pequeño, en Python puro.
+
+### D-017 · Límites de py-enigma
+py-enigma rechaza más de 10 cables («Please specify 10 or less pairs») y no trae el
+reflector A. La comparación de 10.000 claves usa de 0 a 10 cables y los reflectores B y
+C (B y C delgados en la M4). Las pruebas con hypothesis cubren de 0 a 13 cables y el
+reflector A.
+
+### D-018 · CyberChef a mano en la web (resuelve P-003 para la máquina)
+Docker Desktop estaba apagado y Node.js no está instalado, así que se aplicó el respaldo
+del spec: 6 casos validados a mano en la web de CyberChef. `scripts/cyberchef_urls.py`
+genera las URL con la receta incluida, para poder repetir la validación. Los 3 casos de
+la Bombe quedan para la fase 3, con Docker si está disponible.
+
+### D-019 · E1 y `make resumen` llegan en la fase 1
+El criterio de la fase 1 («100 % frente a py-enigma en 10.000 claves») es la medida de
+E1, y el spec pide `make resumen` al cerrar la fase 1. Por eso en esta fase ya existen:
+- el marco de experimentos: `experiments/common.py` y `__main__.py`;
+- E1, con su Parquet, su figura y su entrada en `summary.json`;
+- `make reproduce`, `make rapido`, `make experimento` y `make resumen`.
+
+La página Experimentos sigue siendo de la fase 2.
+
+### D-020 · Un solo registro de cifras
+`enigma_lab/cifras.py` lista las cifras de la tabla 11.3 con la función que calcula cada
+una. Lo usan `tests/test_presentacion.py` y la tabla «Cifras de la presentación» de
+`RESUMEN.md`, así que las dos no pueden divergir.
+
+### D-021 · `results/` se versiona
+Los resultados son pequeños (E1 ocupa unos 0,7 MB) y la app, el informe y el resumen los
+leen. Al versionarlos, un clon limpio muestra resultados sin esperar `make reproduce`.
+Cada corrida registra el commit del código que la produjo. Por eso los resultados van en
+un commit propio, justo después del commit del código.
+
+### D-022 · Página Máquina
+- **«Clave aleatoria»:** usa azar del sistema, sin semilla, porque la usa el compañero
+  de la demo 2 y cada clave debe ser distinta. Todo lo demás usa la semilla 2026.
+- **Texto de entrada:** se normaliza con `to_machine_letters`, que quita tildes (Ü → U),
+  cambia Ñ → N y ß → SS y descarta lo demás. La normalización del corpus de la fase 2 es
+  otra: en alemán escribe Ü → UE.
+- **«Reiniciar posición»:** vuelve a la posición inicial de la última clave cargada.
+- **Animación:** muestra como máximo 200 letras; el resto se cifra pero no se anima. Va
+  en turquesa a la ida y en ámbar a la vuelta. La lámpara de la tecla pulsada se dibuja
+  con contorno punteado: nunca se enciende.
+
+### D-023 · Semántica de la traza y de las muescas
+- **Traza:** cada etapa guarda la letra que **sale** de ese componente, como en la
+  diapositiva 4.
+- **Muesca:** se guarda como la letra de ventana desde la que el rotor arrastra al
+  siguiente (Q en el rotor I), igual que Wikipedia y py-enigma. CyberChef escribe la
+  letra de llegada (R); la conversión está en `scripts/cyberchef_urls.py`.
+
 ## Pendientes de decidir
 
 ### P-001 · Equipo de las mediciones de la demo 2 (fase 3)
@@ -124,7 +188,7 @@ En 6.5 «letras» son vértices: 11 letras y 13 aristas. En E5 y en la tabla de 
 queda claro si cuentan vértices o aristas. Se resolverá con la fuente original al
 transcribir `data/reference/turing_stops.csv`.
 
-### P-003 · CyberChef sin Node.js (fase 1)
-Node.js no está instalado. El plan es correr la API de Node de CyberChef dentro de Docker
-(imagen oficial `node`) con Docker Desktop encendido. Si no funciona, se validará a mano
-en la web: 5 casos de Enigma y 3 de Bombe.
+### P-003 · CyberChef para la Bombe (fase 3)
+La parte de la máquina se resolvió en D-018. Para los 3 casos de la Bombe, la idea es
+correr la API de Node de CyberChef dentro de Docker (imagen oficial `node`) si Docker
+Desktop está encendido; si no, se harán a mano en la web.

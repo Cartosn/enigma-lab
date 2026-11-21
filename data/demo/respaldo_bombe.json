@@ -1,0 +1,10 @@
+{
+  "description": "Caso de respaldo de la Bombe (spec 6.1 y 6.5): el botón «Caso de respaldo» de la página La Bombe lo carga si falla la demo 2.",
+  "key": {"model": "I", "rotors": "II III I", "reflector": "B", "rings": "DVW", "positions": "KZY", "plugboard": "EJ LI QT DX KH AG RV MF NC UY"},
+  "plaintext": "WETTERBERICHTXFUERXDIEXNACHTXBEWOELKTXWINDXAUSXNORDWESTXSTAERKEXDREIXSICHTXGUT",
+  "ciphertext": "ICGWNXTXINRGBWMLPFTAXFNLHILVEGCVKTJUIUPSDEWXVHFEVWUXPYROMOWJFSMVXXMAUTRNYSWLMP",
+  "crib": "WETTERBERICHT",
+  "crib_position": 0,
+  "expected_menu": {"letters": 11, "edges": 13, "loops": 3, "test_letter": "T", "test_letter_degree": 4},
+  "notes": "El rotor central no se mueve en las 13 primeras letras: el modo Bletchley debe dar la parada verdadera (orden II-III-I) y el verificador una clave equivalente que descifre las 78 letras."
+}

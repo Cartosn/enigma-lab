@@ -119,6 +119,7 @@ pluggy==1.7.0
 protobuf==7.36.2
     # via streamlit
 py-enigma==1.0.2
+    # via enigma-lab
 pyarrow==26.0.1
     # via
     #   enigma-lab

@@ -18,6 +18,21 @@ de una de estas fuentes (spec, sección 0). Las de la sección 12 del spec van t
 - py-enigma: https://pypi.org/project/py-enigma/ · CyberChef (GCHQ): https://gchq.github.io/CyberChef/ y su API de Node.
 - Project Gutenberg (corpus de dominio público): https://www.gutenberg.org/
 
+## Datos usados por el código
+
+- **Cableados y muescas:** Wikipedia, «Enigma rotor details», revisión 1275803743 del
+  15-02-2025, consultada el 20-11-2026. Comprende los rotores I–VIII, Beta y Gamma, y los
+  reflectores A, B, C, B delgado y C delgado. https://en.wikipedia.org/wiki/Enigma_rotor_details
+- **Mensaje histórico:** Rijmenants, D. *The M4 Project*, en Cipher Machines and
+  Cryptology. Es el mensaje de Hartwig Looks (U-264) del 25-11-1942, con clave, cifrado
+  y texto descifrado. https://www.ciphermachinesandcryptology.com/en/m4project.htm
+  (consultado el 20-11-2026). El proyecto original: Krah, S. *M4 Message Breaking
+  Project*. https://www.bytereef.org/m4_project.html
+- **Implementación independiente:** py-enigma 1.0.2, de Brian Neal (licencia MIT).
+  https://pypi.org/project/py-enigma/
+- **Validación a mano:** CyberChef, versión web (GCHQ), consultada el 20-11-2026.
+  https://gchq.github.io/CyberChef/
+
 ## Citadas además en la presentación (diapositiva 24)
 
 - Crypto Museum: páginas de la Bombe y de Colossus. https://www.cryptomuseum.com/

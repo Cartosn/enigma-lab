@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<!--
+  Enigma Lab · animación de la máquina (spec 8.2, punto 2).
+
+  Este componente NO implementa Enigma: solo anima la traza que calcula Python
+  (enigma_lab.core.machine.Enigma.trace) y que llega como JSON en #payload.
+  Por cada letra: la tecla, el paso de los rotores (con el doble paso resaltado),
+  la letra que sale de cada etapa y la lámpara que se enciende.
+-->
+<style>
+  @font-face { font-family: "Inter"; src: url("/app/static/fonts/InterVariable.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "JetBrains Mono"; src: url("/app/static/fonts/JetBrainsMono-Regular.woff2") format("woff2"); font-weight: 400; }
+  @font-face { font-family: "JetBrains Mono"; src: url("/app/static/fonts/JetBrainsMono-Bold.woff2") format("woff2"); font-weight: 700; }
+
+  :root { --stage-ms: 220ms; }
+  html, body { margin: 0; background: var(--background); color: var(--text);
+               font-family: Inter, system-ui, "Segoe UI", sans-serif; font-size: 16px; }
+  body.demo { font-size: 20px; }
+  .mono { font-family: "JetBrains Mono", ui-monospace, Consolas, monospace; }
+  svg { display: block; width: 100%; height: auto; }
+  svg text { font-family: Inter, system-ui, sans-serif; fill: var(--text); }
+  svg .mono { font-family: "JetBrains Mono", ui-monospace, Consolas, monospace; }
+
+  .box { fill: var(--surface); stroke: var(--border); stroke-width: 1.5; }
+  .label { font-size: 15px; fill: var(--text_muted); text-anchor: middle; }
+  .small { font-size: 13px; fill: var(--text_muted); text-anchor: middle; }
+  .window { fill: var(--background); stroke: var(--border); stroke-width: 1.5; transition: stroke 150ms; }
+  .window.stepped { stroke: var(--accent_2); stroke-width: 2.5; }
+  .window.double { stroke: var(--accent); stroke-width: 3; }
+  .win-letter { font-size: 30px; font-weight: 700; text-anchor: middle; dominant-baseline: central; }
+
+  .wire { stroke: var(--border); stroke-width: 3; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+  .wire.fwd.on { stroke: var(--accent_2); }
+  .wire.back.on { stroke: var(--accent); }
+
+  .badge circle { fill: var(--background); stroke: var(--border); stroke-width: 1.5; }
+  .badge text { font-size: 17px; font-weight: 700; text-anchor: middle; dominant-baseline: central; opacity: 0; }
+  .badge.on.fwd circle { fill: var(--accent_2); stroke: var(--accent_2); }
+  .badge.on.back circle, .badge.on.turn circle { fill: var(--accent); stroke: var(--accent); }
+  .badge.on text { opacity: 1; fill: var(--ink); }
+  .badge.turn rect { fill: var(--background); stroke: var(--border); stroke-width: 1.5; }
+  .badge.on.turn rect { fill: var(--accent); stroke: var(--accent); }
+
+  .key rect { fill: var(--surface); stroke: var(--border); stroke-width: 1.5; }
+  .key text, .lamp text { font-size: 16px; text-anchor: middle; dominant-baseline: central; }
+  .key.pressed rect { fill: var(--accent_2); stroke: var(--accent_2); }
+  .key.pressed text { fill: var(--ink); font-weight: 700; }
+  .lamp circle { fill: var(--background); stroke: var(--border); stroke-width: 1.5; }
+  .lamp.lit circle { fill: var(--accent); stroke: var(--accent); filter: url(#glow); }
+  .lamp.lit text { fill: var(--ink); font-weight: 700; }
+  .lamp.blocked circle { stroke: var(--accent_2); stroke-dasharray: 4 3; stroke-width: 2; }
+
+  .tag { font-size: 14px; font-weight: 600; }
+  .tag rect { fill: var(--accent); }
+  .tag text { fill: var(--ink); text-anchor: middle; dominant-baseline: central; }
+
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 6px 0 4px; }
+  button { font: inherit; font-size: 0.9rem; color: var(--text); background: var(--surface);
+           border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+  button:hover { border-color: var(--accent_2); }
+  button:focus-visible { outline: 2px solid var(--accent_2); outline-offset: 2px; }
+  button.primary { background: var(--accent); color: var(--ink); border-color: var(--accent); font-weight: 600; }
+  label { font-size: 0.9rem; color: var(--text_muted); display: flex; align-items: center; gap: 6px; }
+  input[type=range] { accent-color: var(--accent); }
+  #counter { font-size: 0.9rem; color: var(--text_muted); margin-left: auto; }
+
+  .tape { display: grid; grid-template-columns: max-content 1fr; gap: 2px 12px; font-size: 0.95rem;
+          margin-top: 4px; }
+  .tape .name { color: var(--text_muted); }
+  .tape .row { letter-spacing: 0.06em; overflow-wrap: anywhere; }
+  .tape .cur { background: var(--accent_2); color: var(--ink); border-radius: 3px; }
+  .tape .out-cur { background: var(--accent); color: var(--ink); border-radius: 3px; }
+  .tape .future { color: var(--border); }
+  #desc { font-size: 0.9rem; color: var(--text_muted); margin: 6px 0 0; min-height: 1.3em; }
+</style>
+</head>
+<body>
+<div id="app">
+  <svg id="machine" viewBox="0 0 1000 540" role="img" aria-labelledby="desc">
+    <defs>
+      <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+        <feGaussianBlur stdDeviation="5" result="b"/>
+        <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+      </filter>
+    </defs>
+    <g id="scrambler"></g>
+    <g id="boards"></g>
+  </svg>
+  <div class="controls" role="group" aria-label="Controles de la animación">
+    <button id="restart" type="button" title="Volver a la primera letra">⏮ Inicio</button>
+    <button id="prev" type="button" title="Letra anterior">◀ Anterior</button>
+    <button id="play" type="button" class="primary">▶ Reproducir</button>
+    <button id="next" type="button" title="Letra siguiente">Siguiente ▶</button>
+    <label>Velocidad <input id="speed" type="range" min="0.25" max="3" step="0.25" value="1"><span id="speed-val">1×</span></label>
+    <span id="counter"></span>
+  </div>
+  <div class="tape mono" aria-hidden="true">
+    <span class="name">Entrada</span><span class="row" id="tape-in"></span>
+    <span class="name">Salida</span><span class="row" id="tape-out"></span>
+  </div>
+  <p id="desc" aria-live="polite"></p>
+</div>
+
+<script id="payload" type="application/json">__PAYLOAD__</script>
+<script>
+(() => {
+  "use strict";
+  const P = JSON.parse(document.getElementById("payload").textContent);
+  const root = document.documentElement;
+  for (const [name, value] of Object.entries(P.theme)) root.style.setProperty("--" + name, value);
+  if (P.demo) document.body.classList.add("demo");
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (tag, attrs = {}, parent = null, text = null) => {
+    const node = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    if (text !== null) node.textContent = text;
+    if (parent) parent.appendChild(node);
+    return node;
+  };
+
+  // ------------------------------------------------------------ disposición
+  const nRot = P.rotors.length;
+  const Y_FWD = 112, Y_BACK = 192, Y_MID = (Y_FWD + Y_BACK) / 2;
+  const X_REF = 70, X_PLUG = 790, X_IO = 930;
+  const rotorX = P.rotors.map((_, i) => 200 + i * (450 / Math.max(1, nRot - 1)));
+  const scr = document.getElementById("scrambler");
+
+  // Cajas de los componentes
+  el("rect", { class: "box", x: X_REF - 50, y: 40, width: 100, height: 200, rx: 12 }, scr);
+  el("text", { class: "label", x: X_REF, y: 262 }, scr, "Reflector " + P.reflector);
+  const windows = [];
+  P.rotors.forEach((name, i) => {
+    const x = rotorX[i];
+    el("rect", { class: "box", x: x - 58, y: 40, width: 116, height: 200, rx: 12 }, scr);
+    const win = el("rect", { class: "window", x: x - 26, y: 46, width: 52, height: 44, rx: 6 }, scr);
+    const letter = el("text", { class: "win-letter mono", x: x, y: 68 }, scr, P.start[i]);
+    el("text", { class: "label", x: x, y: 262 }, scr, "Rotor " + name);
+    el("text", { class: "small", x: x, y: 282 }, scr, "anillo " + P.rings[i]);
+    windows.push({ win, letter });
+  });
+  el("rect", { class: "box", x: X_PLUG - 52, y: 40, width: 104, height: 200, rx: 12 }, scr);
+  el("text", { class: "label", x: X_PLUG, y: 262 }, scr, "Plugboard");
+  el("text", { class: "small", x: X_PLUG, y: 282 }, scr,
+     P.plugboard.length ? P.plugboard.length + " cables" : "sin cables");
+  el("text", { class: "small", x: X_IO, y: Y_FWD - 34 }, scr, "Tecla");
+  el("text", { class: "small", x: X_IO, y: Y_BACK + 40 }, scr, "Lámpara");
+
+  // Nodos (dónde aparece la letra de cada etapa) y cables entre etapas
+  const stageNodes = [];
+  stageNodes.push({ x: X_IO, y: Y_FWD, dir: "fwd" });                     // tecla
+  stageNodes.push({ x: X_PLUG, y: Y_FWD, dir: "fwd" });                   // plugboard de ida
+  for (let i = nRot - 1; i >= 0; i--) stageNodes.push({ x: rotorX[i], y: Y_FWD, dir: "fwd" });
+  stageNodes.push({ x: X_REF, y: Y_MID, dir: "turn" });                   // reflector
+  for (let i = 0; i < nRot; i++) stageNodes.push({ x: rotorX[i], y: Y_BACK, dir: "back" });
+  stageNodes.push({ x: X_PLUG, y: Y_BACK, dir: "back" });                 // plugboard de vuelta
+  stageNodes.push({ x: X_IO, y: Y_BACK, dir: "back" });                   // lámpara
+
+  const wires = [];
+  for (let s = 1; s < stageNodes.length; s++) {
+    const a = stageNodes[s - 1], b = stageNodes[s];
+    let points;
+    if (b.dir === "turn") points = `${a.x},${a.y} ${b.x},${a.y} ${b.x},${b.y}`;
+    else if (a.dir === "turn") points = `${a.x},${a.y} ${a.x},${b.y} ${b.x},${b.y}`;
+    else points = `${a.x},${a.y} ${b.x},${b.y}`;
+    wires.push(el("polyline", { class: "wire " + (b.dir === "fwd" ? "fwd" : "back"), points }, scr));
+  }
+  const badges = stageNodes.map((n, s) => {
+    const g = el("g", { class: "badge " + n.dir }, scr);
+    if (n.dir === "turn") el("rect", { x: n.x - 34, y: n.y - 17, width: 68, height: 34, rx: 17 }, g);
+    else el("circle", { cx: n.x, cy: n.y, r: 17 }, g);
+    const t = el("text", { class: "mono", x: n.x, y: n.y }, g, "");
+    return { g, t };
+  });
+
+  // Etiqueta de doble paso
+  const tag = el("g", { class: "tag", opacity: 0 }, scr);
+  const middleX = rotorX[nRot - 2];
+  el("rect", { x: middleX - 54, y: 12, width: 108, height: 26, rx: 13 }, tag);
+  el("text", { x: middleX, y: 25 }, tag, "doble paso");
+
+  // ------------------------------------------------------------ teclado y lámparas
+  const ROWS = ["QWERTZUIO", "ASDFGHJK", "PYXCVBNML"];
+  const boards = document.getElementById("boards");
+  const lamps = {}, keys = {};
+  const drawBoard = (x0, title, kind) => {
+    el("text", { class: "label", x: x0 + 225, y: 330, "text-anchor": "middle" }, boards, title);
+    ROWS.forEach((row, r) => {
+      const offset = (9 - row.length) * 25;
+      [...row].forEach((ch, c) => {
+        const cx = x0 + offset + c * 50 + 25, cy = 370 + r * 54;
+        const g = el("g", { class: kind }, boards);
+        if (kind === "lamp") el("circle", { cx, cy, r: 20 }, g);
+        else el("rect", { x: cx - 20, y: cy - 20, width: 40, height: 40, rx: 8 }, g);
+        el("text", { class: "mono", x: cx, y: cy }, g, ch);
+        (kind === "lamp" ? lamps : keys)[ch] = g;
+      });
+    });
+  };
+  drawBoard(20, "Lámparas", "lamp");
+  drawBoard(530, "Teclado", "key");
+
+  // ------------------------------------------------------------ cinta y controles
+  const letters = P.letters;
+  const tapeIn = document.getElementById("tape-in"), tapeOut = document.getElementById("tape-out");
+  const counter = document.getElementById("counter"), desc = document.getElementById("desc");
+  const playBtn = document.getElementById("play");
+  const speedInput = document.getElementById("speed"), speedVal = document.getElementById("speed-val");
+  let speed = 1, current = -1, playing = false, timers = [];
+
+  const spaced = (chars, upto, cls) => chars.map((ch, i) => {
+    const sep = i > 0 && i % 5 === 0 ? " " : "";
+    if (i === upto) return sep + `<span class="${cls}">${ch}</span>`;
+    if (i > upto) return sep + `<span class="future">${ch}</span>`;
+    return sep + ch;
+  }).join("");
+
+  const renderTape = () => {
+    const ins = letters.map(l => l.key), outs = letters.map(l => l.lamp);
+    tapeIn.innerHTML = spaced(ins, current, "cur") + (P.truncated ? " …" : "");
+    tapeOut.innerHTML = spaced(outs.map((ch, i) => i <= current ? ch : "·"), current, "out-cur");
+    counter.textContent = letters.length
+      ? `Letra ${Math.max(current + 1, 0)} de ${letters.length}` + (P.truncated ? ` (de ${P.total} en total)` : "")
+      : "Escribe un texto para ver la animación";
+  };
+
+  const clearTimers = () => { timers.forEach(clearTimeout); timers = []; };
+  const later = (ms, fn) => timers.push(setTimeout(fn, reducedMotion ? 0 : ms / speed));
+
+  const resetSignal = () => {
+    badges.forEach(b => { b.g.classList.remove("on"); b.t.textContent = ""; });
+    wires.forEach(w => w.classList.remove("on"));
+    Object.values(keys).forEach(k => k.classList.remove("pressed"));
+    Object.values(lamps).forEach(l => l.classList.remove("lit", "blocked"));
+    windows.forEach(w => w.win.classList.remove("stepped", "double"));
+    tag.setAttribute("opacity", 0);
+  };
+
+  const setWindows = (text) => windows.forEach((w, i) => { w.letter.textContent = text[i]; });
+
+  const describe = (l) => {
+    const path = l.stages.slice(1, -1).map(s => `${s.label} ${s.letter}`).join(" → ");
+    const step = l.double_step ? " Doble paso: el rotor central avanzó por su propia muesca." : "";
+    return `Tecla ${l.key} → lámpara ${l.lamp}. Ventanas ${l.positions_before} → ${l.positions}.${step} ` +
+           `Camino: ${path}. La lámpara ${l.key} no puede encenderse.`;
+  };
+
+  // Muestra la letra i: instantánea (animate = false) o etapa por etapa.
+  const show = (i, animate) => {
+    clearTimers();
+    resetSignal();
+    current = i;
+    renderTape();
+    if (i < 0) { setWindows(P.start); desc.textContent = "Listo para cifrar."; return; }
+    const l = letters[i];
+    keys[l.key].classList.add("pressed");
+    lamps[l.key].classList.add("blocked");
+    setWindows(l.positions_before);
+    const stepT = animate ? 380 : 0;
+    later(stepT * 0.4, () => {
+      setWindows(l.positions);
+      l.stepped.forEach((moved, r) => { if (moved) windows[r].win.classList.add(l.double_step && r === nRot - 2 ? "double" : "stepped"); });
+      if (l.double_step) tag.setAttribute("opacity", 1);
+    });
+    const stageT = animate ? 220 : 0;
+    l.stages.forEach((s, k) => {
+      later(stepT + k * stageT, () => {
+        const b = badges[k];
+        b.g.classList.add("on");
+        b.t.textContent = s.direction === "turn" ? `${l.stages[k - 1].letter}→${s.letter}` : s.letter;
+        if (k > 0) wires[k - 1].classList.add("on");
+        if (s.component === "lamp") lamps[s.letter].classList.add("lit");
+      });
+    });
+    const total = stepT + l.stages.length * stageT;
+    later(total, () => {
+      desc.textContent = describe(l);
+      if (playing) later(animate ? 650 : 0, () => {
+        if (current + 1 < letters.length) show(current + 1, !reducedMotion);
+        else stop();
+      });
+    });
+  };
+
+  const stop = () => { playing = false; playBtn.textContent = "▶ Reproducir"; };
+  const play = () => {
+    if (!letters.length) return;
+    playing = true; playBtn.textContent = "⏸ Pausa";
+    show(current + 1 < letters.length ? current + 1 : 0, !reducedMotion);
+  };
+
+  playBtn.addEventListener("click", () => (playing ? (stop(), clearTimers()) : play()));
+  document.getElementById("next").addEventListener("click", () => {
+    stop(); if (current + 1 < letters.length) show(current + 1, !reducedMotion);
+  });
+  document.getElementById("prev").addEventListener("click", () => {
+    stop(); show(Math.max(current - 1, -1), false);
+  });
+  document.getElementById("restart").addEventListener("click", () => { stop(); show(-1, false); });
+  speedInput.addEventListener("input", () => { speed = Number(speedInput.value); speedVal.textContent = speed + "×"; });
+
+  show(-1, false);
+  if (P.autoplay && letters.length && !reducedMotion) setTimeout(play, 300);
+  if (P.autoplay && reducedMotion && letters.length) show(letters.length - 1, false);
+})();
+</script>
+</body>
+</html>

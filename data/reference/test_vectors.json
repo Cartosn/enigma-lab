@@ -1,0 +1,89 @@
+{
+  "description": "Vectores de prueba de la sección 6.1 del spec y un mensaje histórico real. Los usan tests/test_vectors.py, el experimento E1 y la página Inicio.",
+  "vectors": [
+    {
+      "id": "bdzgo",
+      "kind": "encrypt",
+      "label": "AAAAA con I-II-III y anillos AAA",
+      "key": {"model": "I", "rotors": "I II III", "reflector": "B", "rings": "AAA", "positions": "AAA", "plugboard": ""},
+      "input": "AAAAA",
+      "output": "BDZGO",
+      "source": "Wikipedia, «Enigma rotor details»; spec 6.1"
+    },
+    {
+      "id": "ewtyx",
+      "kind": "encrypt",
+      "label": "Lo mismo con anillos BBB",
+      "key": {"model": "I", "rotors": "I II III", "reflector": "B", "rings": "BBB", "positions": "AAA", "plugboard": ""},
+      "input": "AAAAA",
+      "output": "EWTYX",
+      "source": "Wikipedia, «Enigma rotor details»; spec 6.1"
+    },
+    {
+      "id": "doble_paso",
+      "kind": "stepping",
+      "label": "Doble paso desde ADU",
+      "key": {"model": "I", "rotors": "I II III", "reflector": "B", "rings": "AAA", "positions": "ADU", "plugboard": ""},
+      "presses": 4,
+      "windows": ["ADU", "ADV", "AEW", "BFX", "BFY"],
+      "source": "spec 6.1; diapositiva 5"
+    },
+    {
+      "id": "py_enigma",
+      "kind": "message_key",
+      "label": "Ejemplo de py-enigma (10 cables)",
+      "key": {"model": "I", "rotors": "II IV V", "reflector": "B", "rings": "BUL", "positions": "WXC", "plugboard": "AV BS CG DL FU HZ IN KM OW RX"},
+      "indicator": "KCH",
+      "message_key": "BLA",
+      "input": "NIBLFMYMLLUFWCASCSSNVHAZ",
+      "output": "THEXRUSSIANSXAREXCOMINGX",
+      "source": "documentación de py-enigma (anillos en base 0: [1, 20, 11] = B-U-L); spec 6.1"
+    },
+    {
+      "id": "odometro",
+      "kind": "period",
+      "label": "Periodo de los rotores I-II-III",
+      "rotors": "I II III",
+      "period": 16900,
+      "off_cycle": 676,
+      "source": "spec 6.1; diapositivas 3, 5 y 14"
+    },
+    {
+      "id": "traza_a",
+      "kind": "trace",
+      "label": "Traza de la primera letra (diapositiva 4)",
+      "key": {"model": "I", "rotors": "I II III", "reflector": "B", "rings": "AAA", "positions": "AAA", "plugboard": ""},
+      "input": "A",
+      "path": "plugboard A → III C → II D → I F → reflector S → I S → II E → III B → plugboard B",
+      "letters": ["A", "A", "C", "D", "F", "S", "S", "E", "B", "B", "B"],
+      "source": "spec 6.1; diapositiva 4"
+    },
+    {
+      "id": "portada",
+      "kind": "encrypt",
+      "label": "Mensaje de la portada (diapositiva 1)",
+      "key": {"model": "I", "rotors": "II V III", "reflector": "B", "rings": "ENI", "positions": "GMA", "plugboard": "BQ CR DI EJ KW MT OS PX UZ GH"},
+      "input": "ROMPERXENIGMAXCRIPTOGRAFIAXUNAL",
+      "output": "LGNEVYPYZQDVKESNPUYYQVWSKYNZJHE",
+      "source": "generado por el piloto para la presentación; spec 6.1"
+    },
+    {
+      "id": "respaldo_bombe",
+      "kind": "encrypt",
+      "label": "Caso de respaldo de la Bombe",
+      "key": {"model": "I", "rotors": "II III I", "reflector": "B", "rings": "DVW", "positions": "KZY", "plugboard": "EJ LI QT DX KH AG RV MF NC UY"},
+      "input": "WETTERBERICHTXFUERXDIEXNACHTXBEWOELKTXWINDXAUSXNORDWESTXSTAERKEXDREIXSICHTXGUT",
+      "output": "ICGWNXTXINRGBWMLPFTAXFNLHILVEGCVKTJUIUPSDEWXVHFEVWUXPYROMOWJFSMVXXMAUTRNYSWLMP",
+      "source": "generado por el piloto para la presentación; spec 6.1"
+    },
+    {
+      "id": "m4_u264",
+      "kind": "encrypt",
+      "label": "Mensaje real del U-264 (M4, 25-11-1942)",
+      "key": {"model": "M4", "rotors": "Beta II IV I", "reflector": "B-Thin", "rings": "AAAV", "positions": "VJNA", "plugboard": "AT BL DF GJ HM NW OP QY RZ VX"},
+      "input": "NCZWVUSXPNYMINHZXMQXSFWXWLKJAHSHNMCOCCAKUQPMKCSMHKSEINJUSBLKIOSXCKUBHMLLXCSJUSRRDVKOHULXWCCBGVLIYXEOAHXRHKKFVDREWEZLXOBAFGYUJQUKGRTVUKAMEURBVEKSUHHVOYHABCJWMAKLFKLMYFVNRIZRVVRTKOFDANJMOLBGFFLEOPRGTFLVRHOWOPBEKVWMUQFMPWPARMFHAGKXIIBG",
+      "output": "VONVONJLOOKSJHFFTTTEINSEINSDREIZWOYYQNNSNEUNINHALTXXBEIANGRIFFUNTERWASSERGEDRUECKTYWABOSXLETZTERGEGNERSTANDNULACHTDREINULUHRMARQUANTONJOTANEUNACHTSEYHSDREIYZWOZWONULGRADYACHTSMYSTOSSENACHXEKNSVIERMBFAELLTYNNNNNNOOOVIERYSICHTEINSNULL",
+      "source": "Mensaje de Hartwig Looks (U-264), interceptado el 25-11-1942 y roto por el M4 Project de Stefan Krah (2006). Clave, cifrado y texto: D. Rijmenants, https://www.ciphermachinesandcryptology.com/en/m4project.htm (consultado el 20-11-2026), sin los grupos indicadores FCLC y QRKN. Ver también https://www.bytereef.org/m4_project.html"
+    }
+  ]
+}

@@ -9,6 +9,8 @@ import streamlit as st
 
 from enigma_lab import paths
 from enigma_lab.core import keyspace as ks
+from enigma_lab.core.vectors import check_all
+from enigma_lab.experiments.common import read_summary
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct, fmt_sci
 from enigma_lab.viz.theme import DARK
 from ui.catalog import MODULES
@@ -102,11 +104,34 @@ for index, module in enumerate(MODULES):
             st.badge(f"{module.phase} · pendiente", color="gray")
 
 st.subheader("Estado de la validación")
+
+
+@st.cache_data(show_spinner=False)
+def _vector_status() -> list[tuple[str, bool]]:
+    """Los vectores de 6.1, comprobados con el simulador (una vez por sesión del servidor)."""
+    return [(result.label, result.ok) for result in check_all()]
+
+
+status = _vector_status()
+passed = sum(ok for _, ok in status)
 st.markdown(
-    ":material/pending: **Pendiente (fase 1).** Aquí aparecerán, comprobados en vivo, los "
-    "vectores de prueba de la sección 6.1 del spec: BDZGO, EWTYX, el doble paso, el "
-    "ejemplo de py-enigma, el mensaje de la portada y la traza de la letra A."
+    f"Vectores de prueba de la sección 6.1, comprobados en vivo: **{passed} de {len(status)}**."
 )
+status_columns = st.columns(3)
+for index, (label, ok) in enumerate(status):
+    mark = ":green[:material/check_circle:]" if ok else ":red[:material/cancel:]"
+    status_columns[index % 3].markdown(f"{mark} {label}")
+
+e1 = read_summary().get("e1")
+if e1:
+    st.caption(
+        f"E1 (modo {e1['corrida']['modo']}, semilla {e1['corrida']['semilla']}): "
+        f"{fmt_int(e1['pyenigma_coincidencias'])} de {fmt_int(e1['pyenigma_casos'])} claves "
+        f"aleatorias coinciden con py-enigma; {fmt_int(e1['puntos_fijos'])} puntos fijos en "
+        f"{fmt_int(e1['propiedades_letras'])} letras."
+    )
+else:
+    st.caption("E1 todavía no se ha corrido en este equipo: `make reproduce`.")
 
 with st.expander("Fuentes", icon=":material/menu_book:"):
     sources = paths.DOCS / "FUENTES.md"

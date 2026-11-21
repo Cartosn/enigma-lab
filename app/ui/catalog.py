@@ -26,9 +26,10 @@ MODULES: tuple[Module, ...] = (
     Module(
         "maquina",
         "Máquina",
-        "Configura una Enigma I o M3, cifra y sigue el camino de cada letra.",
+        "Configura una Enigma I, M3 o M4, cifra y sigue el camino de cada letra.",
         "Fase 1",
         ":material/keyboard:",
+        page="pages/maquina.py",
     ),
     Module(
         "espacio",

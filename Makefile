@@ -14,7 +14,11 @@ PORT ?= 8501
 # Opciones extra de Streamlit, p. ej.  make app STREAMLIT_FLAGS=--server.headless=true
 STREAMLIT_FLAGS ?=
 
-.PHONY: help install test test-rapido lint format app requirements
+SEMILLA ?= 2026
+MODO ?= completo
+E ?= todos
+
+.PHONY: help install test test-rapido lint format app requirements experimento reproduce rapido resumen
 
 help: ## Muestra esta lista
 	@$(UV) run --no-project python scripts/make_help.py Makefile
@@ -39,6 +43,19 @@ format: ## Formatea el código con ruff
 
 app: ## Abre Enigma Lab en el navegador (http://localhost:8501)
 	$(UV) run streamlit run app/Inicio.py --server.port $(PORT) $(STREAMLIT_FLAGS)
+
+experimento: ## Corre un experimento: make experimento E=e1 MODO=rapido
+	$(UV) run python -m enigma_lab.experiments $(E) --mode $(MODO) --seed $(SEMILLA)
+
+reproduce: ## Corre todos los experimentos en modo completo y arma el resumen
+	$(UV) run python -m enigma_lab.experiments todos --mode completo --seed $(SEMILLA)
+	$(UV) run python -m enigma_lab.resumen
+
+rapido: ## Corre todos los experimentos en modo rápido (para la app)
+	$(UV) run python -m enigma_lab.experiments todos --mode rapido --seed $(SEMILLA)
+
+resumen: ## Arma results/presentacion/ (RESUMEN.md, cifras.json, CSV) sin correr nada
+	$(UV) run python -m enigma_lab.resumen
 
 requirements: ## Regenera requirements.txt a partir de uv.lock
 	$(UV) export --format requirements-txt --no-hashes --all-groups --output-file requirements.txt
