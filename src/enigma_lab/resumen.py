@@ -614,8 +614,9 @@ def _slide_9(e7: dict[str, Any]) -> list[str]:
     levels = traffic["por_nivel"]
 
     def mean_ci(level: str, key: str = "dia") -> str:
+        """«128,0 mensajes (IC 95 % 127,0–129,1)»."""
         mean, low, high = levels[level][key]
-        return f"{fmt_dec(mean, 1)} (IC 95 % {fmt_dec(low, 1)}–{fmt_dec(high, 1)})"
+        return f"{fmt_dec(mean, 1)} mensajes (IC 95 % {fmt_dec(low, 1)}–{fmt_dec(high, 1)})"
 
     found = traffic["catalogo"]
     return [
@@ -640,12 +641,12 @@ def _slide_9(e7: dict[str, Any]) -> list[str]:
         "las clases grandes pesan mucho.",
         f"- **Mensajes de un día** ({fmt_int(traffic['dias'])} días con claves de mensaje al azar, "
         f"semilla {e7['corrida']['semilla']}): ver las 26 letras de AD, BE y CF pide "
-        f"{mean_ci('todas')} mensajes (teoría exacta: "
-        f"{fmt_dec(levels['todas']['teoria_dia'], 1)}; una sola permutación, "
-        f"{fmt_dec(levels['todas']['ad'][0], 1)} frente a 26·H₂₆ = "
+        f"{mean_ci('todas')}; la teoría exacta da "
+        f"{fmt_dec(levels['todas']['teoria_dia'], 1)} (una sola permutación: "
+        f"{fmt_dec(levels['todas']['ad'][0], 1)}, frente a 26·H₂₆ = "
         f"{fmt_dec(traffic['coleccionista_26H26'], 1)}). Por eliminación, "
         f"{mean_ci('eliminacion')}. Con el teorema de los ciclos en parejas, la característica "
-        f"queda determinada en {mean_ci('caracteristica')} mensajes y las tres permutaciones en "
+        f"queda determinada en {mean_ci('caracteristica')} y las tres permutaciones en "
         f"{mean_ci('permutacion')}: los «unos sesenta» de Rejewski.",
         f"- **El catálogo encuentra el día** en el {fmt_pct(found['encontrada'])} de los días "
         f"(IC 95 % {fmt_pct(found['ic'][0])}–{fmt_pct(found['ic'][1])}): en el "
@@ -672,9 +673,8 @@ def _attack(e8: dict[str, Any]) -> list[str]:
             )
         else:
             halves.append(f"con {cables} cables, el 50 % no se alcanza en las longitudes medidas")
-    by_cables = "; ".join(
-        f"{cables} cables: {fmt_pct(v['exito'])} de los mensajes"
-        for cables, v in e8["por_cables"].items()
+    by_cables = ", ".join(
+        f"el {fmt_pct(v['exito'])} con {cables} cables" for cables, v in e8["por_cables"].items()
     )
     ref = e8["referencias"]
     lines = [
@@ -682,7 +682,8 @@ def _attack(e8: dict[str, Any]) -> list[str]:
         f"Gillogly prueba {fmt_int(e8['ubicaciones_fase1'])} ubicaciones con el IC y sube el "
         f"plugboard por hill climbing; {fmt_dec(e8['segundos_por_mensaje'], 1)} s por mensaje en "
         f"este equipo. Con {e8['n_por_celda']} mensajes por celda ({fmt_int(e8['mensajes'])} en "
-        f"total), lee {by_cables}.",
+        f"total, de {fmt_int(min(e8['longitudes']))} a {fmt_int(max(e8['longitudes']))} letras), "
+        f"lee {by_cables}.",
     ]
     if halves:
         lines.append(
