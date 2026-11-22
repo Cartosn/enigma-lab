@@ -249,6 +249,8 @@ ATTACK_MACROS = (
     "ELataqueOraculoECorto",
     "ELataqueCorto",
     "ELataqueDiezCorto",
+    "ELgilloglySeis",
+    "ELgilloglyDiez",
 )
 
 
@@ -303,6 +305,8 @@ def _attack_macros(e8: dict[str, Any] | None) -> dict[str, str]:
         "ELataqueOraculoECorto": cell(many, probe, "oraculo_e"),
         "ELataqueCorto": fmt_int(probe),
         "ELataqueDiezCorto": cell(many, short, "oraculo_e"),
+        "ELgilloglySeis": fmt_int(e8["referencias"]["gillogly_letras_hasta_6_cables"]),
+        "ELgilloglyDiez": fmt_int(e8["referencias"]["gillogly_letras_10_cables"]),
     }
 
 

@@ -740,47 +740,53 @@ def rejewski_class_sizes(
 
 
 def rejewski_messages(days: pd.DataFrame, theory: np.ndarray, demo: bool = False) -> go.Figure:
-    """E7: mensajes del día hasta reconstruir AD, BE y CF, por nivel, con la teoría y Rejewski."""
+    """E7: mensajes del día hasta reconstruir AD, BE y CF, por nivel, con la teoría y Rejewski.
+
+    Cada nivel es un histograma en escalón (fracción de los días por tramo de 5 mensajes), para
+    que los cuatro se lean superpuestos; la teoría es la del coleccionista de cupones.
+    """
     from enigma_lab.rejewski.traffic import LEVEL_LABELS
 
+    edges = np.arange(0, 326, 5)
     fig = go.Figure()
     order = ("caracteristica", "permutacion", "eliminacion", "todas")
     for color, level in zip(CATEGORICAL, order, strict=False):
         values = days[level].to_numpy()
-        fig.add_histogram(
-            x=values,
-            xbins={"start": 0, "end": 320, "size": 5},
-            histnorm="probability",
+        counts, _ = np.histogram(values, bins=edges)
+        share = counts / len(values)
+        fig.add_scatter(
+            x=edges,
+            y=np.r_[share, share[-1]],
+            mode="lines",
+            line={"color": color, "width": 2.5, "shape": "hv"},
             name=f"{LEVEL_LABELS[level]}: {fmt_dec(float(values.mean()), 1)}",
-            marker_color=color,
-            opacity=0.55,
-            hovertemplate="%{x} mensajes: %{y:.1%} de los días<extra></extra>",
+            customdata=edges + 5,
+            hovertemplate="de %{x} a %{customdata} mensajes: %{y:.1%} de los días<extra></extra>",
         )
-    n = np.arange(len(theory))
     binned = np.add.reduceat(theory, np.arange(0, len(theory), 5))
+    keep = np.arange(len(binned)) * 5 < edges[-1]
     fig.add_scatter(
-        x=n[::5][: len(binned)] + 2.5,
-        y=binned,
+        x=(np.arange(len(binned)) * 5 + 2.5)[keep],
+        y=binned[keep],
         mode="lines",
         name="teoría de las 26 letras (coleccionista de cupones)",
         line={"color": DARK.text_muted, "dash": "dash", "width": 2},
         hoverinfo="skip",
     )
-    for value, label in ((60, "Rejewski: unos 60"), (80, "unos 80")):
+    for value, label, side in ((60, "Rejewski: unos 60", "top left"), (80, "unos 80", "top right")):
         fig.add_vline(
             x=value,
             line_dash="dot",
             line_color=DARK.text_muted,
             annotation_text=label,
-            annotation_position="top right",
+            annotation_position=side,
         )
     perm = float(days["permutacion"].mean())
     fig.update_layout(
         template=_template(demo),
-        barmode="overlay",
         title=f"Con el teorema, AD, BE y CF quedan determinadas en {fmt_dec(perm, 1)} mensajes",
         xaxis={"title": "mensajes del día", "range": [0, 320]},
-        yaxis={"title": "fracción de los días", "tickformat": ".0%"},
+        yaxis={"title": "fracción de los días (tramos de 5 mensajes)", "tickformat": ".0%"},
         height=460,
         legend={"orientation": "h", "yanchor": "top", "y": -0.2, "x": 0, "xanchor": "left"},
         margin={"b": 150},
@@ -931,29 +937,44 @@ def e8_success(
             hovertemplate="%{x} letras: %{y:.0%}<extra>con la ubicación dada</extra>",
         )
     for k, (value, label) in enumerate(references):
-        fig.add_vline(
-            x=value,
-            line_dash="dash",
-            line_color=DARK.text_muted,
-            annotation_text=label,
-            annotation_position="bottom right" if k % 2 else "top right",
+        fig.add_vline(x=value, line_dash="dash", line_color=DARK.text_muted)
+        # En un eje logarítmico, Plotly ubica la anotación por log₁₀ de la x: va aparte, sobre
+        # el marco y en dos alturas, para que no se pisen 250 y 300.
+        fig.add_annotation(
+            x=np.log10(value),
+            y=1.0,
+            yref="paper",
+            yshift=4 + 16 * (k % 2),
+            text=label,
+            showarrow=False,
+            yanchor="bottom",
+            # Los rótulos de los extremos se anclan hacia dentro, para que no se corten.
+            xanchor="left" if value < 40 else "right" if value > 1_000 else "center",
+            font={"color": DARK.text_muted, "size": 13},
         )
+    ticks = [25, 50, 100, 200, 400, 800, 1_500]
     fig.update_layout(
         template=_template(demo),
-        title="Mensajes que lee el ataque de Gillogly, según su longitud",
+        title={
+            "text": "Mensajes que lee el ataque de Gillogly, según su longitud",
+            "y": 0.98,
+            "yanchor": "top",
+        },
         xaxis={
             "type": "log",
             "title": "longitud del mensaje (letras, escala log)",
             "range": [np.log10(20), np.log10(1_800)],
+            "tickvals": ticks,
+            "ticktext": [fmt_int(v) for v in ticks],
         },
         yaxis={
             "title": "mensajes leídos (≥ 90 % de las letras)",
             "tickformat": ".0%",
             "range": [-0.03, 1.05],
         },
-        height=480,
+        height=520,
         legend={"orientation": "h", "yanchor": "top", "y": -0.2, "x": 0, "xanchor": "left"},
-        margin={"b": 140},
+        margin={"b": 140, "t": 120},
     )
     return fig
 

@@ -293,10 +293,9 @@ def summary(df: pd.DataFrame, days: pd.DataFrame, params: dict[str, Any]) -> dic
 def _sizes_panel(ax: Any, df: pd.DataFrame, theme: str) -> None:
     """Cuántas características hay de cada tamaño de clase, en escala log-log, frente a Kuhl."""
     from enigma_lab.viz.numfmt import fmt_int
-    from enigma_lab.viz.static_figs import es_number, tokens
+    from enigma_lab.viz.static_figs import es_number
     from enigma_lab.viz.theme import CATEGORICAL
 
-    t = tokens(theme)
     ax.plot(
         df["tamano"],
         df["caracteristicas"],
@@ -318,24 +317,23 @@ def _sizes_panel(ax: Any, df: pd.DataFrame, theme: str) -> None:
     )
     data = kuhl()
     largest = data["mayor_clase"]["configuraciones"]
-    ax.plot([largest], [1], "D", markersize=5, markerfacecolor="none", color=CATEGORICAL[2])
-    ax.annotate(
-        f"Kuhl: {data['mayor_clase']['caracteristica']}\n{fmt_int(largest)} configuraciones "
-        f"(E7: {fmt_int(int(df['tamano'].max()))})",
-        xy=(largest, 1),
-        xytext=(-6, 18),
-        textcoords="offset points",
-        ha="right",
-        fontsize="x-small",
-        color=t.text_muted,
+    ax.plot(
+        [largest],
+        [1],
+        "s",
+        markersize=6,
+        markerfacecolor="none",
+        markeredgewidth=1.2,
+        color=CATEGORICAL[2],
+        label=f"Kuhl, la mayor: {fmt_int(largest)} (E7: {fmt_int(int(df['tamano'].max()))})",
     )
     ax.set_xscale("log")
     ax.set_yscale("log")
-    ax.set_xlabel("tamaño de la clase (configuraciones con la misma característica)")
+    ax.set_xlabel("tamaño de la clase (configuraciones)")
     ax.set_ylabel("características con ese tamaño")
     ax.xaxis.set_major_formatter(es_number())
     ax.yaxis.set_major_formatter(es_number())
-    ax.legend(fontsize="small", loc="upper right")
+    ax.legend(fontsize="small", loc="lower left")  # abajo a la izquierda no hay puntos
     ax.set_title("Tamaños de clase del catálogo")
 
 
@@ -349,9 +347,9 @@ def _messages_panel(ax: Any, days: pd.DataFrame, theme: str) -> None:
     t = tokens(theme)
     bins = np.arange(0, 301, 5)
     labels = {
-        "caracteristica": "la característica (teorema)",
-        "permutacion": "las permutaciones (teorema)",
-        "todas": "las 26 letras vistas",
+        "caracteristica": "característica (teorema)",
+        "permutacion": "permutaciones (teorema)",
+        "todas": "26 letras vistas",
     }
     for color, level in zip(CATEGORICAL, labels, strict=False):
         ax.hist(
@@ -372,17 +370,20 @@ def _messages_panel(ax: Any, days: pd.DataFrame, theme: str) -> None:
         color=t.text_muted,
         linestyle="--",
         linewidth=1,
-        label=f"teoría de las 26 letras: {fmt_dec(coupon_expectation(26, 3), 1)}",
+        label=f"teoría, 26 letras: {fmt_dec(coupon_expectation(26, 3), 1)}",
     )
     reference = kuhl()["rejewski_mensajes"]
     for value in (reference["apendice_D"], reference["apendice_E"]):
         ax.axvline(value, color=t.text_muted, linestyle=":", linewidth=1)
+    # El rótulo va vertical junto a la línea de 80, a media altura: arriba está la leyenda.
     ax.annotate(
         "Rejewski: 60 y 80",
-        xy=(reference["apendice_E"], 1),
+        xy=(reference["apendice_E"], 0.45),
         xycoords=("data", "axes fraction"),
-        xytext=(4, -12),
+        xytext=(4, 0),
         textcoords="offset points",
+        rotation=90,
+        va="center",
         fontsize="x-small",
         color=t.text_muted,
     )
@@ -392,7 +393,7 @@ def _messages_panel(ax: Any, days: pd.DataFrame, theme: str) -> None:
     ax.xaxis.set_major_formatter(es_number())
     ax.yaxis.set_major_formatter(es_number(3))
     ax.legend(fontsize="x-small", loc="upper right")
-    ax.set_title("Mensajes hasta reconstruir AD, BE y CF")
+    ax.set_title("Mensajes por día")
 
 
 def figure(df: pd.DataFrame, theme: str = "enigma_print", days: pd.DataFrame | None = None) -> Any:
@@ -413,10 +414,13 @@ def figure(df: pd.DataFrame, theme: str = "enigma_print", days: pd.DataFrame | N
             fig, (left, right) = plt.subplots(1, 2, figsize=size)
             _sizes_panel(left, df, theme)
             _messages_panel(right, days, theme)
+        # Con la letra grande de las diapositivas, el título en una línea no cabe en el 16:9.
+        gap = "\n" if theme == "enigma_slides" else " "
         fig.suptitle(
             f"{fmt_int(catalog['caracteristicas_unicas'])} de las "
             f"{fmt_int(catalog['caracteristicas_distintas'])} características señalan una sola "
-            f"configuración (Kuhl: {fmt_int(catalog['kuhl']['caracteristicas_unicas']['kuhl'])} "
+            f"configuración{gap}(Kuhl: "
+            f"{fmt_int(catalog['kuhl']['caracteristicas_unicas']['kuhl'])} "
             f"de {fmt_int(catalog['kuhl']['caracteristicas_distintas']['kuhl'])})"
         )
         fig.tight_layout()
