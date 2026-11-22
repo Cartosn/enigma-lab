@@ -4,8 +4,8 @@
       "experimento": "e1",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 23:30 UTC",
-      "commit": "2f4db4e"
+      "fecha": "2026-11-22 10:24 UTC",
+      "commit": "82fda70"
     },
     "vectores_ok": 9,
     "vectores_total": 9,
@@ -36,15 +36,15 @@
     "puntos_fijos": 0,
     "involucion_ok": 2000,
     "lotes_igual_escalar": 2000,
-    "segundos": 18.1
+    "segundos": 18.4
   },
   "e2": {
     "corrida": {
       "experimento": "e2",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 23:30 UTC",
-      "commit": "2f4db4e"
+      "fecha": "2026-11-22 10:24 UTC",
+      "commit": "82fda70"
     },
     "total_sin_anillos": "158962555217826360000",
     "bits_sin_anillos": 67.10724886600143,
@@ -70,8 +70,8 @@
       "experimento": "e4",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 23:30 UTC",
-      "commit": "2f4db4e"
+      "fecha": "2026-11-22 10:24 UTC",
+      "commit": "82fda70"
     },
     "n_por_L": 1000,
     "longitudes": [
@@ -290,8 +290,8 @@
       "experimento": "e3",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 23:30 UTC",
-      "commit": "2f4db4e"
+      "fecha": "2026-11-22 10:24 UTC",
+      "commit": "82fda70"
     },
     "n_por_condicion": 1000,
     "longitudes": [
@@ -352,8 +352,8 @@
       "experimento": "e5",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 23:33 UTC",
-      "commit": "2f4db4e"
+      "fecha": "2026-11-22 10:27 UTC",
+      "commit": "82fda70"
     },
     "n_por_celda": 100,
     "letras": [
@@ -562,20 +562,20 @@
     "exito_bletchley_sin_vuelta": 1.0,
     "vuelta_frac": 0.45,
     "exito_robusto": 0.98,
-    "robusto_tiempo_relativo": 14.079680324979078,
+    "robusto_tiempo_relativo": 13.209201049737826,
     "robusto_paradas_relativas": 10.91435616515124,
-    "s_por_orden_bletchley": 0.006278486048278864,
-    "s_por_orden_robusto": 0.09718701562596835,
+    "s_por_orden_bletchley": 0.0069442611992708405,
+    "s_por_orden_robusto": 0.104409869252122,
     "menus": 2000,
-    "segundos": 162.1
+    "segundos": 170.9
   },
   "e6": {
     "corrida": {
       "experimento": "e6",
       "modo": "completo",
       "semilla": 2026,
-      "fecha": "2026-11-21 23:34 UTC",
-      "commit": "2f4db4e"
+      "fecha": "2026-11-22 10:28 UTC",
+      "commit": "82fda70"
     },
     "n_pares": 2000,
     "letras_maximas": 10000,
@@ -1178,6 +1178,6 @@
         "por_letra_azar_db": -0.056266399476157275
       }
     },
-    "segundos": 46.4
+    "segundos": 46.7
   }
 }

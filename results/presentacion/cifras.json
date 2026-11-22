@@ -359,8 +359,8 @@
         "experimento": "e1",
         "modo": "completo",
         "semilla": 2026,
-        "fecha": "2026-11-21 23:30 UTC",
-        "commit": "2f4db4e"
+        "fecha": "2026-11-22 10:24 UTC",
+        "commit": "82fda70"
       },
       "vectores_ok": 9,
       "vectores_total": 9,
@@ -391,15 +391,15 @@
       "puntos_fijos": 0,
       "involucion_ok": 2000,
       "lotes_igual_escalar": 2000,
-      "segundos": 18.1
+      "segundos": 18.4
     },
     "e2": {
       "corrida": {
         "experimento": "e2",
         "modo": "completo",
         "semilla": 2026,
-        "fecha": "2026-11-21 23:30 UTC",
-        "commit": "2f4db4e"
+        "fecha": "2026-11-22 10:24 UTC",
+        "commit": "82fda70"
       },
       "total_sin_anillos": "158962555217826360000",
       "bits_sin_anillos": 67.10724886600143,
@@ -425,8 +425,8 @@
         "experimento": "e4",
         "modo": "completo",
         "semilla": 2026,
-        "fecha": "2026-11-21 23:30 UTC",
-        "commit": "2f4db4e"
+        "fecha": "2026-11-22 10:24 UTC",
+        "commit": "82fda70"
       },
       "n_por_L": 1000,
       "longitudes": [
@@ -645,8 +645,8 @@
         "experimento": "e3",
         "modo": "completo",
         "semilla": 2026,
-        "fecha": "2026-11-21 23:30 UTC",
-        "commit": "2f4db4e"
+        "fecha": "2026-11-22 10:24 UTC",
+        "commit": "82fda70"
       },
       "n_por_condicion": 1000,
       "longitudes": [
@@ -707,8 +707,8 @@
         "experimento": "e5",
         "modo": "completo",
         "semilla": 2026,
-        "fecha": "2026-11-21 23:33 UTC",
-        "commit": "2f4db4e"
+        "fecha": "2026-11-22 10:27 UTC",
+        "commit": "82fda70"
       },
       "n_por_celda": 100,
       "letras": [
@@ -917,20 +917,20 @@
       "exito_bletchley_sin_vuelta": 1.0,
       "vuelta_frac": 0.45,
       "exito_robusto": 0.98,
-      "robusto_tiempo_relativo": 14.079680324979078,
+      "robusto_tiempo_relativo": 13.209201049737826,
       "robusto_paradas_relativas": 10.91435616515124,
-      "s_por_orden_bletchley": 0.006278486048278864,
-      "s_por_orden_robusto": 0.09718701562596835,
+      "s_por_orden_bletchley": 0.0069442611992708405,
+      "s_por_orden_robusto": 0.104409869252122,
       "menus": 2000,
-      "segundos": 162.1
+      "segundos": 170.9
     },
     "e6": {
       "corrida": {
         "experimento": "e6",
         "modo": "completo",
         "semilla": 2026,
-        "fecha": "2026-11-21 23:34 UTC",
-        "commit": "2f4db4e"
+        "fecha": "2026-11-22 10:28 UTC",
+        "commit": "82fda70"
       },
       "n_pares": 2000,
       "letras_maximas": 10000,
@@ -1533,12 +1533,12 @@
           "por_letra_azar_db": -0.056266399476157275
         }
       },
-      "segundos": 46.4
+      "segundos": 46.7
     }
   },
   "demo2": {
-    "fecha": "2026-11-21 21:27 UTC",
-    "commit": "2cfa34b",
+    "fecha": "2026-11-21 18:25 UTC",
+    "commit": "5b34896",
     "semilla": 2026,
     "equipo": {
       "nodo": "DESKTOP-QQ6240V",
@@ -1558,18 +1558,18 @@
         "ordenes": 60,
         "crib": "WETTERBERICHT",
         "modo": "robusto",
-        "n": 30,
-        "exitos": 30,
+        "n": 60,
+        "exitos": 60,
         "exito": 1.0,
         "exito_ic": [
-          0.8864866068260312,
-          0.9999999999999999
+          0.93982814785791,
+          0.9999999999999998
         ],
-        "p50": 7.232899900060147,
-        "p95": 10.963604005047818,
-        "p50_barrido": 6.063773400033824,
-        "p95_barrido": 8.98068207000615,
-        "maximo": 14.520125299924985,
+        "p50": 6.413439050025772,
+        "p95": 9.752500080101889,
+        "p50_barrido": 5.583274750038981,
+        "p95_barrido": 7.282061290030833,
+        "maximo": 14.861880699987523,
         "no_cubiertos": 0,
         "cumple": true
       },
@@ -1580,18 +1580,18 @@
         "ordenes": 6,
         "crib": "WETTERBERICHT",
         "modo": "robusto",
-        "n": 30,
-        "exitos": 30,
+        "n": 60,
+        "exitos": 60,
         "exito": 1.0,
         "exito_ic": [
-          0.8864866068260312,
-          0.9999999999999999
+          0.93982814785791,
+          0.9999999999999998
         ],
-        "p50": 1.3337967999395914,
-        "p95": 1.6773649000620934,
-        "p50_barrido": 0.651992600003723,
-        "p95_barrido": 0.7913025100133381,
-        "maximo": 1.8877335999859497,
+        "p50": 1.2554959499975666,
+        "p95": 1.6993367999966722,
+        "p50_barrido": 0.6030708999605849,
+        "p95_barrido": 0.8186626249866094,
+        "maximo": 1.7406486000400037,
         "no_cubiertos": 0,
         "cumple": true
       },
@@ -1602,18 +1602,18 @@
         "ordenes": 60,
         "crib": "WETTERBERICHTXFUER",
         "modo": "robusto",
-        "n": 30,
-        "exitos": 29,
-        "exito": 0.9666666666666667,
+        "n": 60,
+        "exitos": 59,
+        "exito": 0.9833333333333333,
         "exito_ic": [
-          0.8332960900859082,
-          0.9940914096183874
+          0.9114487027240993,
+          0.9970518402052136
         ],
-        "p50": 9.14736509998329,
-        "p95": 11.014326185034585,
-        "p50_barrido": 9.119234799931291,
-        "p95_barrido": 10.971713694976641,
-        "maximo": 12.399517700076103,
+        "p50": 8.911424849939067,
+        "p95": 10.416482585074844,
+        "p50_barrido": 8.884754149941728,
+        "p95_barrido": 10.377684380055868,
+        "maximo": 12.500905200024135,
         "no_cubiertos": 1,
         "cumple": true
       }

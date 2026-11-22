@@ -1,10 +1,10 @@
 # Resumen de resultados para la presentación
 
-- **Fecha:** 2026-11-21 23:34 UTC
-- **Commit:** 2f4db4e
+- **Fecha:** 2026-11-22 10:28 UTC
+- **Commit:** 82fda70
 - **Semilla:** 2026
 - **Modo:** completo
-- **Corridas:** E1: modo completo, 2026-11-21 23:30 UTC, commit 2f4db4e; E2: modo completo, 2026-11-21 23:30 UTC, commit 2f4db4e; E3: modo completo, 2026-11-21 23:30 UTC, commit 2f4db4e; E4: modo completo, 2026-11-21 23:30 UTC, commit 2f4db4e; E5: modo completo, 2026-11-21 23:33 UTC, commit 2f4db4e; E6: modo completo, 2026-11-21 23:34 UTC, commit 2f4db4e
+- **Corridas:** E1: modo completo, 2026-11-22 10:24 UTC, commit 82fda70; E2: modo completo, 2026-11-22 10:24 UTC, commit 82fda70; E3: modo completo, 2026-11-22 10:24 UTC, commit 82fda70; E4: modo completo, 2026-11-22 10:24 UTC, commit 82fda70; E5: modo completo, 2026-11-22 10:27 UTC, commit 82fda70; E6: modo completo, 2026-11-22 10:28 UTC, commit 82fda70
 
 Generado por `make resumen` a partir de `results/summary.json` y los Parquet, sin volver a correr experimentos. Cada cifra sale del código.
 
@@ -35,8 +35,8 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 - **Toda la tabla de Turing** (8 a 16 letras): en 15 de 17 celdas con valor exacto, las hipótesis abiertas por orden que medimos están entre la mitad y el doble de la estimación de Turing. Detalle por celda en `r3_bombe.csv` (columnas `paradas_media`, `hipotesis_media` y `turing`).
 - **Pocas letras y sin lazos:** con 8 letras Turing da 40.000 paradas por orden, más que las 17.576 posiciones. Su cifra cuenta hipótesis abiertas, no posiciones: medimos 37.546 hipótesis en 17.219 posiciones.
 - **Éxito:** en modo Bletchley aparece la parada verdadera en el 55,0 % de los menús. El central se movió dentro del tramo en el 45,0 %; sin esa vuelta, en el 100,0 %.
-- **Modo robusto** (menús de 12 y 16 letras): éxito 98,0 %, 14,1 veces el tiempo y 10,9 veces las paradas del modo Bletchley.
-- **Tiempo por orden** (17.576 posiciones, en el equipo de `make reproduce`): 0,006 s en modo Bletchley y 0,097 s en modo robusto.
+- **Modo robusto** (menús de 12 y 16 letras): éxito 98,0 %, 13,2 veces el tiempo y 10,9 veces las paradas del modo Bletchley.
+- **Tiempo por orden** (17.576 posiciones, en el equipo de `make reproduce`): 0,007 s en modo Bletchley y 0,104 s en modo robusto.
 - **«Letras» son vértices** (P-002, D-031): las letras distintas del menú. Con esa lectura la columna de 12 letras queda cerca de la de Turing (entre 0,8 y 2,8 veces su valor); contando aristas no.
 
 ### Diapositiva 17 · Banburismus (E6)
@@ -111,16 +111,17 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 
 ## 3. Demos
 
-- **Demo 1 (diapositiva 4):** el cálculo es instantáneo. La traza de «Vector BDZGO» tarda 0,2 ms y la de «Portada» 0,6 ms en el equipo donde corrió `make resumen` (Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos). Los 45 s del guion los pone la interacción. Falta cronometrar el recorrido completo en el portátil del autor.
-- **Demo 2 (diapositiva 12):** `make bench-demo` del 2026-11-21 21:27 UTC (commit 2cfa34b) en Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos, Windows 11. Casos de compañero: clave como la de «Clave aleatoria» (10 cables), mensaje alemán de 78 letras que empieza por el crib, crib en la posición 0. Flujo completo de la página La Bombe: barrido, máquina de verificación y «Verificar». Éxito: el descifrado es el mensaje letra por letra.
+- **Demo 1 (diapositiva 4):** el cálculo es instantáneo. La traza de «Vector BDZGO» tarda 0,2 ms y la de «Portada» 0,7 ms en el equipo donde corrió `make resumen` (Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos). Los 45 s del guion los pone la interacción. Falta cronometrar el recorrido completo en el portátil del autor.
+- **La app en clase:** abre `http://localhost:8501/maquina?demo=1` (el modo demo queda en la URL y sobrevive a una recarga) y, en otra pestaña, `http://localhost:8501/bombe?demo=1`; pliega la barra lateral para ganar ancho. En modo demo, Máquina muestra solo «Vector BDZGO» y «Portada», y La Bombe, «Cifrado del compañero» y «Caso de respaldo» (plan B).
+- **Demo 2 (diapositiva 12):** `make bench-demo` del 2026-11-21 18:25 UTC (commit 5b34896) en Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos, Windows 11. Casos de compañero: clave como la de «Clave aleatoria» (10 cables), mensaje alemán de 78 letras que empieza por el crib, crib en la posición 0. Flujo completo de la página La Bombe: barrido, máquina de verificación y «Verificar». Éxito: el descifrado es el mensaje letra por letra.
 
 | Configuración | Éxito (IC 95 %) | p50 | p95 | Barrido p95 | ¿Cumple? |
 | --- | --- | --- | --- | --- | --- |
-| 60 órdenes, modo robusto | 30 de 30 (89 %–100 %) | 7,2 s | 11,0 s | 9,0 s | sí |
-| Rotores I, II y III (6 órdenes), modo robusto | 30 de 30 (89 %–100 %) | 1,3 s | 1,7 s | 0,8 s | sí |
-| Crib WETTERBERICHTXFUER, 60 órdenes, modo robusto | 29 de 30 (83 %–99 %) | 9,1 s | 11,0 s | 11,0 s | sí |
+| 60 órdenes, modo robusto | 60 de 60 (94 %–100 %) | 6,4 s | 9,8 s | 7,3 s | sí |
+| Rotores I, II y III (6 órdenes), modo robusto | 60 de 60 (94 %–100 %) | 1,3 s | 1,7 s | 0,8 s | sí |
+| Crib WETTERBERICHTXFUER, 60 órdenes, modo robusto | 59 de 60 (91 %–100 %) | 8,9 s | 10,4 s | 10,4 s | sí |
 
-- **Recomendada (la más simple con éxito ≥ 95% y p95 ≤ 30 s):** 60 órdenes, modo robusto: el compañero usa «Clave aleatoria» sin restricciones y empieza su mensaje por WETTERBERICHT (con X entre palabras). En la demo: «Rotores I a V (60 órdenes)», modo robusto. Éxito 100,0 %, p95 11,0 s.
+- **Recomendada (la más simple con éxito ≥ 95% y p95 ≤ 30 s):** 60 órdenes, modo robusto: el compañero usa «Clave aleatoria» sin restricciones y empieza su mensaje por WETTERBERICHT (con X entre palabras). En la demo, el botón «Cifrado del compañero» de La Bombe deja el crib en la posición 0, «Rotores I a V (60 órdenes)» y el modo robusto; se pega el cifrado y se pulsa Ctrl+Enter. Éxito 100,0 %, p95 9,8 s.
 - Estos tiempos son del equipo indicado. Este equipo es un escritorio; el presupuesto de 30 s es del portátil del autor (P-001): corre `make bench-demo` allí antes de ensayar y usa la configuración que recomiende.
 
 ## 4. Discrepancias
@@ -141,6 +142,6 @@ Ninguna contradicción con las diapositivas ni con el guion. Notas:
 
 ## 5. Pendientes
 
-- Fase 5 · Rejewski (E7) y ataque moderno (E8), opcionales: semana 3.
-- Fase 6 · modo demo completo, Docker, informe y entrega: fin de la semana 3.
-- Demo 2 · correr `make bench-demo` en el portátil del autor (P-001) y confirmar la configuración: antes de ensayar.
+- Fase 5 · Rejewski (E7) y ataque moderno (E8), opcionales: no se hicieron; la diapositiva 9 solo cita a Kuhl y el README los lista entre las limitaciones.
+- Demos · correr `make bench-demo` en el portátil del autor (P-001) y ensayar las dos demos allí: antes de ensayar.
+- Repositorio remoto · crearlo, para la CI y el enlace de la diapositiva 21: antes de la presentación.
