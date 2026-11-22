@@ -1,14 +1,23 @@
 # Resumen de resultados para la presentación
 
-- **Fecha:** 2026-11-22 10:30 UTC
-- **Commit:** de697e4
+- **Fecha:** 2026-11-22 17:13 UTC
+- **Commit:** 67e022b
 - **Semilla:** 2026
 - **Modo:** completo
-- **Corridas:** E1: modo completo, 2026-11-22 10:24 UTC, commit 82fda70; E2: modo completo, 2026-11-22 10:24 UTC, commit 82fda70; E3: modo completo, 2026-11-22 10:24 UTC, commit 82fda70; E4: modo completo, 2026-11-22 10:24 UTC, commit 82fda70; E5: modo completo, 2026-11-22 10:27 UTC, commit 82fda70; E6: modo completo, 2026-11-22 10:28 UTC, commit 82fda70
+- **Corridas:** E1: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E2: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E3: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E4: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E5: modo completo, 2026-11-22 16:47 UTC, commit 67e022b; E6: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E7: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E8: modo completo, 2026-11-22 17:13 UTC, commit 67e022b
 
 Generado por `make resumen` a partir de `results/summary.json` y los Parquet, sin volver a correr experimentos. Cada cifra sale del código.
 
 ## 1. Por diapositiva de resultados
+
+### Diapositiva 9 · Rejewski (E7)
+
+- **Cifra para la diapositiva:** el catálogo de los rotores I–III con el reflector A tiene 105.456 configuraciones (6 × 17.576) y 21.225 características distintas; 11.578 señalan una sola configuración (54,5 %) y la más frecuente, (13 13)(13 13)(13 13), 1.728. Es exacto (sin azar).
+- **Kuhl (2007):** 21.230, 11.466 y 1.771. Diferencias: −0,02 %, 1,0 % y −2,4 %. De las 15 características de su tabla 1, 14 están entre nuestras 15 más frecuentes (ver Discrepancias).
+- Con 41.088 configuraciones en clases de 10 o menos, una configuración al azar comparte su característica con 111,7 en promedio (mediana 20): las clases grandes pesan mucho.
+- **Mensajes de un día** (4.000 días con claves de mensaje al azar, semilla 2026): ver las 26 letras de AD, BE y CF pide 128,0 (IC 95 % 127,0–129,1) mensajes (teoría exacta: 127,1; una sola permutación, 100,9 frente a 26·H₂₆ = 100,2). Por eliminación, 90,5 (IC 95 % 89,9–91,0). Con el teorema de los ciclos en parejas, la característica queda determinada en 49,1 (IC 95 % 48,8–49,4) mensajes y las tres permutaciones en 60,7 (IC 95 % 60,3–61,0): los «unos sesenta» de Rejewski.
+- **El catálogo encuentra el día** en el 75,4 % de los días (IC 95 % 74,0 %–76,7 %): en el 100,0 % de los días en que el rotor central no se mueve durante el indicador y en el 1,4 % de los demás. El central se mueve en 176 de cada 676 posiciones del día (26,0 %).
+- Datos para dibujarla: `r5_rejewski.csv` (tamaños de clase con la tabla 2 de Kuhl).
 
 ### Diapositiva 14 · Validación (E1)
 
@@ -35,8 +44,8 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 - **Toda la tabla de Turing** (8 a 16 letras): en 15 de 17 celdas con valor exacto, las hipótesis abiertas por orden que medimos están entre la mitad y el doble de la estimación de Turing. Detalle por celda en `r3_bombe.csv` (columnas `paradas_media`, `hipotesis_media` y `turing`).
 - **Pocas letras y sin lazos:** con 8 letras Turing da 40.000 paradas por orden, más que las 17.576 posiciones. Su cifra cuenta hipótesis abiertas, no posiciones: medimos 37.546 hipótesis en 17.219 posiciones.
 - **Éxito:** en modo Bletchley aparece la parada verdadera en el 55,0 % de los menús. El central se movió dentro del tramo en el 45,0 %; sin esa vuelta, en el 100,0 %.
-- **Modo robusto** (menús de 12 y 16 letras): éxito 98,0 %, 13,2 veces el tiempo y 10,9 veces las paradas del modo Bletchley.
-- **Tiempo por orden** (17.576 posiciones, en el equipo de `make reproduce`): 0,007 s en modo Bletchley y 0,104 s en modo robusto.
+- **Modo robusto** (menús de 12 y 16 letras): éxito 98,0 %, 12,0 veces el tiempo y 10,9 veces las paradas del modo Bletchley.
+- **Tiempo por orden** (17.576 posiciones, en el equipo de `make reproduce`): 0,008 s en modo Bletchley y 0,114 s en modo robusto.
 - **«Letras» son vértices** (P-002, D-031): las letras distintas del menú. Con esa lectura la columna de 12 letras queda cerca de la de Turing (entre 0,8 y 2,8 veces su valor); contando aristas no.
 
 ### Diapositiva 17 · Banburismus (E6)
@@ -57,6 +66,11 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 - **Antifrecuencia:** como ninguna letra se cifra a sí misma, la letra c sale cifrada con probabilidad (1 − f_c)/25. Las letras comunes del idioma salen un poco menos: la E, el 17,1 % del alemán, debería ser el 3,32 % del cifrado y no el 3,85 %. Con esa distribución, la χ² no central predice un 8,0 % de rechazos con 1.000 letras; se midió 10,0 %. Las frecuencias del idioma se filtran débiles y al revés.
 - Puntos fijos: 0 en 3.850.000 letras.
 - **E2 (diapositiva 7):** 1,6 × 10²⁰ claves (67,11 bits); el plugboard aporta el 70,2 %; la Bombe barre 1.054.560 configuraciones; máximo de N(k) con 11 cables.
+- **E8 · Ataque moderno (pregunta «¿Hoy se rompería por fuerza bruta?»):** el ataque de Gillogly prueba 1.054.560 ubicaciones con el IC y sube el plugboard por hill climbing; 1,7 s por mensaje en este equipo. Con 24 mensajes por celda (864 en total), lee 6 cables: 43,1 % de los mensajes; 8 cables: 21,9 % de los mensajes; 10 cables: 3,5 % de los mensajes.
+- Regresión logística: la mitad de los mensajes se lee con 6 cables desde unas 314 letras (IC 95 % 273–362); con 8 cables desde unas 845 letras (IC 95 % 752–950); con 10 cables, el 50 % no se alcanza en las longitudes medidas.
+- Referencias: Gillogly, unas 300 letras con 6 cables o menos y un solo éxito con 10 cables (1.463 letras); distancia de unicidad, unas 23 letras; los mensajes reales no pasaban de 250 letras (Ostwald y Weierud 2017).
+- Con la ubicación dada (lo que queda si la fase 1 no falla), el hill climbing lee el 73,3 % de los mensajes y con la búsqueda parcial de la E, el 80,0 %. El cuello de botella es la fase 1: supone los anillos, y el central y el izquierdo giran en otra letra (D-067). Datos: `r6_ataque.csv`.
+- Respuesta corta: no hace falta fuerza bruta; un computador de escritorio lee en segundos un mensaje largo con pocos cables, y los ataques de hoy (Ostwald y Weierud) llegan cerca de la unicidad agotando todas las ubicaciones con hill climbing durante días.
 
 ## 2. Cifras de la presentación
 
@@ -98,7 +112,8 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 | 11 | letra de prueba y su grado | T, grado 6 | T, grado 6 | sí |
 | 6.5 | menú del caso de respaldo: letras, aristas, componentes y lazos | 11 · 13 · 1 · 3 | 11 · 13 · 1 · 3 | sí |
 | 6.5 | letra de prueba del caso de respaldo | T, grado 4 | T, grado 4 | sí |
-| 9 | Kuhl: 105.456 · 21.230 · 11.466 | 105.456 · 21.230 · 11.466 | — | sin calcular (fase 5 (P2), que no se hizo: la diapositiva solo cita a Kuhl (2007)) |
+| 9 | configuraciones del catálogo: 6 órdenes × 17.576 posiciones (E7) | 105.456 | 105.456 | sí |
+| 9 | Kuhl (2007): características distintas y únicas (E7 da 21.225 y 11.578: Discrepancias) | 21.230 · 11.466 | 21.230 · 11.466 | sí |
 | 13, 17 | decibanes por repetición: 10·log₁₀((1/17)/(1/26)) | +1,845 dB | +1,845 dB | sí |
 | 5.6 | decibanes por no repetición: 10·log₁₀((16/17)/(25/26)) | −0,093 dB | −0,093 dB | sí |
 | 17 | decibanes por letra, en promedio, en profundidad | +0,0211 dB | +0,0211 dB | sí |
@@ -107,7 +122,7 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 | 13, 17 | letras esperadas según Wald, en profundidad y al azar | 929 y 1.062 | 929 y 1.062 | sí |
 | 16 | Turing, 12 letras: paradas por orden con 0, 1, 2 y 3 lazos; en 60 órdenes con 2 y 3 | 820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60 | 820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60 | sí |
 
-43 de 43 cifras calculadas coinciden; 1 sin calcular, de la fase 5, que no se hizo.
+45 de 45 cifras calculadas coinciden.
 
 ## 3. Demos
 
@@ -139,9 +154,9 @@ Ninguna contradicción con las diapositivas ni con el guion. Notas:
 - py-enigma admite como máximo 10 cables: la comparación de 10.000 claves usa de 0 a 10 cables, y las pruebas con hypothesis cubren de 0 a 13.
 - Mensaje histórico: no se encontró una fuente verificable del mensaje de Barbarossa (1941). Se usa el del U-264 (M4), publicado con clave, cifrado y texto por D. Rijmenants.
 - Corpus: gutenberg.org estaba en mantenimiento el 20-11-2026; se descargó de su espejo oficial (Mirror Service), con SHA-256 verificado.
+- Diapositiva 9: nuestro catálogo da 21.225 características, 11.578 únicas y 1.728 en la más frecuente; Kuhl, 21.230, 11.466 y 1.771. No se ajustó nada: Kuhl no dice qué supone del rotor central ni de los anillos, y ninguna de las 33 variantes de los supuestos que probamos reproduce sus cifras (`scripts/kuhl_variantes.py`, VALIDACION). Su artículo tiene además erratas: escribe 105.465 configuraciones, da 11.466 como el 54,40 % (es el 54,01 %) y dice que 20.433 tienen 10 o menos cuando su tabla 2 suma 19.604. Sugerencia: la diapositiva puede seguir citando a Kuhl («Kuhl calculó…») y agregar, si cabe, «nuestro catálogo: 21.225 y 11.578».
 
 ## 5. Pendientes
 
-- Fase 5 · Rejewski (E7) y ataque moderno (E8), opcionales: no se hicieron; la diapositiva 9 solo cita a Kuhl y el README los lista entre las limitaciones.
 - Demos · correr `make bench-demo` en el portátil del autor (P-001) y ensayar las dos demos allí: antes de ensayar.
 - Repositorio remoto · crearlo, para la CI y el enlace de la diapositiva 21: antes de la presentación.
