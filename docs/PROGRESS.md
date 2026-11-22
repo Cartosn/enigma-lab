@@ -1,6 +1,6 @@
 # Progreso
 
-Última actualización: 21-11-2026 · fase 4 cerrada.
+Última actualización: 22-11-2026 · fase 6 cerrada: entrega lista.
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
@@ -9,8 +9,105 @@
 | 2 · Estadística y cribs | Cerrada (20-11-2026) | 1–2 (reunión con el profe) |
 | 3 · Bombe | Cerrada (21-11-2026) | 2 |
 | 4 · Banburismus | Cerrada (21-11-2026) | 3 |
-| 5 · Extensiones P2 | Siguiente (opcional) | 3 |
-| 6 · Pulido y entrega | Pendiente | Fin de la 3 |
+| 5 · Extensiones P2 | No se hizo (opcional; ver limitaciones del README) | 3 |
+| 6 · Pulido y entrega | Cerrada (22-11-2026) | Fin de la 3 |
+
+## Fase 6 · Pulido y entrega
+
+**Criterio de aceptación:** se cumple en este equipo. La sección 10 está completa (README,
+informe, datos para las diapositivas y prueba final desde un clon limpio) y las dos demos del
+guion corren dentro de su tiempo. Falta repetir el banco y el ensayo en el portátil del autor
+(P-001).
+
+| Criterio | Resultado |
+| --- | --- |
+| README (spec 10) | En español, con 5 capturas y el GIF de la demo 2 (`docs/img/`), inicio rápido con Docker y en local, `make reproduce`, estructura, validación, limitaciones (la fase 5 entre ellas) y fuentes |
+| Informe | `report/informe.pdf`: 3 páginas a 11 pt, una columna, con 3 figuras (E4, E5 y E6) y 1 tabla (E1 y E2); todas las cifras entran por `report/numbers.tex` (108 macros generadas desde los resultados); los párrafos de análisis van marcados `% REVISAR` |
+| Datos para las diapositivas | `results/presentacion/` (RESUMEN.md, cifras.json y los CSV) y el respaldo 16:9 oscuro de E2 a E6 en `results/figures/slides/` |
+| Modo demo sin internet | Ninguna petición sale de localhost (revisado en el navegador, también con la app en Docker); Numba se precalienta al abrir la app |
+| Demo 1 (diapositiva 4, 45 s) | «Vector BDZGO» y «Portada» responden en 0,18 s del clic al texto; el resto lo pone la exposición |
+| Demo 2 (diapositiva 12, 1:15) | Un caso real de compañero, en modo robusto con los 60 órdenes: barrido y máquina de verificación en 10,3 s, «Verificar» en 1,1 s y el mensaje descifrado letra por letra |
+| Prueba final desde un clon limpio | Clon de `395c9b3` en una carpeta temporal. `docker compose up`: imagen construida (Numba compilado en 12,2 s dentro de ella) y app respondiendo en 2 min 14 s; el caso de respaldo se descifró en el contenedor sin ninguna petición externa. `make install` (8 s) y `make reproduce` (5 min 30 s, con la descarga del corpus): sin errores, y las cifras iguales a las comprometidas (solo cambian fechas y tiempos) |
+
+`make test` da 305 pruebas que pasan y 1 cifra sin calcular (la de Kuhl, de la fase 5), en
+1 min 49 s. `make lint` pasa sin errores. `make reproduce` completo (corpus, E1 a E6, resumen
+y figuras) tarda 4 min 29 s en este equipo, y `make report`, 9 s (la primera vez, 1 min 40 s,
+porque Tectonic baja sus paquetes).
+
+**Qué quedó:**
+- **Modo demo** (D-049):
+  - letra de 20 px como mínimo en toda la app, también en los gráficos (plantilla de 22 px) y,
+    con la barra lateral plegada, de 18 a 21 px dentro de las animaciones;
+  - oculta los «¿Qué estoy viendo?», la clave de Máquina, las tablas largas, las descargas y
+    la comparación con y sin diagonal board;
+  - el resultado en grande en Máquina y en La Bombe, con la lectura con la X como espacio;
+  - queda en la URL (`?demo=1`): sobrevive a una recarga y se puede abrir directo;
+  - en Máquina, solo «Vector BDZGO» y «Portada»; en La Bombe, «Cifrado del compañero» y
+    «Caso de respaldo», y el menú visible, como pide el guion.
+- **«Cifrado del compañero»** (D-050): vacía el cifrado y aplica la configuración que
+  recomendó `make bench-demo` en el equipo. Al recorrer la demo en el navegador apareció un
+  error real: el modo volvía a «Bletchley» al pegar el cifrado. Quedó corregido y probado.
+- **Reglas de 8.3:**
+  - *Nada bloquea más de 1 s sin indicador:* Experimentos tardaba de 5 a 8 s en blanco al
+    abrirse; con las tablas en caché y las figuras diferidas abre en menos de 1 s, y los
+    módulos pesados se precargan al arrancar, con el indicador «Preparando Enigma Lab…»
+    (D-051, D-057).
+  - *Cada página tiene su «¿Qué estoy viendo?»:* las 8; una prueba lo comprueba.
+  - *Todo gráfico se exporta:* la figura desde la barra de Plotly (PNG a 2x) y los datos con
+    «Datos (CSV)», sacados de la propia figura; las animaciones exportan su traza, sus
+    alineaciones o sus aristas (D-051).
+- **Correcciones encontradas al revisar la app:** los índices del arrastre del crib no
+  quedaban sobre su letra (D-059); el menú amontonaba sus componentes (D-058); y los
+  componentes pasan de `components.html`, obsoleto, a `st.iframe` (D-056).
+- **Docker** (D-054, D-055): `Dockerfile`, `docker-compose.yml` y `.dockerignore`; Python 3.12
+  con uv 0.13.9 y `uv sync --frozen --no-dev`; Numba compilado dentro de la imagen; usuario sin
+  privilegios; `ENIGMA_LAB_ROOT` y `NUMBA_CACHE_DIR` con escritura; Streamlit headless en el
+  puerto 8501; la app funciona sin internet.
+- **Informe** (D-052, D-053): `report/informe.tex`, `informe.py` (cifras y compilación) y
+  `figuras.py` (figuras del informe y respaldo de las diapositivas); `make report` y
+  `make figuras`. Tectonic 0.17.0 instalado en la carpeta de usuario.
+- **Documentos:**
+  - README final, con capturas tomadas en el navegador integrado y un GIF de la demo 2 (D-061);
+  - guía de estudio: índice de dónde está cada algoritmo, el tema 6 (Rejewski y el ataque
+    moderno, solo teoría) y las 15 preguntas más probables, con las 6 del guion;
+  - ARQUITECTURA con el diagrama al día y la imagen de Docker;
+  - DECISIONES D-049 a D-061; el banco de la demo 2 de 60 casos, a pedido del autor (D-060).
+
+**Tiempos medidos en este equipo** (escritorio i5-9400F, 6 núcleos, 16 GB; navegador
+integrado):
+- **Arranque de la app** con la caché de Numba en disco: 5,6 s hasta ver Inicio, con el
+  indicador visible. Con la caché vacía, compilar Numba toma 16,4 s; la imagen de Docker ya la
+  trae compilada (12,4 s al construirla).
+- **Demo 1:** del clic en «Portada» al texto descifrado, 0,18 s.
+- **Demo 2,** caso de compañero cifrado en Máquina con «Clave aleatoria» (86 letras, menú de 16
+  letras, 3 componentes y 0 lazos, con vuelta del central en la letra 8): 388.817 paradas y 618
+  hipótesis consistentes; barrido y máquina de verificación en 10,3 s desde el clic (en una
+  segunda corrida, para el GIF, el barrido marcó 7,4 s); «Verificar» en 1,1 s. Es un caso
+  difícil: sin lazos.
+- **Caso de respaldo** (plan B) dentro del contenedor: barrido en 2,4 s y «Verificar» en 0,9 s.
+- **Docker:** la primera construcción tardó 2 min 37 s (con las descargas); la imagen pesa
+  2,79 GB y responde a `/_stcore/health` 4 s después de `docker compose up`.
+
+**Cifras obtenidas** (modo completo, semilla 2026): las de las fases 1 a 4, sin cambios; la
+corrida final las reprodujo. Las del informe están en `report/numbers.tex`:
+- 10.000 de 10.000 claves iguales a py-enigma; 9 de 9 vectores; 0 puntos fijos en 200.000
+  letras.
+- E4: con 13 letras sobrevive el 60,1 % de las alineaciones falsas (alemán real: 61,6 %).
+- E5: 678 · 26,3 · 0,99 · 0,11 paradas falsas por orden con 12 letras y 0 a 3 lazos (Turing:
+  820 · 31 · 1,2 · 0,04); 15 de 17 celdas de su tabla entre la mitad y el doble.
+- E6: 983 letras en profundidad (Wald: 929; exacto: 959,7).
+- **Cifras de la presentación:** 43 de 43 coinciden; la de Kuhl queda sin calcular (fase 5).
+
+**Qué falta:** nada del código. La fase 5 (Rejewski y el ataque moderno) no se hizo: el README
+y el informe la listan entre las limitaciones, y la diapositiva 9 solo cita a Kuhl.
+
+**Pendiente del autor:**
+- correr `make bench-demo` en el portátil y ensayar allí las dos demos (P-001);
+- actualizar con `results/presentacion/` la configuración de la demo 2 y los
+  ajustes del guion;
+- reescribir con su voz los párrafos `% REVISAR` del informe;
+- crear el repositorio remoto, para la CI y el enlace de la diapositiva 21 (y ponerlo en el
+  encabezado del informe).
 
 ## Fase 4 · Banburismus
 
