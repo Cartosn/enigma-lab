@@ -38,6 +38,7 @@ from enigma_lab.experiments.e6_banburismus import auc, roc_points
 from enigma_lab.viz import plotly_figs
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 from enigma_lab.viz.theme import CATEGORICAL, DARK
+from ui.charts import chart
 from ui.layout import is_demo, what_am_i_seeing
 
 K = "banb_"
@@ -229,11 +230,11 @@ st.caption(
 st.subheader("Coincidencias y decibanes por desplazamiento")
 table = offset_scores(pair.cipher1[0], pair.cipher2[0], length, model, OFFSETS)
 best = int(table.loc[table["decibanes"].idxmax(), "desplazamiento"])
-st.plotly_chart(
+chart(
     plotly_figs.banburismus_offsets(table, upper, offset if reveal else None, demo),
-    theme=None,
-    config=plotly_figs.plotly_config(),
-    width="stretch",
+    "decibanes_por_desplazamiento",
+    demo,
+    data=table,
 )
 best_row = table[table["desplazamiento"] == best].iloc[0]
 expected_random = length / 26
@@ -272,11 +273,10 @@ paths = [
     (label, trajectory(repeats(pair.cipher1[0], pair.cipher2[0], d, length), model), color)
     for label, d, color in lines
 ]
-st.plotly_chart(
+chart(
     plotly_figs.banburismus_trajectories(paths, upper, lower, demo),
-    theme=None,
-    config=plotly_figs.plotly_config(),
-    width="stretch",
+    "trayectorias_wald",
+    demo,
 )
 st.caption(
     " · ".join(f"{label}: {_decision(values, upper, lower)}" for label, values, _ in paths)
@@ -291,12 +291,7 @@ st.subheader("Curva ROC")
 roc_length = min(length, ROC_MAX_LETTERS)
 with st.spinner(f"Simulando {ROC_PAIRS} pares con {fmt_int(roc_length)} letras…"):
     curves = _roc(text, roc_length)
-st.plotly_chart(
-    plotly_figs.roc_curves(curves, roc_length, demo),
-    theme=None,
-    config=plotly_figs.plotly_config(),
-    width="stretch",
-)
+chart(plotly_figs.roc_curves(curves, roc_length, demo), "curvas_roc", demo)
 st.caption(
     f"{ROC_PAIRS} pares nuevos de «{TEXT_SOURCES[text]}» (semilla {SEED}): el puntaje en el "
     "desplazamiento verdadero frente al de otro al azar, tras "

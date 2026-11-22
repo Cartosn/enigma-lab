@@ -1,7 +1,9 @@
 """Página La Bombe: el barrido de los rotores, las paradas y el verificador (spec 8.2, punto 6).
 
 Demo 2 del guion (diapositiva 12): el cifrado de un compañero con el crib WETTERBERICHT.
-Plan B: el botón «Caso de respaldo», que carga el caso de 6.1 (modo Bletchley, 3 lazos).
+«Cifrado del compañero» vacía el cifrado y deja la configuración que recomendó
+``make bench-demo`` en este equipo (``results/bench_demo2.json``). Plan B: el botón «Caso
+de respaldo», que carga el caso de 6.1 (modo Bletchley, 3 lazos).
 """
 
 from __future__ import annotations
@@ -14,6 +16,7 @@ import streamlit as st
 
 from enigma_lab import paths
 from enigma_lab.bombe import checker
+from enigma_lab.bombe.cases import DEMO_CRIB
 from enigma_lab.bombe.scrambler import (
     ENIGMA_I_ROTORS,
     Order,
@@ -29,7 +32,7 @@ from enigma_lab.cribs.menu import menu_at, menu_stats
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int
 from ui.bombe_view import drums_payload, render_drums, stops_frame
 from ui.cribs_view import menu_payload, render_menu
-from ui.layout import is_demo, what_am_i_seeing
+from ui.layout import big_result, hidden_in_demo, is_demo, what_am_i_seeing, x_as_space
 
 K = "bombe_"
 ORDER_SETS: dict[str, tuple[str, tuple[str, ...]]] = {
@@ -56,27 +59,84 @@ def _load(
     position: int,
     key: dict[str, str] | None = None,
     plaintext: str | None = None,
+    **settings: object,
 ) -> None:
+    """Carga un caso: cifrado y crib en sus cuadros; posición y ajustes, como pendientes.
+
+    La posición y los ajustes (``orders``, ``diagonal``, ``mode``) no se escriben en sus
+    controles sino en ``bombe_pending``: si en la vuelta siguiente un control no se dibuja
+    (con el cifrado vacío la página se detiene antes), Streamlit borra su estado y el
+    ajuste se perdería. ``_apply_pending`` los pasa a cada control justo antes de dibujarlo.
+    """
     state[K + "cipher"] = groups_of_five(clean(cipher))
     state[K + "crib"] = clean(crib)
-    state[K + "position"] = position
     state[K + "key"] = key
     state[K + "plaintext"] = plaintext
+    state[K + "pending"] = {"position": position, **settings}
     state.pop(K + "test", None)
     _clear_results()
 
 
+def _apply_pending(name: str) -> None:
+    """Pasa al control ``name`` el ajuste que dejó un botón (ver ``_load``)."""
+    pending = state.get(K + "pending")
+    if pending and name in pending:
+        state[K + name] = pending.pop(name)
+
+
 def _backup_case() -> None:
     data = json.loads((paths.DEMO / "respaldo_bombe.json").read_text(encoding="utf-8"))
-    _load(data["ciphertext"], data["crib"], data["crib_position"], data["key"], data["plaintext"])
-    state[K + "mode"] = "bletchley"
-    state[K + "orders"] = "todos"
-    state[K + "diagonal"] = True
+    _load(
+        data["ciphertext"],
+        data["crib"],
+        data["crib_position"],
+        data["key"],
+        data["plaintext"],
+        mode="bletchley",
+        orders="todos",
+        diagonal=True,
+    )
 
 
 def _from_cribs() -> None:
     data = state["bombe_input"]
     _load(data["cipher"], data["crib"], int(data["position"]))
+
+
+def demo2_setup() -> dict[str, str]:
+    """La configuración de la demo 2 que recomendó ``make bench-demo`` en este equipo.
+
+    Lee ``results/bench_demo2.json``: órdenes a probar, crib y modo de la configuración
+    recomendada. Si no hay banco o ninguna cumplió, usa la más simple: los 60 órdenes en
+    modo robusto con WETTERBERICHT.
+    """
+    setup = {"orders": "todos", "crib": DEMO_CRIB, "mode": "robusto", "name": ""}
+    try:
+        bench = json.loads((paths.RESULTS / "bench_demo2.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return setup
+    chosen = next(
+        (c for c in bench.get("configuraciones", []) if c.get("id") == bench.get("recomendada")),
+        None,
+    )
+    if chosen is None:
+        return setup
+    rotors = tuple(chosen["rotores"].split())
+    orders = next((k for k, (_, names) in ORDER_SETS.items() if names == rotors), None)
+    if orders is None or chosen["modo"] not in MODES:
+        return setup
+    return {
+        "orders": orders,
+        "crib": chosen["crib"],
+        "mode": chosen["modo"],
+        "name": chosen["nombre"],
+    }
+
+
+def _companion() -> None:
+    """Demo 2: cifrado vacío para pegar el del compañero, con la configuración recomendada."""
+    setup = demo2_setup()
+    _load("", setup["crib"], 0, mode=setup["mode"], orders=setup["orders"], diagonal=True)
 
 
 if K + "cipher" not in state:
@@ -102,26 +162,53 @@ what_am_i_seeing(
     "busca los anillos y descifra el mensaje.",
 )
 
-buttons = st.columns(2)
+setup = demo2_setup()
+buttons = st.columns(2 if demo else 3)
 buttons[0].button(
+    "Cifrado del compañero",
+    on_click=_companion,
+    icon=":material/person:",
+    width="stretch",
+    wrap=True,
+    help="Demo 2: vacía el cifrado para pegar el del compañero y deja el crib "
+    f"{setup['crib']} en la posición 0, con la configuración que recomendó make bench-demo "
+    "en este equipo" + (f": {setup['name']}." if setup["name"] else "."),
+)
+buttons[1].button(
     "Caso de respaldo",
     on_click=_backup_case,
     icon=":material/support:",
     width="stretch",
+    wrap=True,
     help="El caso de 6.1: rotores II-III-I, WETTERBERICHT en la posición 0, 3 lazos.",
 )
-buttons[1].button(
-    "Traer de Cribs y menús",
-    on_click=_from_cribs,
-    icon=":material/hub:",
-    width="stretch",
-    disabled="bombe_input" not in state,
-    help="El cifrado, el crib y la alineación elegidos en la página Cribs y menús.",
-)
+if not demo:
+    buttons[2].button(
+        "Traer de Cribs y menús",
+        on_click=_from_cribs,
+        icon=":material/hub:",
+        width="stretch",
+        wrap=True,
+        disabled="bombe_input" not in state,
+        help="El cifrado, el crib y la alineación elegidos en la página Cribs y menús.",
+    )
 
 inputs = st.columns([3, 2])
-cipher = clean(inputs[0].text_area("Texto cifrado", key=K + "cipher", height=90))
+cipher = clean(
+    inputs[0].text_area(
+        "Texto cifrado",
+        key=K + "cipher",
+        height=90,
+        placeholder="Pega aquí el cifrado y pulsa Ctrl+Enter",
+    )
+)
 crib = clean(inputs[1].text_input("Crib", key=K + "crib"))
+if not cipher:
+    st.info(
+        "Pega el texto cifrado y pulsa Ctrl+Enter (o haz clic fuera del cuadro).",
+        icon=":material/content_paste:",
+    )
+    st.stop()
 if not crib or len(crib) > len(cipher) or len(crib) < 2:
     st.warning(
         "Escribe un cifrado y un crib de 2 letras o más, más corto que él.",
@@ -137,6 +224,7 @@ valid = [a.position for a in alignments(cipher, crib) if a.valid]
 if not valid:
     st.error("Ninguna alineación es posible: el crib no cabe sin conflictos en este cifrado.")
     st.stop()
+_apply_pending("position")
 if state.get(K + "position") not in valid:
     state[K + "position"] = valid[0]
 position = inputs[1].selectbox(
@@ -163,8 +251,7 @@ metrics[4].metric(
     delta_color="off",
     delta_arrow="off",
 )
-if not demo:
-    render_menu(menu_payload(menu))
+render_menu(menu_payload(menu, demo))
 if stats.loops < 3:
     st.warning(
         f"Este menú tiene {stats.loops} lazo{'s' if stats.loops != 1 else ''}. Con menos de 3 "
@@ -176,7 +263,8 @@ if stats.loops < 3:
 # ---------------------------------------------------------------- configuración
 
 st.subheader("Configuración")
-config_cols = st.columns([2.2, 1.2, 1.4, 1.2])
+config_cols = st.columns([1.8, 1.8, 1.3, 1.2])
+_apply_pending("orders")
 state.setdefault(K + "orders", "todos")
 choice = config_cols[0].radio(
     "Órdenes a probar",
@@ -196,8 +284,10 @@ if choice == "uno":
     orders: tuple[Order, ...] = (single,)
 else:
     orders = tuple(rotor_orders(ORDER_SETS[choice][1]))
+_apply_pending("diagonal")
 state.setdefault(K + "diagonal", True)
 diagonal = config_cols[1].toggle("Diagonal board", key=K + "diagonal")
+_apply_pending("mode")
 state.setdefault(K + "mode", "bletchley")
 mode = config_cols[2].radio(
     "Modo",
@@ -320,7 +410,7 @@ if run.n_stops == 0:
         "Ninguna parada: con este crib y estos órdenes no hay posición posible.",
         icon=":material/info:",
     )
-else:
+elif not demo:  # en modo demo la tabla larga sobra: la parada está en los tambores
     st.dataframe(table, hide_index=True, width="stretch", height=260)
     st.caption(
         f"{fmt_int(run.n_stops)} paradas; {fmt_int(len(hypotheses))} hipótesis pasan la máquina de "
@@ -341,12 +431,11 @@ if verification is not None:
     if best is None:
         st.error("Ninguna parada da un descifrado: revisa el crib o su posición.")
     else:
-        size = "2.6rem" if demo else "1.8rem"
-        tone = "el-cipher" if best.plausible else "el-sub"
-        st.markdown(
-            f'<div class="{tone}" style="font-size: {size}; line-height: 1.35; '
-            f'word-break: break-all;">{groups_of_five(best.plaintext)}</div>',
-            unsafe_allow_html=True,
+        big_result(
+            groups_of_five(best.plaintext),
+            x_as_space(best.plaintext),
+            ok=best.plausible,
+            demo=demo,
         )
         if best.plausible:
             st.success(
@@ -360,7 +449,6 @@ if verification is not None:
                 "central se movió dentro del tramo (prueba el modo robusto).",
                 icon=":material/warning:",
             )
-        st.caption(f"Leyendo la X como espacio: {best.plaintext.replace('X', ' ').strip()}")
         st.markdown(f"**Clave equivalente:** `{best.config.describe()}`")
         if known_key is not None:
             same = best.plaintext == state.get(K + "plaintext")
@@ -372,7 +460,10 @@ if verification is not None:
                     else ""
                 )
             )
-        with st.expander("Hipótesis examinadas", icon=":material/list:"):
+        with (
+            hidden_in_demo("bombe_hipotesis"),
+            st.expander("Hipótesis examinadas", icon=":material/list:"),
+        ):
             rows: list[dict[str, Any]] = [
                 {
                     "Orden": order_label(s.hypothesis.stop.order),
@@ -392,6 +483,8 @@ if verification is not None:
 
 # ---------------------------------------------------------------- con y sin diagonal board
 
+if demo:  # la demo no usa la comparación ni la lista de hipótesis
+    st.stop()
 st.subheader("Con y sin diagonal board")
 compare: dict[str, int] | None = state.get(K + "compare")
 if compare is None:

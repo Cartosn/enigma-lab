@@ -7,12 +7,17 @@ porque la primera llamada a una función de Numba incluye su compilación.
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
 from hypothesis import settings
 
 ROOT = Path(__file__).resolve().parents[1]
+
+# Las figuras se dibujan a archivo: sin el backend Agg, Matplotlib usa Tk en Windows y
+# falla a veces al crear muchas figuras seguidas.
+os.environ.setdefault("MPLBACKEND", "Agg")
 
 settings.register_profile("enigma", derandomize=True, deadline=None)
 settings.load_profile("enigma")

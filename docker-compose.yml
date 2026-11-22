@@ -1,0 +1,17 @@
+# Enigma Lab con Docker:
+#
+#   docker compose up            (la primera vez construye la imagen: unos minutos)
+#   abrir http://localhost:8501  (para el modo demo: http://localhost:8501/?demo=1)
+#   docker compose down          (para detenerla)
+#
+# Variables de entorno de la imagen (ver Dockerfile):
+#   ENIGMA_LAB_ROOT   raíz del repositorio dentro del contenedor (/app)
+#   NUMBA_CACHE_DIR   caché de los núcleos compilados, con escritura para el usuario «enigma»
+
+services:
+  enigma-lab:
+    build: .
+    image: enigma-lab:latest
+    ports:
+      - "8501:8501"
+    restart: unless-stopped

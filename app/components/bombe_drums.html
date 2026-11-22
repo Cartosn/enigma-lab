@@ -20,7 +20,6 @@
   .head .title { font-weight: 650; }
   .head .muted { color: var(--text_muted); }
   .head .amber { color: var(--accent); font-family: "JetBrains Mono", monospace; letter-spacing: 0.06em; }
-  body.demo .head { font-size: 19px; }
   svg { display: block; width: 100%; height: auto; }
   .frame { fill: var(--surface); stroke: var(--border); stroke-width: 1.5; }
   .drum { fill: var(--background); stroke: var(--border); stroke-width: 2; }
@@ -33,6 +32,11 @@
   .label { font-size: 12px; fill: var(--text_muted); text-anchor: middle; }
   .label.pair { font-family: "JetBrains Mono", monospace; font-weight: 700; fill: var(--text); font-size: 13px; }
   .row { font-size: 12px; fill: var(--text_muted); text-anchor: end; dominant-baseline: central; }
+  /* Modo demo: rótulos más grandes, para proyectar. */
+  body.demo .head { font-size: 20px; }
+  body.demo .label { font-size: 15px; }
+  body.demo .label.pair { font-size: 16px; }
+  body.demo .row { font-size: 15px; }
 </style>
 </head>
 <body>

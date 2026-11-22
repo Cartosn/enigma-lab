@@ -7,7 +7,7 @@ de respaldo de las diapositivas:
   versión oscura (app y diapositivas) e impresa (informe, fondo blanco);
 * paleta categórica Okabe-Ito, apta para daltonismo, en un orden fijo;
 * rampas secuenciales de un solo tono (el ámbar de las lámparas de Enigma);
-* plantillas Plotly ``enigma_dark`` y ``enigma_dark_demo`` (letra de 20 px);
+* plantillas Plotly ``enigma_dark`` y ``enigma_dark_demo`` (nada bajo 20 px);
 * estilos Matplotlib ``enigma_print`` (fondo blanco) y ``enigma_slides`` (oscuro, 16:9).
 
 Plotly y Matplotlib se importan dentro de las funciones: importar este módulo es
@@ -223,11 +223,15 @@ def plotly_template(tokens: Tokens = DARK, font_size: int = 16) -> Any:
 
 
 def register_plotly_templates() -> None:
-    """Registra ``enigma_dark`` (16 px) y ``enigma_dark_demo`` (20 px) en Plotly."""
+    """Registra ``enigma_dark`` (16 px) y ``enigma_dark_demo`` en Plotly.
+
+    La de modo demo parte de 22 px para que también las marcas de los ejes, que van 2 px
+    por debajo de la letra base, queden en 20 px (spec 8.1: 20 px en el modo demo).
+    """
     import plotly.io as pio
 
     pio.templates["enigma_dark"] = plotly_template(DARK, font_size=16)
-    pio.templates["enigma_dark_demo"] = plotly_template(DARK, font_size=20)
+    pio.templates["enigma_dark_demo"] = plotly_template(DARK, font_size=22)
 
 
 PLOTLY_CONFIG: dict[str, Any] = {

@@ -4,6 +4,10 @@
 # Los scripts de shell necesitan LF; los de PowerShell, CRLF.
 *.sh text eol=lf
 Makefile text eol=lf
+# Docker los lee en Linux: siempre con LF, también en un clon de Windows.
+Dockerfile text eol=lf
+.dockerignore text eol=lf
+docker-compose.yml text eol=lf
 *.ps1 text eol=crlf
 
 # Binarios

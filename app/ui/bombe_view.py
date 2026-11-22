@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 import pandas as pd
-import streamlit.components.v1 as components
+import streamlit as st
 
 from enigma_lab.bombe.checker import Hypotheses
 from enigma_lab.bombe.scrambler import order_label, position_letters
@@ -63,7 +63,7 @@ def drums_payload(
 
 def render_drums(payload: dict[str, Any]) -> None:
     height = 300 if payload.get("demo") else 250
-    components.html(component_html("bombe_drums.html", payload), height=height)
+    st.iframe(component_html("bombe_drums.html", payload), height=height)
 
 
 def stops_frame(run: BombeRun, hypotheses: Hypotheses | None, limit: int = 300) -> pd.DataFrame:

@@ -8,6 +8,8 @@
 
 # La consola de Windows usa cp1252: sin esto, imprimir tildes puede fallar.
 export PYTHONUTF8 := 1
+# Las figuras van a archivo: Matplotlib sin ventanas (en Windows usaría Tk).
+export MPLBACKEND := Agg
 
 UV ?= uv
 PORT ?= 8501
@@ -20,7 +22,7 @@ E ?= todos
 # Casos por configuración en make bench-demo
 N ?= 30
 
-.PHONY: help install test test-rapido lint format app requirements corpus experimento reproduce rapido resumen bench-demo
+.PHONY: help install test test-rapido lint format app requirements corpus experimento reproduce rapido resumen figuras report bench-demo
 
 help: ## Muestra esta lista
 	@$(UV) run --no-project python scripts/make_help.py Makefile
@@ -52,15 +54,22 @@ corpus: ## Descarga el corpus completo de Project Gutenberg (verifica SHA-256)
 experimento: ## Corre un experimento: make experimento E=e1 MODO=rapido
 	$(UV) run python -m enigma_lab.experiments $(E) --mode $(MODO) --seed $(SEMILLA)
 
-reproduce: corpus ## Corre todos los experimentos en modo completo y arma el resumen
+reproduce: corpus ## Corre todos los experimentos en modo completo; arma el resumen y las figuras
 	$(UV) run python -m enigma_lab.experiments todos --mode completo --seed $(SEMILLA)
 	$(UV) run python -m enigma_lab.resumen
+	$(UV) run python -m enigma_lab.figuras
 
 rapido: ## Corre todos los experimentos en modo rápido (para la app)
 	$(UV) run python -m enigma_lab.experiments todos --mode rapido --seed $(SEMILLA)
 
 resumen: ## Arma results/presentacion/ (RESUMEN.md, cifras.json, CSV) sin correr nada
 	$(UV) run python -m enigma_lab.resumen
+
+figuras: ## Figuras del informe (report/figuras/) y de respaldo de las diapositivas (results/figures/slides/)
+	$(UV) run python -m enigma_lab.figuras
+
+report: ## Informe: report/numbers.tex, sus figuras y el PDF (con latexmk o Tectonic, si hay)
+	$(UV) run python -m enigma_lab.informe
 
 bench-demo: ## Mide la demo 2 en este equipo: éxito y tiempos (make bench-demo N=30)
 	$(UV) run python scripts/bench_demo2.py --n $(N)

@@ -7,6 +7,8 @@ página Inicio está en ``pages/inicio.py``.
 
 from __future__ import annotations
 
+import importlib
+
 import streamlit as st
 
 from enigma_lab.bombe.sweep import warm_up
@@ -21,17 +23,34 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+# Módulos pesados que las páginas importan: se cargan al arrancar, detrás del indicador,
+# para que ninguna página quede en blanco más de 1 s al abrirla (spec 8.3).
+PRELOAD = (
+    "scipy.stats",
+    "pandas",
+    "networkx",
+    "enigma_lab.bombe.checker",
+    "enigma_lab.experiments.e1_validation",
+    "enigma_lab.experiments.e3_statistics",
+    "enigma_lab.experiments.e4_cribs",
+    "enigma_lab.experiments.e5_bombe",
+    "enigma_lab.experiments.e6_banburismus",
+)
 
-@st.cache_resource(show_spinner="Preparando la Bombe…")
+
+@st.cache_resource(show_spinner="Preparando Enigma Lab: precalentando la Bombe…")
 def _setup_once() -> bool:
     """Preparativos de una sola vez por proceso.
 
     Registra la plantilla de Plotly y precalienta la Bombe: compila los núcleos de Numba
     (o los carga de su caché en disco, ``cache=True``) y precalcula el aleatorizador de
     los 60 órdenes. Así la demo 2 no espera al compilador, aunque el salón no tenga red.
+    Carga además los módulos pesados de las demás páginas.
     """
     register_plotly_templates()
     warm_up(all_tables=True)
+    for module in PRELOAD:
+        importlib.import_module(module)
     return True
 
 

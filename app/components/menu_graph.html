@@ -11,7 +11,7 @@
   @font-face { font-family: "Inter"; src: url("/app/static/fonts/InterVariable.woff2") format("woff2"); font-weight: 100 900; }
   @font-face { font-family: "JetBrains Mono"; src: url("/app/static/fonts/JetBrainsMono-Bold.woff2") format("woff2"); font-weight: 700; }
   html, body { margin: 0; background: var(--background); color: var(--text); font-family: Inter, system-ui, sans-serif; }
-  /* Ancho máximo: así el grafo (720 × 470) cabe completo en el iframe de 520 px. */
+  /* Ancho máximo: así el grafo (720 × 440) y la leyenda caben en el iframe de 520 px. */
   svg { display: block; width: 100%; max-width: 760px; height: auto; margin: 0 auto; }
   .edge { fill: none; stroke: var(--border); stroke-width: 2.5; }
   .edge.loop { stroke: var(--accent); stroke-width: 3.5; }
@@ -23,17 +23,34 @@
   .node text { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 20px;
                fill: var(--text); text-anchor: middle; dominant-baseline: central; }
   .tag { font-size: 13px; fill: var(--accent_2); text-anchor: middle; }
-  .legend { font-size: 13px; fill: var(--text_muted); }
+  .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 22px;
+            font-size: 14px; color: var(--text_muted); margin: 2px 8px 0; }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .legend .line { display: inline-block; width: 28px; height: 0; border-top: 3px solid var(--border); }
+  .legend .line.loop { border-top: 4px solid var(--accent); }
+  .legend .ring { display: inline-block; width: 12px; height: 12px; border-radius: 50%;
+                  border: 3px solid var(--accent_2); }
+  /* Modo demo: letras y pasos más grandes, para proyectar. */
+  body.demo .elabel { font-size: 19px; stroke-width: 5px; }
+  body.demo .node text { font-size: 24px; }
+  body.demo .legend { font-size: 20px; }
 </style>
 </head>
 <body>
-<svg id="g" viewBox="0 0 720 470" role="img" aria-label="Grafo del menú"></svg>
+<svg id="g" viewBox="0 0 720 440" role="img" aria-label="Grafo del menú"></svg>
+<div class="legend">
+  <span><i class="line loop"></i>en un lazo</span>
+  <span><i class="line"></i>sin lazo</span>
+  <span><i class="ring"></i>letra de prueba</span>
+  <span>número de cada arista: su paso en el crib</span>
+</div>
 <script id="payload" type="application/json">__PAYLOAD__</script>
 <script>
 (() => {
   "use strict";
   const P = JSON.parse(document.getElementById("payload").textContent);
   for (const [k, v] of Object.entries(P.theme)) document.documentElement.style.setProperty("--" + k, v);
+  if (P.demo) document.body.classList.add("demo");
   const NS = "http://www.w3.org/2000/svg";
   const svg = document.getElementById("g");
   const el = (tag, attrs, text) => { const n = document.createElementNS(NS, tag);
@@ -64,13 +81,6 @@
     const tx = document.createElementNS(NS, "text"); tx.setAttribute("x", pos[n.id].x); tx.setAttribute("y", pos[n.id].y); tx.textContent = n.id; g.appendChild(tx);
     svg.appendChild(g);
   });
-  el("line", { x1: 16, y1: 452, x2: 44, y2: 452, class: "edge loop" });
-  el("text", { class: "legend", x: 52, y: 456 }, "en un lazo");
-  el("line", { x1: 140, y1: 452, x2: 168, y2: 452, class: "edge" });
-  el("text", { class: "legend", x: 176, y: 456 }, "sin lazo");
-  el("circle", { cx: 268, cy: 452, r: 8, fill: "none", stroke: "var(--accent_2)", "stroke-width": 3 });
-  el("text", { class: "legend", x: 284, y: 456 }, "letra de prueba");
-  el("text", { class: "legend", x: 410, y: 456 }, "número de cada arista: su paso en el crib");
 })();
 </script>
 </body>

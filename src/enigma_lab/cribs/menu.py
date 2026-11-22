@@ -17,6 +17,7 @@ dibuja como una arista p — c etiquetada con i.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 import networkx as nx
 
@@ -106,16 +107,49 @@ def menu_edges(graph: nx.MultiGraph) -> list[MenuEdge]:
     return sorted(edges, key=lambda e: e.offset)
 
 
+def _unit_box(raw: dict[Any, Any]) -> dict[str, tuple[float, float]]:
+    """Lleva unas posiciones al cuadrado [0, 1] × [0, 1]; un eje sin extensión queda en 0,5."""
+    xs = [float(p[0]) for p in raw.values()]
+    ys = [float(p[1]) for p in raw.values()]
+    span_x, span_y = max(xs) - min(xs), max(ys) - min(ys)
+    return {
+        str(node): (
+            (float(x) - min(xs)) / span_x if span_x else 0.5,
+            (float(y) - min(ys)) / span_y if span_y else 0.5,
+        )
+        for node, (x, y) in raw.items()
+    }
+
+
 def layout(graph: nx.MultiGraph) -> dict[str, tuple[float, float]]:
-    """Posiciones de las letras para dibujar el menú, en [0, 1] y deterministas."""
+    """Posiciones de las letras para dibujar el menú, en [0, 1] y deterministas.
+
+    Cada componente conexa se dibuja aparte con Kamada-Kawai, y las componentes van una
+    al lado de la otra, de la más grande a la más pequeña, con un ancho proporcional a
+    sus letras. Con una sola componente es Kamada-Kawai sobre todo el menú.
+    """
     simple = nx.Graph(graph)
     if simple.number_of_nodes() == 1:
-        return {next(iter(simple.nodes)): (0.5, 0.5)}
-    raw = nx.kamada_kawai_layout(simple)
-    xs = [p[0] for p in raw.values()]
-    ys = [p[1] for p in raw.values()]
-    span_x = (max(xs) - min(xs)) or 1.0
-    span_y = (max(ys) - min(ys)) or 1.0
-    return {
-        str(node): ((x - min(xs)) / span_x, (y - min(ys)) / span_y) for node, (x, y) in raw.items()
-    }
+        return {str(next(iter(simple.nodes))): (0.5, 0.5)}
+    components = sorted(
+        (sorted(c) for c in nx.connected_components(simple)), key=lambda c: (-len(c), c)
+    )
+    if len(components) == 1:
+        return _unit_box(nx.kamada_kawai_layout(simple))
+    gap = 0.6  # espacio entre componentes, en «letras»
+    total = sum(len(c) for c in components) + gap * (len(components) - 1)
+    positions: dict[str, tuple[float, float]] = {}
+    start = 0.0
+    for nodes in components:
+        sub = simple.subgraph(nodes)
+        box = (
+            _unit_box(nx.kamada_kawai_layout(sub))
+            if len(nodes) > 2
+            else _unit_box({n: (k, 0.0) for k, n in enumerate(nodes)})
+        )
+        width = len(nodes) / total
+        margin = 0.12 * width if len(nodes) > 1 else 0.0
+        for node, (x, y) in box.items():
+            positions[node] = (start + margin + x * (width - 2 * margin), y)
+        start += width + gap / total
+    return positions

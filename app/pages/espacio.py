@@ -11,6 +11,7 @@ from enigma_lab.experiments.e2_keyspace import run as e2_table
 from enigma_lab.viz import plotly_figs
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct, fmt_sci
 from enigma_lab.viz.theme import DARK
+from ui.charts import chart, csv_button
 from ui.layout import is_demo, segmented_bar, what_am_i_seeing
 
 MODELS = {"Enigma I (5 rotores)": ks.ENIGMA_I, "Enigma M3 (8 rotores)": ks.M3}
@@ -95,18 +96,8 @@ st.caption(
 )
 
 charts = st.columns(2)
-charts[0].plotly_chart(
-    plotly_figs.keyspace_bits(space, model_name, demo),
-    theme=None,
-    config=plotly_figs.plotly_config(),
-    width="stretch",
-)
-charts[1].plotly_chart(
-    plotly_figs.plugboard_curve(cables, demo),
-    theme=None,
-    config=plotly_figs.plotly_config(),
-    width="stretch",
-)
+chart(plotly_figs.keyspace_bits(space, model_name, demo), "bits_por_componente", demo, charts[0])
+chart(plotly_figs.plugboard_curve(cables, demo), "plugboard_nk", demo, charts[1])
 
 st.subheader("Calculadora de fuerza bruta")
 exponent = st.slider(
@@ -136,11 +127,10 @@ st.caption(
     f"barrido de la Bombe (2^{fmt_dec(math.log2(space.plugboard), 1)}, los bits del plugboard)."
 )
 
-table = e2_table()
-st.download_button(
-    "Descargar los datos (CSV)",
-    table.to_csv(index=False).encode("utf-8"),
-    "e2_espacio_de_claves.csv",
-    "text/csv",
-    icon=":material/download:",
-)
+if not demo:
+    csv_button(
+        "Todas las cifras de E2 (CSV)",
+        e2_table,
+        "e2_espacio_de_claves",
+        icon=":material/download:",
+    )

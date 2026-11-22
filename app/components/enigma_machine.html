@@ -75,6 +75,15 @@
   .tape .out-cur { background: var(--accent); color: var(--ink); border-radius: 3px; }
   .tape .future { color: var(--border); }
   #desc { font-size: 0.9rem; color: var(--text_muted); margin: 6px 0 0; min-height: 1.3em; }
+
+  /* Modo demo: letra más grande en el dibujo y en los controles, para proyectar. El SVG
+     escala con el ancho: con la barra lateral plegada, sus etiquetas quedan cerca de 20 px. */
+  body.demo .label { font-size: 21px; }
+  body.demo .small { font-size: 19px; }
+  body.demo .key text, body.demo .lamp text { font-size: 19px; }
+  body.demo .tag { font-size: 18px; }
+  body.demo button, body.demo label, body.demo #counter, body.demo .tape,
+  body.demo #desc { font-size: 20px; }
 </style>
 </head>
 <body>

@@ -76,3 +76,61 @@ def test_bombe_page_backup_case_decrypts() -> None:
     assert not app.exception
     text = " ".join(str(block.value) for block in app.markdown)
     assert groups_of_five(data["plaintext"]) in text
+
+
+@pytest.mark.parametrize("page", PAGES, ids=[p.stem for p in PAGES])
+def test_every_page_explains_itself_except_in_demo_mode(page) -> None:  # type: ignore[no-untyped-def]
+    """Spec 8.3: cada página tiene su «¿Qué estoy viendo?»; el modo demo lo oculta (8.2.11)."""
+    label = "¿Qué estoy viendo?"
+    app = AppTest.from_file(str(page), default_timeout=120).run()
+    assert [e for e in app.expander if e.label == label], page.stem
+    demo = AppTest.from_file(str(page), default_timeout=120)
+    demo.session_state["demo_mode"] = True
+    demo.run()
+    assert not demo.exception, demo.exception
+    assert not [e for e in demo.expander if e.label == label], page.stem
+
+
+def test_bombe_companion_button_sets_the_recommended_demo_2() -> None:
+    """Demo 2: «Cifrado del compañero» vacía el cifrado y deja la configuración del banco."""
+    import json
+
+    bench = json.loads((paths.RESULTS / "bench_demo2.json").read_text(encoding="utf-8"))
+    chosen = next(c for c in bench["configuraciones"] if c["id"] == bench["recomendada"])
+    app = AppTest.from_file(str(paths.APP / "pages" / "bombe.py"), default_timeout=300)
+    app.session_state["demo_mode"] = True
+    app.run()
+    next(b for b in app.button if b.label == "Cifrado del compañero").click().run()
+    assert not app.exception
+    assert app.session_state["bombe_cipher"] == ""
+    assert app.session_state["bombe_crib"] == chosen["crib"]
+    assert any("Pega el texto cifrado" in str(block.value) for block in app.info)
+    # El compañero pega su cifrado: los ajustes de la demo 2 siguen ahí, aunque los
+    # controles no se dibujaron mientras el cifrado estaba vacío.
+    data = json.loads((paths.DEMO / "respaldo_bombe.json").read_text(encoding="utf-8"))
+    app.text_area(key="bombe_cipher").set_value(data["ciphertext"]).run()
+    assert not app.exception
+    assert app.radio(key="bombe_mode").value == chosen["modo"]
+    assert app.toggle(key="bombe_diagonal").value is True
+    assert app.selectbox(key="bombe_position").value == 0
+
+
+def test_bombe_demo_mode_backup_case_shows_the_result_large() -> None:
+    """Plan B en modo demo: sin tabla de paradas ni comparación, y el descifrado en grande."""
+    import json
+
+    from enigma_lab.core.machine import groups_of_five
+
+    data = json.loads((paths.DEMO / "respaldo_bombe.json").read_text(encoding="utf-8"))
+    app = AppTest.from_file(str(paths.APP / "pages" / "bombe.py"), default_timeout=300)
+    app.session_state["demo_mode"] = True
+    app.run()
+    next(b for b in app.button if b.label == "Caso de respaldo").click().run()
+    next(b for b in app.button if b.label == "Correr la Bombe").click().run()
+    assert not app.exception
+    assert not app.dataframe  # la tabla larga de paradas no se dibuja en modo demo
+    next(b for b in app.button if b.label == "Verificar").click().run()
+    assert not app.exception
+    big = [m.value for m in app.markdown if 'class="el-result ok"' in m.value]
+    assert big and groups_of_five(data["plaintext"]) in big[0]
+    assert not [h for h in app.subheader if h.value == "Con y sin diagonal board"]

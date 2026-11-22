@@ -7,13 +7,13 @@ y nunca reimplementan la máquina.
 
 ## Módulos y flujo de datos
 
-En gris punteado, lo que llega en fases siguientes.
+En gris punteado, la fase 5 (P2, opcional), que no se hizo.
 
 ```mermaid
 flowchart LR
     subgraph data["data/"]
-        ref["reference/<br/>vectores · Turing · Kuhl"]
-        corp["corpora/<br/>alemán · español"]
+        ref["reference/<br/>vectores · Turing"]
+        corp["corpora/<br/>muestras · completo"]
         demo["demo/<br/>portada · respaldo"]
     end
 
@@ -25,38 +25,60 @@ flowchart LR
         banb["banburismus<br/>decibanes · SPRT"]
         rej["rejewski<br/>características"]
         att["attacks<br/>Gillogly · hill climbing"]
-        exp["experiments<br/>E1 a E8"]
-        viz["viz<br/>tema · numfmt · figuras"]
+        exp["experiments<br/>E1 a E6"]
+        viz["viz<br/>tema · numfmt · Plotly"]
+        cif["cifras.py<br/>cifras de la presentación"]
+        res["resumen.py"]
+        fig["figuras.py"]
+        inf["informe.py"]
     end
 
-    app["app/<br/>Streamlit + componentes JS"]
-    results["results/<br/>Parquet · figuras · summary.json"]
+    subgraph appdir["app/"]
+        ui["ui/<br/>layout · charts · vistas"]
+        pages["pages/<br/>8 páginas"]
+        comp["components/<br/>HTML + SVG + JS"]
+    end
+
+    results["results/<br/>Parquet · summary.json · bench_demo2.json"]
     pres["results/presentacion/<br/>RESUMEN.md · cifras.json · CSV"]
-    report["report/<br/>informe.tex · numbers.tex"]
+    slides["results/figures/slides/<br/>respaldo 16:9"]
+    report["report/<br/>informe.tex · numbers.tex · figuras/ · PDF"]
+    docker["Dockerfile · docker-compose.yml"]
 
     corp --> stats
-    ref --> exp
-    demo --> app
+    ref --> core
+    demo --> pages
     core --> cribs --> bombe
     core --> banb
-    core --> rej
     stats --> bombe
-    stats --> att
-    core --> att
     stats --> banb
-    core & stats & cribs & bombe & banb & rej & att --> exp
-    exp --> results --> pres
-    results --> report
-    viz --> app
-    viz --> exp
-    core & stats & cribs & bombe & banb --> app
-    results --> app
+    core -.-> rej
+    stats -.-> att
+    core & stats & cribs & bombe & banb --> exp
+    exp --> results
+    results & cif --> res --> pres
+    results --> fig --> slides
+    fig & results --> inf --> report
+    viz --> pages
+    viz --> fig
+    core & stats & cribs & bombe & banb --> pages
+    results --> pages
+    ui --> pages
+    pages -- "traza JSON" --> comp
+    lib & appdir & data & results --> docker
 
     classDef done fill:#171B21,stroke:#F2B134,color:#E8E6E3
     classDef todo fill:#0F1216,stroke:#2A3038,color:#9AA3AD,stroke-dasharray: 4 3
-    class core,viz,app,exp,results,pres,ref,demo,stats,cribs,corp,bombe,banb done
-    class rej,att,report todo
+    class core,viz,exp,results,pres,ref,demo,stats,cribs,corp,bombe,banb,cif,res,fig,inf,ui,pages,comp,slides,report,docker done
+    class rej,att todo
 ```
+
+**De dónde sale cada número.** Los experimentos escriben `results/summary.json` y sus
+Parquet; de ahí salen, sin volver a correr nada, el resumen para las diapositivas
+(`make resumen`), las figuras (`make figuras`) y las cifras del informe
+(`report/numbers.tex`, `make report`). Las cifras de las diapositivas que no son resultados
+(espacio de claves, vectores, pesos de Turing) las calcula `cifras.py`, y
+`tests/test_presentacion.py` las compara con la presentación.
 
 ## Estado por fase
 
@@ -88,7 +110,12 @@ flowchart LR
 | `banburismus/sprt.py` | Umbrales y aproximación de Wald, cálculo exacto con sobrepaso y SPRT en Numba | 4 |
 | `experiments/` E6 | SPRT frente a Wald, aciertos por solapamiento, identificación del desplazamiento y ROC | 4 |
 | `app/pages/banburismus.py` | Página Banburismus y pestaña E6 en Experimentos | 4 |
-| `rejewski/`, `attacks/` | Extensiones P2 | 5 |
+| `rejewski/`, `attacks/` | Extensiones P2: no se hicieron (la diapositiva 9 solo cita a Kuhl) | 5 |
+| `app/ui/layout.py` | Modo demo: 20 px, paneles ocultos, resultado en grande y `?demo=1` en la URL | 6 |
+| `app/ui/charts.py` | Gráficos con su descarga de datos (CSV) y figuras del informe diferidas | 6 |
+| `figuras.py` | Figuras del informe (`report/figuras/`) y respaldo 16:9 de las diapositivas | 6 |
+| `informe.py`, `report/informe.tex` | `numbers.tex` desde los resultados y compilación con latexmk o Tectonic | 6 |
+| `Dockerfile`, `docker-compose.yml` | Imagen con uv, Numba precompilado y la app sin internet | 6 |
 
 ## Flujo de una letra en la página Máquina
 
@@ -117,7 +144,7 @@ sequenceDiagram
     participant S as bombe.sweep (Numba)
     participant C as bombe.checker
     participant J as bombe_drums.html (JS)
-    U->>P: cifrado, crib y alineación (o «Caso de respaldo»)
+    U->>P: «Cifrado del compañero» y pega el cifrado (o «Caso de respaldo»)
     P->>W: wiring_from_menu(crib, tramo)
     W-->>P: cables, aristas y pares del diagonal board
     loop por orden de rotores
@@ -152,6 +179,20 @@ sequenceDiagram
 
 E6 usa las mismas piezas con miles de pares y corre la prueba con el núcleo de Numba
 (`sprt.run_sprt`); la página solo usa NumPy.
+
+## La imagen de Docker
+
+```mermaid
+flowchart TB
+    base["python:3.12-slim + uv 0.13.9"] --> deps["uv sync --frozen --no-dev --no-install-project<br/>(capa de dependencias, de uv.lock)"]
+    deps --> code["COPY . (sin lo que excluye .dockerignore)<br/>uv sync --frozen --no-dev"]
+    code --> user["usuario «enigma» sin privilegios<br/>NUMBA_CACHE_DIR y MPLCONFIGDIR con escritura"]
+    user --> warm["warm_up(): núcleos de Numba compilados en la imagen"]
+    warm --> run["streamlit run app/Inicio.py<br/>headless, 0.0.0.0:8501, sin vigilar archivos"]
+```
+
+`ENIGMA_LAB_ROOT=/app` le dice a `enigma_lab.paths` dónde está el repositorio. La imagen
+trae las muestras del corpus y `results/`, así que la app funciona sin internet.
 
 ## Convenciones de código
 

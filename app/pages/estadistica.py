@@ -19,6 +19,7 @@ from enigma_lab.stats.frequencies import (
 from enigma_lab.stats.inference import no_fixed_point_probability
 from enigma_lab.viz import plotly_figs
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
+from ui.charts import chart
 from ui.layout import is_demo, what_am_i_seeing
 
 K = "est_"
@@ -101,24 +102,23 @@ st.caption(
     f"cifrado (25 grados de libertad). Puntos fijos: {fmt_int(fixed)} de {fmt_int(length)}."
 )
 
-st.plotly_chart(
+chart(
     plotly_figs.frequency_comparison(frequencies(plain[0]), frequencies(cipher[0]), demo),
-    theme=None,
-    config=plotly_figs.plotly_config(),
-    width="stretch",
+    "frecuencias_plano_cifrado",
+    demo,
 )
 
 st.subheader("La diagonal en cero")
 n_messages = st.slider("Mensajes de 200 letras, cada uno con su propia clave", 50, 1000, 300, 50)
 rng_heat = np.random.default_rng(st.session_state[K + "seed"] + 10_000)
-plain_many = random_excerpts(rng_heat, language, n_messages, 200, mode=mode)  # type: ignore[arg-type]
-keys_many, _ = random_key_batch(rng_heat, n_messages, cables=10)
-cipher_many = encrypt_batch(keys_many, plain_many)
-st.plotly_chart(
+with st.spinner(f"Cifrando {fmt_int(n_messages)} mensajes, cada uno con su clave…"):
+    plain_many = random_excerpts(rng_heat, language, n_messages, 200, mode=mode)  # type: ignore[arg-type]
+    keys_many, _ = random_key_batch(rng_heat, n_messages, cables=10)
+    cipher_many = encrypt_batch(keys_many, plain_many)
+chart(
     plotly_figs.pair_heatmap(pair_matrix(plain_many, cipher_many), demo),
-    theme=None,
-    config=plotly_figs.plotly_config(),
-    width="stretch",
+    "matriz_plano_cifrado",
+    demo,
 )
 st.caption(
     f"{fmt_int(n_messages * 200)} letras cifradas. Las filas oscuras son las letras más "

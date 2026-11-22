@@ -33,7 +33,8 @@ what_am_i_seeing(
     "«67 → 20 bits» compara las claves de Enigma I sin anillos con lo que de verdad "
     "recorre la Bombe. Lo calcula `core/keyspace.py`.",
     "La barra reparte los bits entre los componentes de la clave; en ámbar, lo que barre la Bombe.",
-    "Las tarjetas llevan a cada módulo; los que aún no existen dicen en qué fase llegan.",
+    "Las tarjetas llevan a cada módulo. Rejewski y el ataque moderno (fase 5, opcional) no "
+    "se hicieron: la presentación solo cita la literatura.",
 )
 
 st.markdown(
@@ -101,7 +102,7 @@ for index, module in enumerate(MODULES):
         if module.page:
             st.page_link(module.page, label="Abrir", icon=":material/arrow_forward:")
         else:
-            st.badge(f"{module.phase} · pendiente", color="gray")
+            st.badge(module.phase, color="gray")
 
 st.subheader("Estado de la validación")
 

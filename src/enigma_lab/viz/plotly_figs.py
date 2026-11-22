@@ -673,3 +673,46 @@ def plotly_config() -> dict[str, Any]:
     from enigma_lab.viz.theme import PLOTLY_CONFIG
 
     return PLOTLY_CONFIG
+
+
+def _values(data: Any) -> list[Any]:
+    """Los valores de un eje de una serie de Plotly como lista (vacía si no hay)."""
+    if data is None:
+        return []
+    return [v.item() if isinstance(v, np.generic) else v for v in np.asarray(data).ravel()]
+
+
+def figure_table(fig: go.Figure) -> pd.DataFrame:
+    """Los datos de una figura de Plotly en formato largo, para descargarlos (spec 8.3).
+
+    Una fila por punto de cada serie, con las columnas «serie», «x» e «y»; los mapas de
+    calor agregan «z», con una fila por celda, y los bigotes de error, «error_y». Las
+    bandas de IC salen como series propias (el contorno de la banda).
+    """
+    rows: list[dict[str, Any]] = []
+    for k, trace in enumerate(fig.data):
+        name = trace.name or f"serie {k + 1}"
+        z = getattr(trace, "z", None)
+        if z is not None:
+            matrix = np.asarray(z)
+            xs = _values(trace.x) or list(range(matrix.shape[1]))
+            ys = _values(trace.y) or list(range(matrix.shape[0]))
+            rows += [
+                {"serie": name, "x": x, "y": y, "z": matrix[i, j].item()}
+                for i, y in enumerate(ys)
+                for j, x in enumerate(xs)
+            ]
+            continue
+        xs, ys = _values(getattr(trace, "x", None)), _values(getattr(trace, "y", None))
+        if not xs and not ys:
+            continue
+        xs = xs or list(range(len(ys)))
+        ys = ys or [None] * len(xs)
+        error = getattr(trace, "error_y", None)
+        errors = _values(error.array) if error is not None and error.array is not None else []
+        for i, (x, y) in enumerate(zip(xs, ys, strict=False)):
+            row = {"serie": name, "x": x, "y": y}
+            if errors:
+                row["error_y"] = errors[i] if i < len(errors) else None
+            rows.append(row)
+    return pd.DataFrame(rows)

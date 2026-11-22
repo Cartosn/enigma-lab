@@ -262,6 +262,22 @@ def run(params: dict[str, Any], seed: int = SEED) -> pd.DataFrame:
     return df
 
 
+def turing_agreement(table: pd.DataFrame) -> tuple[int, int]:
+    """¿En cuántas celdas de la tabla de Turing coincide la Bombe medida? (cerca, total).
+
+    Solo las celdas con valor exacto (no las cotas «< 0,01»), con diagonal board y en modo
+    Bletchley. Una celda está cerca si las hipótesis abiertas por orden que medimos quedan
+    entre la mitad y el doble de la estimación de Turing, que cuenta hipótesis y no
+    posiciones (D-038).
+    """
+    within = table[(table["diagonal"] == "si") & (table["modo"] == "bletchley")].dropna(
+        subset=["turing"]
+    )
+    exact = within[within["turing_cota"] == ""]
+    ratio = exact["hipotesis_media"].clip(lower=1e-9) / exact["turing"]
+    return int(((ratio >= 0.5) & (ratio <= 2)).sum()), len(exact)
+
+
 def aggregate(df: pd.DataFrame) -> pd.DataFrame:
     """Tabla de la diapositiva 16 (``r3_bombe.csv``): una fila por celda, diagonal y modo."""
     out = []

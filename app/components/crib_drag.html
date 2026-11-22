@@ -22,8 +22,10 @@
   .cell { width: 1.75em; height: 1.9em; flex: none; display: flex; align-items: center;
           justify-content: center; border-radius: 5px; border: 1px solid var(--border);
           background: var(--surface); font-weight: 700; }
-  .index .cell { border: none; background: none; color: var(--text_muted); font-weight: 400;
-                 font-size: 0.7em; }
+  /* Los números van a 0,7 de la letra; el ancho se corrige (1,75 / 0,7 = 2,5) para que
+     cada número quede justo sobre su letra. */
+  .index .cell { border-color: transparent; background: none; color: var(--text_muted); font-weight: 400;
+                 font-size: 0.7em; width: 2.5em; height: 2.714em; }
   .spacer { width: 1.75em; flex: none; }
   .crib .cell { border-color: var(--accent_2); }
   .crib.bad .cell { border-color: var(--border); }
@@ -45,6 +47,10 @@
   .chip.valid { border-color: var(--success); color: var(--success); }
   .chip.invalid { border-color: var(--error); color: var(--error); opacity: 0.75; }
   .chip.current { outline: 2px solid var(--accent); }
+  /* Modo demo: nada bajo 20 px. */
+  body.demo button, body.demo #status, body.demo .chip { font-size: 20px; }
+  body.demo .label { font-size: 1em; }
+  body.demo .index .cell { font-size: 1em; width: 1.75em; height: 1.9em; }
 </style>
 </head>
 <body>

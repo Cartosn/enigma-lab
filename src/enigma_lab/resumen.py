@@ -32,15 +32,23 @@ from enigma_lab.cifras import evaluate
 from enigma_lab.core.machine import Enigma, EnigmaConfig
 from enigma_lab.core.vectors import vector
 from enigma_lab.experiments.common import git_commit, read_summary
+from enigma_lab.experiments.e5_bombe import turing_agreement
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 
 PHASES_LEFT = [
-    ("Fase 5 · Rejewski (E7) y ataque moderno (E8), opcionales", "semana 3"),
-    ("Fase 6 · modo demo completo, Docker, informe y entrega", "fin de la semana 3"),
     (
-        "Demo 2 · correr `make bench-demo` en el portátil del autor (P-001) y confirmar la "
-        "configuración",
+        "Fase 5 · Rejewski (E7) y ataque moderno (E8), opcionales",
+        "no se hicieron; la diapositiva 9 solo cita a Kuhl y el README los lista entre las "
+        "limitaciones",
+    ),
+    (
+        "Demos · correr `make bench-demo` en el portátil del autor (P-001) y ensayar las dos "
+        "demos allí",
         "antes de ensayar",
+    ),
+    (
+        "Repositorio remoto · crearlo, para la CI y el enlace de la diapositiva 21",
+        "antes de la presentación",
     ),
 ]
 R2_COLUMNS = ["L", "texto", "n", "sobreviven", "p", "ic_bajo", "ic_alto", "teorico"]
@@ -314,16 +322,11 @@ def _slide_16(e5: dict[str, Any], table: pd.DataFrame | None) -> list[str]:
             "todas las 17.576 posiciones: sin el diagonal board un menú sin lazos no descarta "
             "nada."
         )
-    within = table[(table["diagonal"] == "si") & (table["modo"] == "bletchley")].dropna(
-        subset=["turing"]
-    )
-    exact = within[within["turing_cota"] == ""]
-    if len(exact):
+    close, total = turing_agreement(table)
+    if total:
         # Turing cuenta hipótesis abiertas (ver «Pocas letras y sin lazos»).
-        ratio = exact["hipotesis_media"].clip(lower=1e-9) / exact["turing"]
-        close = int(((ratio >= 0.5) & (ratio <= 2)).sum())
         lines.append(
-            f"- **Toda la tabla de Turing** (8 a 16 letras): en {close} de {len(exact)} celdas "
+            f"- **Toda la tabla de Turing** (8 a 16 letras): en {close} de {total} celdas "
             "con valor exacto, las hipótesis abiertas por orden que medimos están entre la "
             "mitad y el doble de la estimación de Turing. Detalle por celda en "
             "`r3_bombe.csv` (columnas `paradas_media`, `hipotesis_media` y `turing`)."
@@ -581,14 +584,17 @@ def _demo_2(bench: dict[str, Any]) -> list[str]:
     else:
         how = {
             "60_robusto": "el compañero usa «Clave aleatoria» sin restricciones y empieza su "
-            "mensaje por WETTERBERICHT (con X entre palabras). En la demo: «Rotores I a V "
-            "(60 órdenes)», modo robusto.",
+            "mensaje por WETTERBERICHT (con X entre palabras). En la demo, el botón «Cifrado "
+            "del compañero» de La Bombe deja el crib en la posición 0, «Rotores I a V (60 "
+            "órdenes)» y el modo robusto; se pega el cifrado y se pulsa Ctrl+Enter.",
             "6_robusto": "antes de cifrar, el compañero marca los rotores I, II y III en "
             "«Rotores permitidos en «Clave aleatoria»» (página Máquina), pulsa «Clave "
             "aleatoria» y empieza su mensaje por WETTERBERICHT (con X entre palabras). En la "
-            "demo: «Rotores I, II y III (6 órdenes)», modo robusto; dilo en voz alta.",
-            "crib_largo": "el compañero empieza su mensaje por WETTERBERICHTXFUER. En la demo: "
-            "crib WETTERBERICHTXFUER, «Rotores I a V (60 órdenes)», modo robusto.",
+            "demo, «Cifrado del compañero» deja «Rotores I, II y III (6 órdenes)» y el modo "
+            "robusto; dilo en voz alta.",
+            "crib_largo": "el compañero empieza su mensaje por WETTERBERICHTXFUER. En la demo, "
+            "«Cifrado del compañero» deja ese crib, «Rotores I a V (60 órdenes)» y el modo "
+            "robusto.",
         }[chosen["id"]]
         lines.append(
             f"- **Recomendada ({bench['criterio']}):** {chosen['nombre']}: {how} Éxito "
@@ -788,6 +794,11 @@ def build_markdown(
         f"{fmt_dec(timing['portada'], 1)} ms en el equipo donde corrió `make resumen` "
         f"({cpu}). Los 45 s del guion los pone la interacción. Falta cronometrar el "
         "recorrido completo en el portátil del autor.",
+        "- **La app en clase:** abre `http://localhost:8501/maquina?demo=1` (el modo demo queda "
+        "en la URL y sobrevive a una recarga) y, en otra pestaña, "
+        "`http://localhost:8501/bombe?demo=1`; pliega la barra lateral para ganar ancho. En "
+        "modo demo, Máquina muestra solo «Vector BDZGO» y «Portada», y La Bombe, «Cifrado del "
+        "compañero» y «Caso de respaldo» (plan B).",
         *_demo_2(bench or {}),
         "",
         "## 4. Discrepancias",

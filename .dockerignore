@@ -1,0 +1,38 @@
+# Lo que no entra en la imagen de Docker: el entorno local, las cachés, el historial de
+# git y lo que la app no usa. Sí entran src/, app/, data/ (con las muestras del corpus),
+# results/ (resultados guardados) y docs/ (la página Inicio lee docs/FUENTES.md).
+
+# Entorno y cachés
+.venv/
+**/__pycache__/
+**/*.py[cod]
+**/*.nbi
+**/*.nbc
+.hypothesis/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# Control de versiones y configuración local
+.git/
+.github/
+.gitattributes
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Datos que la app no necesita: el corpus completo se baja con make corpus
+data/corpora/fuentes/
+data/corpora/completo/
+
+# Documentos de la entrega que no usa la app
+docs/presentacion/
+docs/img/
+report/
+tests/
+
+# Sistema operativo
+**/.DS_Store
+**/Thumbs.db
+**/desktop.ini

@@ -20,8 +20,11 @@ def _page() -> AppTest:
 
 
 def _output(app: AppTest) -> str:
-    blocks = [m.value for m in app.markdown if 'class="el-cipher"' in m.value]
-    return re.sub(r"<[^>]+>", "", blocks[0]).strip()
+    """El texto de salida: el bloque grande «el-result» (sin la lectura con la X como espacio)."""
+    blocks = [m.value for m in app.markdown if 'class="el-result' in m.value]
+    found = re.search(r'<div class="el-result[^"]*"[^>]*>(.*?)</div>', blocks[0])
+    assert found is not None
+    return found.group(1).strip()
 
 
 def _click(app: AppTest, label: str) -> AppTest:
@@ -88,3 +91,26 @@ def test_random_key_respects_allowed_rotors() -> None:
         assert not app.exception
         rotors = {app.session_state[f"maq_rotor_{i}"] for i in range(3)}
         assert rotors == {"I", "II", "III"}
+
+
+def test_demo_mode_keeps_only_the_demo_presets() -> None:
+    """Modo demo: los preajustes de la demo 1 con su nombre completo y la clave oculta."""
+    app = AppTest.from_file(str(PAGE), default_timeout=60)
+    app.session_state["demo_mode"] = True
+    app.run()
+    assert not app.exception
+    assert [b.label for b in app.button] == ["Vector BDZGO", "Portada"]
+    assert not [e for e in app.expander if e.label == "¿Qué estoy viendo?"]
+    app = _click(app, "Portada")
+    assert _output(app).replace(" ", "") == "ROMPERXENIGMAXCRIPTOGRAFIAXUNAL"
+    text = " ".join(m.value for m in app.markdown)
+    assert "ROMPER ENIGMA CRIPTOGRAFIA UNAL" in text
+
+
+def test_trace_table_has_one_row_per_letter() -> None:
+    from ui.machine_view import trace_table
+
+    config = EnigmaConfig.from_strings("I II III")
+    table = trace_table(Enigma(config).trace("AAAAA"))
+    assert list(table["lampara"]) == list("BDZGO")
+    assert table["camino"].iloc[0] == "A → A → C → D → F → S → S → E → B → B → B"

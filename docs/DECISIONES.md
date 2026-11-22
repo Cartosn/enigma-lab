@@ -471,10 +471,131 @@ PNG de E1 a E5 cambian en la siguiente corrida; los SVG y PDF conservan su conte
   - al azar, 5,1 letras más: 2,4 por el sobrepaso de abajo y 2,9 porque el error real
     (0,86 %) queda bajo el 1 %, menos 0,3 por el sobrepaso de arriba.
 
+## Fase 6 · Pulido y entrega (22-11-2026)
+
+### D-049 · Modo demo
+- **Qué oculta.** Los paneles «¿Qué estoy viendo?», la clave de Máquina, las tablas largas (la
+  de paradas, las de Experimentos), «Hipótesis examinadas», la comparación con y sin diagonal
+  board y los botones de descarga. En Máquina quedan solo los preajustes de la demo 1 («Vector
+  BDZGO» y «Portada»); en La Bombe, «Cifrado del compañero» y «Caso de respaldo».
+- **Cómo oculta los controles.** Streamlit borra el estado de un control que no se dibuja, así
+  que la clave de Máquina se dibuja dentro de un contenedor con clave `nodemo_…` y el CSS del
+  modo demo lo esconde (`ui/layout.py` · `hidden_in_demo`). Lo demás simplemente no se dibuja.
+- **20 px.** La letra base sube a 20 px y lo que Streamlit dibuja más pequeño (pies de texto,
+  etiquetas, métricas, insignias, cuadros de texto) se lleva a 1rem. La plantilla Plotly
+  `enigma_dark_demo` parte de 22 px para que las marcas de los ejes queden en 20. Las
+  animaciones agrandan su letra en modo demo; el SVG escala con el ancho, y con la barra lateral
+  plegada sus rótulos quedan entre 18 y 21 px.
+- **El resultado en grande.** `ui/layout.py` · `big_result`: el texto en grupos de 5 a 3rem
+  (60 px) y debajo la lectura con la X como espacio. En Máquina la lectura solo aparece al
+  descifrar (cuando la salida trae más X que la entrada).
+- **El menú sí se ve en la demo 2.** Antes el modo demo lo ocultaba; el guion pide mostrarlo
+  («Muestra el menú y sus lazos»).
+- **En la URL.** El interruptor se refleja en `?demo=1`, así que una recarga o un enlace guardado
+  abren la app en modo demo.
+
+### D-050 · «Cifrado del compañero» (demo 2)
+- **Qué hace.** Vacía el cifrado, deja el crib en la posición 0 y aplica la configuración que
+  recomendó `make bench-demo` en ese equipo: lee `results/bench_demo2.json` (órdenes, crib y
+  modo). Si no hay banco, usa la más simple: los 60 órdenes en modo robusto con WETTERBERICHT.
+  Así, si el banco del portátil recomienda otra configuración, el botón la sigue sin tocar código.
+- **El error que corrige.** Al probar la demo en el navegador, el modo volvía a «Bletchley» al
+  pegar el cifrado: con el cifrado vacío la página se detiene antes de dibujar la configuración,
+  y Streamlit borra el estado de esos controles. Ahora los botones guardan sus ajustes aparte
+  (`bombe_pending`) y cada control los toma justo antes de dibujarse (`_apply_pending`).
+
+### D-051 · Exportar los gráficos (spec 8.3)
+- **La figura:** la barra de cada gráfico de Plotly la baja en PNG a 2x.
+- **Los datos:** cada gráfico de las páginas lleva «Datos (CSV)», con las series de la propia
+  figura (`viz/plotly_figs.py` · `figure_table`) o la tabla que lo origina. En Experimentos, cada
+  pestaña baja su tabla y la figura del informe en PNG y SVG.
+- **Descargas diferidas.** El CSV y las figuras se arman solo al pulsar el botón (Streamlit
+  1.67 acepta una función como `data`). Antes, Experimentos dibujaba seis figuras de Matplotlib en
+  cada carga y tardaba de 5 a 8 s sin indicador; ahora abre en menos de 1 s después del arranque.
+- **Las animaciones** (máquina, crib, menú, tambores) no se exportan como figura: exportan sus
+  datos (la traza, las alineaciones y las aristas del menú, en CSV).
+
+### D-052 · Figuras y tabla del informe
+- **Figuras:** E4 (supervivencia de cribs), E5 (paradas frente a Turing) y E6 (SPRT frente a
+  Wald). Son los tres resultados que comparan una medida propia con una referencia publicada o
+  teórica: (25/26)^L, la tabla de Turing y la aproximación de Wald, y son las diapositivas 15 a 17.
+  E1 y E2 no necesitan figura: son cifras exactas, y van en la tabla.
+- **Tabla:** validación (E1) y espacio de claves (E2): las cifras que sostienen la pregunta
+  («67 → 20 bits») y la confianza en el simulador.
+- **Formato.** Figuras compactas propias del informe (`figuras.py`, estilo `enigma_print` con
+  letra de 8 pt), no las de los experimentos, que están pensadas para una página. Papel carta,
+  márgenes de 1,8 cm y 11 pt: entra en 3 páginas con unas 7 líneas de margen para la reescritura
+  del autor.
+- **Las cifras** entran por `report/numbers.tex`, que `informe.py` genera desde
+  `results/summary.json`, `results/e5_bombe.parquet` (las celdas de Turing) y
+  `results/bench_demo2.json`. El periodo del odómetro sale del código (`core/stepping.py`). Una
+  prueba comprueba que toda macro `\EL…` del informe exista.
+
+### D-053 · LaTeX con Tectonic
+El equipo no tenía LaTeX. Con la aprobación del autor se instaló Tectonic 0.17.0 (el zip oficial
+para Windows de GitHub, SHA-256 verificado) en `%LOCALAPPDATA%\Programs\tectonic`, sin tocar el
+PATH. `informe.py` busca latexmk en el PATH y Tectonic en el PATH, en la variable `TECTONIC` y en
+esa carpeta. La primera compilación baja los paquetes de LaTeX (necesita internet esa vez).
+`informe.tex` compila también con pdfLaTeX (por ejemplo, en Overleaf).
+
+### D-054 · Docker
+- **Imagen:** `python:3.12-slim` con uv 0.13.9 (la versión que generó `uv.lock`); las
+  dependencias en su propia capa (`uv sync --frozen --no-dev --no-install-project`) y el entorno
+  en `/opt/venv`, fuera de la carpeta del proyecto.
+- **Usuario sin privilegios** («enigma»), con escritura solo en `NUMBA_CACHE_DIR` y
+  `MPLCONFIGDIR`. `ENIGMA_LAB_ROOT=/app`.
+- **Numba compilado en la imagen:** la construcción corre `warm_up()`, así que el contenedor
+  arranca en unos segundos y no en los ~16 s de compilar.
+- **Streamlit:** headless, en `0.0.0.0:8501`, sin vigilar archivos (en WSL la vigilancia sería
+  por sondeo) y con chequeo de salud en `/_stcore/health`.
+- **Sin internet:** la imagen trae las muestras del corpus y `results/`; `.dockerignore` deja
+  fuera el corpus completo, `docs/presentacion/`, `report/` y las pruebas.
+
+### D-055 · Streamlit no consulta la IP pública
+Sin navegador (headless), Streamlit consultaba en internet la IP pública para imprimir una
+«External URL». `.streamlit/config.toml` fija `browser.serverAddress = "localhost"`: no hay
+consulta externa y la dirección impresa es la que se usa.
+
+### D-056 · `st.iframe` en lugar de `components.html`
+Streamlit 1.67 marca `st.components.v1.html` como obsoleto («se quita después del
+01-06-2026»). Los cuatro componentes pasan a `st.iframe` con el mismo HTML; siguen siendo solo
+dibujo (la regla clave del spec 3 no cambia).
+
+### D-057 · Ninguna espera sin indicador (spec 8.3)
+- **Al arrancar** (`Inicio.py` · `_setup_once`, con el indicador «Preparando Enigma Lab…»):
+  precalienta Numba y precarga los módulos pesados (SciPy, pandas, networkx, los experimentos).
+  Así ninguna página queda en blanco al abrirla.
+- **Experimentos:** tablas en caché y figuras diferidas (D-051); correr un experimento en modo
+  rápido muestra su indicador.
+- **Estadística:** el cifrado de cientos de mensajes para el mapa de calor lleva indicador.
+
+### D-058 · Dibujo del menú por componentes
+Con WETTERBERICHT el menú suele tener varias componentes, y Kamada-Kawai sobre todo el grafo las
+amontonaba. Ahora cada componente se dibuja aparte y las componentes van una al lado de la otra
+(`cribs/menu.py` · `layout`). Con una sola componente (el menú de la diapositiva 11) el dibujo
+no cambia.
+
+### D-059 · Índices del arrastre del crib
+En la animación del crib, los números de posición iban más angostos que las letras y se corrían
+(en la posición 17, unos 220 px a la izquierda de su letra). Ahora cada número queda sobre su
+letra, también en modo demo.
+
+### D-060 · Banco de la demo 2: el de 60 casos
+`results/bench_demo2.json` tenía sin commit una corrida de 30 casos (21-11-2026, 21:27 UTC,
+commit `2cfa34b`) que el `RESUMEN.md` comprometido citaba. A pedido del autor se restauró la de
+60 casos (18:25 UTC, commit `5b34896`), con el mismo código de la Bombe, y el resumen final la
+cita.
+
+### D-061 · Capturas del README
+Se tomaron con el navegador integrado de la app de escritorio, con la ventana emulada a
+1024 × 640; el navegador las guarda a 800 px de ancho (el tamaño del panel). El GIF de la demo 2
+son seis de esas capturas, armadas con Pillow.
+
 ## Pendientes de decidir
 
 ### P-001 · Equipo de las mediciones de la demo 2
 Este equipo es un escritorio (i5-9400F, 6 núcleos, 16 GB). El presupuesto de 30 s de la
 demo 2 es del portátil del autor. `make bench-demo` ya existe; `RESUMEN.md` dice en qué
-equipo se midió cada tiempo. Falta que el autor lo corra en el portátil y confirme la
-configuración.
+equipo se midió cada tiempo, y el botón «Cifrado del compañero» sigue la configuración que
+recomiende el banco del equipo donde corre (D-050). Falta que el autor lo corra en el
+portátil y ensaye allí las dos demos.

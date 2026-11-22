@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 
 import numpy as np
+import pandas as pd
 import streamlit as st
 
 from enigma_lab import paths
@@ -14,7 +15,8 @@ from enigma_lab.cribs.dragging import alignments, survival_probability
 from enigma_lab.cribs.menu import menu_at, menu_stats
 from enigma_lab.stats.corpus import random_excerpts
 from enigma_lab.viz.numfmt import fmt_int, fmt_pct
-from ui.cribs_view import drag_payload, menu_payload, render_drag, render_menu
+from ui.charts import csv_button
+from ui.cribs_view import drag_payload, menu_payload, menu_table, render_drag, render_menu
 from ui.layout import is_demo, what_am_i_seeing
 
 K = "crib_"
@@ -69,15 +71,17 @@ buttons[0].button(
     on_click=_slide_example,
     icon=":material/slideshow:",
     width="stretch",
+    wrap=True,
 )
 buttons[1].button(
-    "Caso de respaldo", on_click=_backup_case, icon=":material/support:", width="stretch"
+    "Caso de respaldo", on_click=_backup_case, icon=":material/support:", width="stretch", wrap=True
 )
 buttons[2].button(
     "Generar un caso",
     on_click=_generate,
     icon=":material/casino:",
     width="stretch",
+    wrap=True,
     help="Mensaje alemán real de 80 letras con clave al azar.",
 )
 
@@ -131,7 +135,19 @@ metrics[4].metric(
     delta_color="off",
     delta_arrow="off",
 )
-render_menu(menu_payload(menu))
+render_menu(menu_payload(menu, demo))
+if not demo:
+    downloads = st.columns(2)
+    csv_button("Aristas del menú (CSV)", lambda: menu_table(menu), "menu_aristas", downloads[0])
+    csv_button(
+        "Alineaciones (CSV)",
+        lambda: pd.DataFrame(
+            {"posicion": a.position, "posible": a.valid, "conflictos": len(a.conflicts)}
+            for a in aligned
+        ),
+        "alineaciones_crib",
+        downloads[1],
+    )
 if stats.loops < 3:
     st.warning(
         f"Este menú tiene {stats.loops} lazo{'s' if stats.loops != 1 else ''}. Con menos de 3, "

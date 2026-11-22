@@ -61,3 +61,12 @@ def test_streamlit_theme_matches_tokens() -> None:
     assert config["server"]["enableStaticServing"] is True
     for face in t["fontFaces"]:
         assert (paths.ROOT / face["url"]).is_file(), face["url"]
+
+
+def test_demo_mode_survives_a_reload_through_the_url() -> None:
+    """Con ?demo=1 en la URL la app abre en modo demo (una recarga no lo apaga)."""
+    app = AppTest.from_file(str(ENTRYPOINT), default_timeout=60)
+    app.query_params["demo"] = "1"
+    app.run()
+    assert not app.exception
+    assert app.toggle(key="demo_mode").value is True

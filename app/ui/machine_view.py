@@ -9,7 +9,8 @@ from __future__ import annotations
 import json
 from typing import Any
 
-import streamlit.components.v1 as components
+import pandas as pd
+import streamlit as st
 
 from enigma_lab import paths
 from enigma_lab.core.machine import EnigmaConfig, LetterTrace
@@ -60,4 +61,23 @@ def render_machine(
 ) -> None:
     """Dibuja la animación de la máquina para la traza dada."""
     height = 720 if demo else 650
-    components.html(machine_html(machine_payload(config, traces, demo, autoplay)), height=height)
+    st.iframe(machine_html(machine_payload(config, traces, demo, autoplay)), height=height)
+
+
+def trace_table(traces: list[LetterTrace]) -> pd.DataFrame:
+    """La traza como tabla: una fila por letra, con las ventanas y el camino de la corriente.
+
+    Son los datos de la animación, para descargarlos (spec 8.3).
+    """
+    return pd.DataFrame(
+        {
+            "letra": t.index + 1,
+            "tecla": t.key,
+            "lampara": t.lamp,
+            "ventanas_antes": t.positions_before,
+            "ventanas": t.positions,
+            "doble_paso": t.double_step,
+            "camino": t.path(),
+        }
+        for t in traces
+    )

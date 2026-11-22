@@ -1,17 +1,45 @@
 # Guía de estudio
 
 Para defender el proyecto frente al profesor (spec, sección 8.4). Cada tema explica la
-idea en lenguaje claro, da la fórmula y dice en qué archivo y función está. Crece con
-cada fase.
+idea en lenguaje claro, da la fórmula y dice en qué archivo y función está. Las rutas son
+relativas a `src/enigma_lab/` salvo que digan otra cosa.
 
 **Temas:**
+0. [Dónde está cada algoritmo](#0-dónde-está-cada-algoritmo) (índice del código)
 1. [El espacio de claves](#1-el-espacio-de-claves) (fase 0)
 2. [La máquina y el doble paso](#2-la-máquina-y-el-doble-paso) (fase 1)
 3. [Estadística del idioma, cribs y menús](#3-estadística-del-idioma-cribs-y-menús) (fase 2)
 4. [La Bombe, el diagonal board y el verificador](#4-la-bombe-el-diagonal-board-y-el-verificador) (fase 3)
 5. [Banburismus, decibanes y la prueba secuencial](#5-banburismus-decibanes-y-la-prueba-secuencial) (fase 4)
-6. Rejewski y el ataque moderno (fase 5)
-7. [Preguntas probables](#preguntas-probables)
+6. [Rejewski y el ataque moderno](#6-rejewski-y-el-ataque-moderno-solo-teoría) (fase 5: no se hizo; solo teoría)
+7. [Las 15 preguntas más probables](#las-15-preguntas-más-probables)
+
+## 0. Dónde está cada algoritmo
+
+| Algoritmo | Idea en una línea | Archivo · función |
+| --- | --- | --- |
+| Configuración y clave | Rotores, reflector, anillos, posiciones y cables, inmutable | `core/machine.py` · `EnigmaConfig` |
+| Cifrado y traza | La corriente cruza plugboard, 3 rotores, reflector y vuelve | `core/machine.py` · `Enigma.encrypt`, `Enigma.trace` |
+| Paso y doble paso | Odómetro con muescas; el central avanza dos veces seguidas | `core/stepping.py` · `step`, `cycle_structure` |
+| Cifrado por lotes | Tablas de permutación precalculadas, en NumPy | `core/batch.py` · `encrypt_batch` |
+| Vectores de prueba | BDZGO, EWTYX, py-enigma, portada, U-264… | `core/vectors.py` · `check_all` |
+| Espacio de claves | Conteos exactos; N(k) del plugboard | `core/keyspace.py` · `keyspace`, `plugboard_settings`, `best_cable_count` |
+| Estadística del idioma | Frecuencias, IC y χ² de uniformidad | `stats/frequencies.py` · `frequencies`, `index_of_coincidence`, `chi2_uniform` |
+| Modelo de n-gramas | Cuadrigramas interpolados; log₁₀ P por la regla de la cadena | `stats/ngrams.py` · `interpolated`, `chain_score` |
+| Intervalos | Wilson para proporciones, normal para medias | `stats/inference.py` · `wilson_interval`, `mean_ci` |
+| Arrastre del crib | Descarta la alineación si una letra cae sobre sí misma | `cribs/dragging.py` · `alignments`, `survival_probability` |
+| Menú | Grafo de pares crib–cifrado; lazos y letra de prueba | `cribs/menu.py` · `build_menu`, `menu_at`, `menu_stats` |
+| Aleatorizador | Las 17.576 permutaciones de cada orden, sin plugboard | `bombe/scrambler.py` · `scrambler_table`, `rotor_orders` |
+| Cableado de la Bombe | Aristas del menú y diagonal board como pares de hilos | `bombe/wiring.py` · `wiring_from_menu`, `_diagonal_pairs` |
+| Barrido | Union-find sobre 676 hilos en cada posición, en Numba | `bombe/bombe_numba.py` · `sweep`, `_find`; `bombe/sweep.py` · `run_bombe` |
+| Parada verdadera | Qué variante (Bletchley o robusta) debe dar la parada | `bombe/sweep.py` · `true_stop` |
+| Verificador | Máquina de verificación, hill climbing del plugboard y anillos | `bombe/checker.py` · `consistent_stops`, `hill_climb`, `ring_settings`, `verify` |
+| Mensajes en profundidad | Dos claves de mensaje que solo difieren en el derecho | `banburismus/depth.py` · `make_pairs`, `true_offset` |
+| Decibanes | 10·log₁₀ del cociente de verosimilitudes por columna | `banburismus/scoring.py` · `decibans`, `column_weights`, `offset_scores` |
+| Prueba secuencial | Umbrales de Wald, cálculo exacto y descomposición del sobrepaso | `banburismus/sprt.py` · `thresholds`, `wald_letters`, `exact_letters`, `wald_gap` |
+| Experimentos | E1 a E6: `run`, `summary`, `figure` y `main` | `experiments/e1_validation.py` … `e6_banburismus.py` |
+| Cifras de la presentación | Un solo registro, comprobado por las pruebas | `cifras.py` · `CIFRAS`; `tests/test_presentacion.py` |
+| Resumen, figuras e informe | RESUMEN.md y CSV; figuras; `numbers.tex` y el PDF | `resumen.py`; `figuras.py`; `informe.py` |
 
 ## 1. El espacio de claves
 
@@ -427,32 +455,111 @@ de repetir.
 - *¿Por qué 1/17, si su corpus repite 1 de cada 12,5?* Es la tasa del tráfico naval que da
   Wikipedia. Nuestro texto es literario; no se ajustó nada para coincidir.
 
-## Preguntas probables
+## 6. Rejewski y el ataque moderno (solo teoría)
 
-Las 15 más probables, con su respuesta y el código que la respalda, se completan a
-medida que llegan los módulos. Las del guion («Preguntas probables») van todas.
+La fase 5 (P2, opcional) no se hizo: no hay código de esto en el repositorio, y la
+diapositiva 9 solo cita a Kuhl. Lo que sigue es lo que hay que saber explicar.
 
-- *¿Y la máquina de Turing?* Es el modelo teórico de computación de 1936. La Bombe es una
-  máquina electromecánica de 1940, hecha para una búsqueda concreta: probar hipótesis de
-  plugboard en cada posición de los rotores. Nuestra Bombe está en `src/enigma_lab/bombe/`.
-- *¿Y si el crib está mal?* La Bombe solo da paradas falsas, o ninguna, y el verificador
-  no encuentra un descifrado que parezca alemán. La página La Bombe lo dice: «Ninguna
-  parada da un texto que parezca alemán» (`checker.Verification.plausible`, con el umbral
-  `PLAUSIBLE`). Entonces se prueba otra posición del crib u otro crib.
-- *¿Por qué cada lazo divide por 26?* La letra supuesta debe ser un punto fijo de la
-  permutación que da la vuelta al lazo; al azar eso pasa con probabilidad 1/26 (tema 4).
-  E5 lo mide frente a la tabla de Turing (`experiments/e5_bombe.py`).
-- *¿Qué hace el diagonal board?* Impone la simetría del plugboard: une el hilo u del cable
-  a con el hilo a del cable u (`bombe/wiring.py` · `_diagonal_pairs`). Así las
-  contradicciones se propagan. La página La Bombe compara las paradas con y sin él para
-  cada menú, y E5 para todos.
-- *¿Hoy se rompería por fuerza bruta?* No hace falta (tema 1; `core/keyspace.py`). Los
-  ataques modernos solo con texto cifrado llegan en la fase 5 (`attacks/`).
-- *¿Qué es un decibán?* 10·log₁₀ del factor de Bayes, P(datos | profundidad) /
-  P(datos | azar). La evidencia de observaciones independientes se suma, porque el
-  logaritmo convierte el producto de los factores en una suma. Una repetición en la misma
-  columna suma +1,845 dB a favor de la profundidad, y una no repetición, −0,093
-  (`banburismus/scoring.py`; tema 5).
-- *¿Cuántas letras necesita el Banburismus?* Con letras sueltas y errores del 1 %, unas 929
-  según Wald, y 960 exactas por el sobrepaso. Por eso Turing puntuaba los multigramas
-  (`banburismus/sprt.py`; E6).
+**El catálogo de Rejewski (1932–1938).**
+- *El dato.* Antes de mayo de 1940, cada mensaje empezaba con su clave de 3 letras cifrada
+  dos veces. Las letras 1 y 4 son la misma letra plana cifrada en dos posiciones, así que
+  cada mensaje da una pareja de la permutación AD = A₄·A₁ (y lo mismo con BE y CF). Con unas
+  80 claves de un día se completan las tres permutaciones.
+- *La matemática.* Con el plugboard S, cada Aᵢ = S·Rᵢ·S⁻¹, donde Rᵢ depende solo de los
+  rotores. Entonces AD = S·(R₄R₁)·S⁻¹: es un conjugado. Conjugar no cambia la estructura de
+  ciclos (las longitudes de los ciclos), así que esa estructura no depende del plugboard.
+- *El catálogo.* Basta tabular la «característica» (la estructura de ciclos de AD, BE y CF)
+  de las 6 × 17.576 = 105.456 configuraciones de rotores. Kuhl (2007) la calculó con el
+  reflector A: 21.230 características distintas; 11.466 señalan una sola configuración y la
+  más frecuente, 1.771.
+- *Qué medía E7.* Reproducir esos tres números y el histograma de tamaños de clase.
+
+**El ataque moderno, solo con texto cifrado.**
+- *Gillogly (1995).* Barre 60 órdenes × 17.576 posiciones con anillos fijos y sin plugboard
+  y puntúa cada descifrado con el índice de coincidencia: con la clave correcta salvo el
+  plugboard, el texto se parece más al idioma que al azar. Luego ajusta los anillos y
+  completa el plugboard por hill climbing con trigramas. Según el artículo, funcionaba con
+  unas 300 letras y hasta 6 cables.
+- *Ostwald y Weierud (2017).* Búsqueda parcial exhaustiva del plugboard más un hill climbing
+  optimizado; estiman la distancia de unicidad en unas 23 letras y rompieron un mensaje
+  real de 32.
+- *Qué medía E8.* La tasa de éxito según la longitud y los cables, con regresión logística.
+- *Lo que sí tenemos que se parece:* el verificador de la Bombe hace hill climbing del
+  plugboard con cuadrigramas (`bombe/checker.py` · `hill_climb`).
+
+## Las 15 preguntas más probables
+
+Las seis primeras son las «Preguntas probables» del guion. Cada respuesta dice dónde está en
+el código.
+
+1. *¿Y la máquina de Turing?* Es el modelo teórico de computación de 1936. La Bombe es una
+   máquina electromecánica de 1940, hecha para una búsqueda concreta: probar hipótesis de
+   plugboard en cada posición de los rotores. Nuestra Bombe está en `bombe/`.
+2. *¿Y si el crib está mal?* La Bombe solo da paradas falsas, o ninguna, y el verificador
+   no encuentra un descifrado que parezca alemán. La página La Bombe lo dice: «Ninguna parada
+   da un texto que parezca alemán» (`bombe/checker.py` · `Verification.plausible`, con el
+   umbral `PLAUSIBLE`). Entonces se prueba otra posición del crib u otro crib.
+3. *¿Por qué cada lazo divide por 26?* La letra supuesta debe ser un punto fijo de la
+   permutación que da la vuelta al lazo; al azar eso pasa con probabilidad 1/26 (tema 4). E5
+   lo mide frente a la tabla de Turing: con 12 letras, 678 → 26,3 → 0,99 paradas por orden
+   con 0, 1 y 2 lazos (`experiments/e5_bombe.py`).
+4. *¿Qué hace el diagonal board?* Impone la simetría del plugboard: une el hilo u del cable a
+   con el hilo a del cable u (`bombe/wiring.py` · `_diagonal_pairs`). Así las contradicciones
+   se propagan más. Sin él, con un lazo hay unas 648 veces más paradas (E5); la página La
+   Bombe lo compara para cada menú.
+5. *¿Hoy se rompería por fuerza bruta?* No hace falta. Probar las 1,6 × 10²⁰ claves a 10⁹
+   por segundo tomaría unos 5.037 años (`core/keyspace.py` · `brute_force_years`), pero los
+   ataques de solo texto cifrado (Gillogly 1995; Ostwald y Weierud 2017) usan el índice de
+   coincidencia y hill climbing (tema 6; no los implementamos).
+6. *¿Qué es un decibán?* 10·log₁₀ del factor de Bayes, P(datos | profundidad) /
+   P(datos | azar). La evidencia de observaciones independientes se suma, porque el
+   logaritmo convierte el producto en una suma. Una repetición suma +1,845 dB a favor de la
+   profundidad y una no repetición, −0,093 (`banburismus/scoring.py` · `decibans`).
+7. *¿Cómo saben que el simulador es correcto?* Por cuatro vías independientes (E1): los 9
+   vectores publicados, py-enigma en 10.000 claves y mensajes aleatorios (10.000 de 10.000),
+   CyberChef a mano en 6 casos y pruebas de propiedades con hypothesis
+   (`core/vectors.py` · `check_all`; `experiments/e1_validation.py`;
+   `tests/test_pyenigma.py`, `tests/test_properties.py`).
+8. *¿Por qué ninguna letra se cifra a sí misma?* El cifrado es E = S⁻¹·P⁻¹·U·P·S: el
+   reflector U es una involución sin puntos fijos y todo lo demás lo conjuga. Una
+   conjugación conserva los puntos fijos, así que E tampoco tiene: si E(x) = x, entonces
+   U(y) = y para y = P(S(x)). Por eso cifrar dos veces devuelve el texto (E es una
+   involución) y E1 encontró 0 puntos fijos en 200.000 letras (`tests/test_properties.py`).
+9. *¿Qué es el doble paso y por qué el periodo es 16.900?* Cuando el central llega a su
+   muesca, en la pulsación siguiente avanza otra vez y arrastra al izquierdo: avanza dos veces
+   seguidas. Así el central se salta una posición por vuelta del izquierdo y el ciclo tiene
+   26 · 25 · 26 = 16.900 posiciones; 676 quedan fuera de él (`core/stepping.py` · `step`,
+   `cycle_structure`).
+10. *¿Por qué la Bombe supone anillos AAA, y cómo salen los anillos?* Un anillo corrido es
+    equivalente a una posición corrida mientras ningún rotor arrastra a otro, así que la
+    Bombe busca la posición del núcleo con anillos AAA. El verificador prueba luego los 676
+    pares (central, derecho) y se queda con la clave cuyo descifrado parece alemán; el
+    anillo izquierdo se fija en A (`bombe/checker.py` · `ring_settings`).
+11. *¿Qué pasa si el rotor central se mueve dentro del crib?* El modo Bletchley, que supone
+    que solo gira el derecho, pierde la parada verdadera: en E5 eso pasó en el 45 % de los
+    menús, y el éxito cayó al 55 %. El modo robusto prueba además una vuelta del central en
+    cada letra del crib y encuentra la parada en el 98 %, con unas 14 veces el tiempo
+    (`bombe/sweep.py` · `BombeSettings`, `true_stop`). La demo 2 usa el modo robusto.
+12. *¿Por qué con alemán real sobreviven más alineaciones que (25/26)^L?* Porque el alemán
+    no es uniforme. En una alineación falsa, la letra del crib choca con la cifrada si es
+    distinta de la letra plana de esa posición (probabilidad 1 − κ, con κ el índice de
+    coincidencia) y además es justo la que salió (1/25): (1 − κ)/25, menos que 1/26 cuando
+    κ > 1/26. La teoría corregida (1 − (1 − κ)/25)^L, con κ = 0,0802 medido en el corpus,
+    queda dentro del IC en las 10 longitudes (`cribs/dragging.py` · `survival_probability`;
+    `experiments/e4_cribs.py`).
+13. *¿Por qué con 3 lazos miden 0,11 paradas por orden y Turing 0,04?* Con tan pocas paradas
+    (11 en 100 menús) la estimación es imprecisa, pero su IC no incluye 0,04, así que lo
+    reportamos como diferencia y no ajustamos nada. Turing daba estimaciones redondas para
+    menús típicos de su tráfico; nuestros menús salen de cribs alemanes con clave aleatoria.
+    En 15 de las 17 celdas de su tabla, lo medido queda entre la mitad y el doble (E5).
+14. *¿Cuántas letras necesita el Banburismus, y por qué no 929?* 929 es la aproximación de
+    Wald, que supone que la prueba se detiene justo en el umbral. En realidad lo pasa: el
+    cálculo exacto da 959,7 y la simulación 983 (IC 954–1.012). Con alemán real basta con
+    332 letras, porque el texto literario repite 1 de cada 12,5 letras y no 1 de cada 17
+    (`banburismus/sprt.py` · `exact_letters`, `wald_gap`; E6).
+15. *Si el plugboard aporta 47 de los 67 bits, ¿por qué no protege?* Porque la Bombe no lo
+    busca: supone la pareja de la letra de prueba, la propaga por el menú y descarta la
+    posición si aparece una contradicción. Así recorre solo 60 órdenes × 17.576 posiciones =
+    1.054.560 configuraciones, unos 20 bits, y el verificador completa después los cables que
+    faltan (`bombe/sweep.py` · `run_bombe`, `bombe/checker.py` · `verify`). Por eso el tamaño
+    de la clave no es la seguridad: cuenta el mejor ataque (`core/keyspace.py` · `keyspace`).

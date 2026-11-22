@@ -14,8 +14,9 @@ from enigma_lab.core.random_keys import random_config
 from enigma_lab.core.vectors import vector
 from enigma_lab.core.wiring import ALPHABET, MODELS
 from enigma_lab.viz.numfmt import fmt_int
-from ui.layout import is_demo, what_am_i_seeing
-from ui.machine_view import render_machine
+from ui.charts import csv_button
+from ui.layout import big_result, hidden_in_demo, is_demo, what_am_i_seeing, x_as_space
+from ui.machine_view import render_machine, trace_table
 
 K = "maq_"  # prefijo de las claves de st.session_state de esta página
 LETTERS = list(ALPHABET)
@@ -137,11 +138,18 @@ PRESETS = (
         "Vuelve a la posición inicial de la clave cargada.",
     ),
 )
-for column, (label, action, icon, tip) in zip(st.columns(5), PRESETS, strict=True):
-    column.button(label, on_click=action, icon=icon, help=tip, width="stretch")
+# En modo demo solo quedan los dos preajustes de la demo 1, con su nombre completo.
+shown_presets = PRESETS[:2] if demo else PRESETS
+for column, (label, action, icon, tip) in zip(
+    st.columns(len(shown_presets)), shown_presets, strict=True
+):
+    column.button(label, on_click=action, icon=icon, help=tip, width="stretch", wrap=True)
 
-settings = st.expander("Clave", expanded=not demo, icon=":material/tune:")
-with settings:
+# La clave se oculta en modo demo, pero sus controles siguen vivos (conservan su estado).
+with (
+    hidden_in_demo("maq_clave"),
+    st.expander("Clave", expanded=True, icon=":material/tune:"),
+):
     top = st.columns([1.3, 1, 1, 1, 1, 1.1])
     model = top[0].selectbox(
         "Modelo", list(MODELS), format_func=lambda k: MODELS[k].name, key=K + "model"
@@ -217,19 +225,15 @@ traces = machine.trace(text)
 output = "".join(t.lamp for t in traces)
 
 st.markdown("**Salida**")
-size = "2.1rem" if demo else "1.6rem"
-st.markdown(
-    f'<div class="el-cipher" style="font-size: {size}; line-height: 1.35;">'
-    f"{groups_of_five(output) or '—'}</div>",
-    unsafe_allow_html=True,
-)
-if output:
+# La lectura con la X como espacio solo tiene sentido al descifrar: cuando la salida trae
+# más X que la entrada (la X separaba palabras en el texto plano).
+reading = x_as_space(output) if output.count("X") > text.count("X") else ""
+big_result(groups_of_five(output), reading, demo=demo)
+if output and not demo:
     with st.expander("Copiar el resultado", icon=":material/content_copy:"):
         st.code(groups_of_five(output), language=None)
-    if "X" in output:
-        st.caption(f"Leyendo la X como espacio: {output.replace('X', ' ').strip()}")
     st.caption(f"Ventanas al terminar: {machine.window} · {fmt_int(len(text))} letras")
-
+if output:
     back = Enigma(config).encrypt(output)
     fixed = sum(a == b for a, b in zip(text, output, strict=True))
     checks = st.columns(2)
@@ -248,3 +252,10 @@ signature = (config, text)
 autoplay = st.session_state.get(K + "last_signature") != signature
 st.session_state[K + "last_signature"] = signature
 render_machine(config, traces, demo=demo, autoplay=autoplay)
+if traces and not demo:
+    csv_button(
+        "Traza (CSV)",
+        lambda: trace_table(traces),
+        "traza_enigma",
+        icon=":material/route:",
+    )

@@ -65,7 +65,9 @@ def test_plotly_templates_registered() -> None:
     fig = go.Figure(go.Scatter(x=[1, 2], y=[3, 4]), layout={"template": "enigma_dark"})
     assert list(fig.layout.template.layout.colorway) == list(theme.CATEGORICAL)
     assert fig.layout.template.layout.separators == ",."
-    assert pio.templates["enigma_dark_demo"].layout.font.size == 20
+    demo = pio.templates["enigma_dark_demo"].layout
+    assert demo.font.size == 22
+    assert demo.xaxis.tickfont.size == 20  # nada bajo 20 px en el modo demo (spec 8.1)
 
 
 @pytest.mark.parametrize("style", ["enigma_print", "enigma_slides"])

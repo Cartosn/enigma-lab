@@ -11,6 +11,9 @@ runOnSave = false
 
 [browser]
 gatherUsageStats = false
+# La dirección que Streamlit imprime al arrancar. Fijarla evita que, sin navegador
+# (headless), consulte en internet la IP pública para mostrar una «External URL».
+serverAddress = "localhost"
 
 [client]
 toolbarMode = "minimal"
