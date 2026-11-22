@@ -773,7 +773,7 @@ def build_markdown(
     ]
     for c in cifras:
         if c["obtenido"] is None:
-            obtained, status = "—", f"pendiente ({c['pendiente']})"
+            obtained, status = "—", f"sin calcular ({c['pendiente']})"
         else:
             obtained, status = str(c["obtenido"]), "sí" if c["coincide"] else "**NO**"
         lines.append(
@@ -785,7 +785,7 @@ def build_markdown(
     lines += [
         "",
         f"{ok} de {len(ready)} cifras calculadas coinciden; "
-        f"{len(cifras) - len(ready)} llegan en fases siguientes.",
+        f"{len(cifras) - len(ready)} sin calcular, de la fase 5, que no se hizo.",
         "",
         "## 3. Demos",
         "",

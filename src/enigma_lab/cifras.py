@@ -347,7 +347,7 @@ CIFRAS: tuple[Cifra, ...] = (
         "9",
         "Kuhl: 105.456 · 21.230 · 11.466",
         "105.456 · 21.230 · 11.466",
-        pending="fase 5 (P2): rejewski/; si no se hace, la diapositiva solo cita a Kuhl",
+        pending="fase 5 (P2), que no se hizo: la diapositiva solo cita a Kuhl (2007)",
     ),
     # Diapositivas 13 y 17 · banburismus/ (tasas 1/17 y 1/26 de Wikipedia, «Banburismus»)
     Cifra(

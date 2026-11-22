@@ -538,7 +538,7 @@ el código.
 11. *¿Qué pasa si el rotor central se mueve dentro del crib?* El modo Bletchley, que supone
     que solo gira el derecho, pierde la parada verdadera: en E5 eso pasó en el 45 % de los
     menús, y el éxito cayó al 55 %. El modo robusto prueba además una vuelta del central en
-    cada letra del crib y encuentra la parada en el 98 %, con unas 14 veces el tiempo
+    cada letra del crib y encuentra la parada en el 98 %, con 13 a 14 veces el tiempo
     (`bombe/sweep.py` · `BombeSettings`, `true_stop`). La demo 2 usa el modo robusto.
 12. *¿Por qué con alemán real sobreviven más alineaciones que (25/26)^L?* Porque el alemán
     no es uniforme. En una alineación falsa, la letra del crib choca con la cifrada si es
