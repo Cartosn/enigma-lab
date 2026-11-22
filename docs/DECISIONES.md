@@ -591,6 +591,151 @@ Se tomaron con el navegador integrado de la app de escritorio, con la ventana em
 1024 × 640; el navegador las guarda a 800 px de ancho (el tamaño del panel). El GIF de la demo 2
 son seis de esas capturas, armadas con Pillow.
 
+## Fase 5 · Extensiones P2 (22-11-2026)
+
+### D-062 · Supuestos del catálogo de Rejewski (E7)
+- **El modelo.** Rotores I, II y III y el reflector A, como Kuhl (2007): 3! = 6 órdenes ×
+  17.576 posiciones = 105.456 configuraciones. El cableado del reflector A es el de Wikipedia
+  (`core/wiring.py`); Kuhl cita a Marks y Weierud (2000), que lo determinaron.
+- **El rotor central.** Durante las seis letras del indicador solo gira el derecho: la pulsación k
+  (1 a 6) usa el aleatorizador en (izq, cen, der + k), porque los rotores avanzan antes de cada
+  letra. Kuhl solo dice que su programa «simula el proceso del ciclómetro». En la máquina real el
+  central se mueve en 176 de cada 676 posiciones del día (26,0 %; prueba
+  `test_middle_rotor_moves_in_176_of_676_positions`): esos días la característica no es la del
+  catálogo, y E7 lo mide con el tráfico (D-064).
+- **Los anillos.** Con el central quieto cada permutación depende solo de la posición del núcleo
+  (ventana − anillo). El catálogo se indexa por la posición del núcleo al empezar el indicador; los
+  anillos solo cambian qué ventanas le corresponden. Una prueba con hypothesis comprueba la
+  entrada del catálogo contra la máquina real, con anillos y plugboard, en las posiciones sin
+  vuelta del central.
+- **La característica** es la terna de estructuras de AD, BE y CF; se guarda como el número de la
+  partición de 13 de cada una (`characteristic.characteristic_code`). El orden (primero A, luego D)
+  no cambia la estructura: DA es conjugada de AD.
+- **No coincide con Kuhl.** E7 da 21.225 características, 11.578 únicas y 1.728 en la más
+  frecuente; Kuhl, 21.230, 11.466 y 1.771. No se ajustó nada. `scripts/kuhl_variantes.py` prueba 33
+  variantes de los supuestos (paso real del central con y sin doble paso, registrando antes o
+  después de avanzar, anillos AAA y ZZZ, la muesca corrida una letra, un odómetro puro, las
+  posiciones de un odómetro real desde AAA, los cableados inversos, el reflector A girado y los
+  reflectores B y C): ninguna reproduce sus cifras, y la suma de las diferencias con su tabla 2 va
+  de 256 a 895 características (442 con nuestros supuestos). Coinciden la forma de la
+  distribución y 14 de las 15 características de su tabla 1. El artículo tiene además erratas
+  internas (VALIDACION, E7).
+
+### D-063 · La cifra de la diapositiva 9
+La diapositiva cita a Kuhl: «hay 21.230 estructuras distintas, y 11.466 señalan una sola
+configuración». Como el catálogo de E7 no reproduce esas cifras, `cifras.py` las separa en dos:
+- *105.456 configuraciones:* la calcula el catálogo (6 × 17.576) y coincide.
+- *Kuhl: 21.230 · 11.466:* se comprueban contra lo transcrito en `data/reference/kuhl_2007.json`,
+  como las cifras de Turing de la diapositiva 16 contra `turing_stops.csv`.
+
+Las cifras propias de E7 van a la sección de la diapositiva 9 de `RESUMEN.md` y la diferencia, a
+«Discrepancias», para decidir cómo decirlo en la diapositiva.
+
+### D-064 · El tráfico de un día (E7)
+- **La clave del día:** rotores I–III en algún orden, reflector A, anillos y posición del día al
+  azar y 6 cables (Kuhl: «en 1932, la Enigma tenía seis cables»).
+- **Las claves de mensaje son al azar** y uniformes: no se modela cómo las elegían los
+  operadores.
+- **El indicador** se cifra con la máquina real (`characteristic.indicator_permutations`): con el
+  plugboard y con el central moviéndose cuando le toca.
+- **Cuatro niveles de reconstrucción** por producto y por día (el máximo de los tres productos):
+  1. las 26 letras vistas como primera letra;
+  2. 25 letras (la última imagen, por eliminación);
+  3. la permutación: la única completación con los ciclos en parejas;
+  4. la característica: todas las completaciones con los ciclos en parejas tienen la misma
+     estructura.
+- **Cómo se cuentan las completaciones** (`traffic.completions`). Lo conocido forma ciclos cerrados
+  y cadenas abiertas; completar es agrupar las cadenas en ciclos nuevos (un grupo de g cadenas se
+  recorre en (g − 1)! órdenes). Para cada una de las 101 estructuras posibles se cuenta de cuántas
+  formas se alcanza, con un conteo por multiconjuntos y memoria. Coincide con la fuerza bruta en
+  150 de 150 casos de prueba (`tests/test_rejewski.py`) y en 300 de 300 al desarrollarlo. Basta
+  distinguir 0, 1 y «2 o más», y la búsqueda para ahí. Determinado, sigue determinado.
+- **La teoría** del coleccionista de cupones es exacta: las primeras letras de AD, BE y CF son
+  sorteos uniformes e independientes, así que P(máx ≤ n) = P(T ≤ n)³, con la distribución de las
+  letras distintas por una cadena de Markov (`traffic.coupon_cdf`).
+- **N:** 4.000 días en modo completo y 400 en el rápido, hasta 600 mensajes por día (con 600, la
+  probabilidad de que falten letras es del orden de 10⁻⁹ por día; si pasara, el experimento se
+  detiene).
+- **El catálogo encuentra el día** si la característica del día coincide con la de su
+  configuración verdadera (orden y posición del núcleo).
+
+### D-065 · El ataque de Gillogly (E8)
+- **De dónde sale.** El artículo de Gillogly (1995) no está libre; se implementa como lo describen
+  Ostwald y Weierud (2017): IC con los anillos fijos y el plugboard vacío en todas las ubicaciones;
+  los 676 anillos del central y del derecho para las mejores; hill climbing del plugboard con cables
+  de prueba, pasando del IC a los trigramas.
+- **Parámetros:** las 200 mejores ubicaciones de la fase 1 pasan a la fase 2 y las 20 mejores de
+  la fase 2, a la 3; gana el mejor puntaje de trigramas por letra. El hill climbing primero con el
+  IC y luego con trigramas, como Sullivan y Weierud (según Ostwald y Weierud).
+- **Trigramas:** la muestra alemana con la X como separador (`stats/ngrams.py`), igual que el
+  verificador de la Bombe. En el modo completo los mensajes salen del corpus completo, que incluye
+  la muestra (un tercio): un sesgo leve a favor del ataque, que se deja anotado.
+- **Éxito:** el descifrado coincide con el texto en al menos el 90 % de las letras. Los resultados
+  son bimodales: en E8, el 22,7 % de los mensajes se leyó completo, el 76,0 % quedó bajo el 20 % de
+  letras correctas y solo el 1,2 %, entre el 20 % y el 36 %. El umbral no cambia nada.
+- **Numba.** El primer núcleo de la fase 1 calculaba mal: dentro del `prange`, la posición no
+  avanzaba y todas las ubicaciones daban el IC del propio cifrado. Se aisló el descifrado de una
+  ubicación en una función (`gillogly._ic_from`) y una prueba compara el núcleo con Python puro.
+
+### D-066 · Vecinas y reajuste de los anillos
+- **El problema.** Con los anillos supuestos, el central y el izquierdo giran en la fase 1 en otra
+  letra que en la máquina verdadera. En las primeras pruebas, varios mensajes con el orden
+  correcto salían descifrados solo en parte (entre el 62 % y el 96 % de las letras): la fase 1
+  había elegido la posición con el izquierdo o el central una posición corridos, en las dos
+  direcciones.
+- **Lo que se agregó** (no está en la descripción de Gillogly; es un detalle de esta
+  implementación): la fase 2 prueba la posición y sus vecinas con el izquierdo o el central una
+  posición atrás (4 variantes); y, con el plugboard ya encontrado, `refine` vuelve a elegir
+  anillos y vecina (9 variantes, en las dos direcciones) por trigramas y sube otra vez, hasta 3
+  veces mientras mejore. Con eso, cuando la ubicación verdadera llega a la fase 2, el mensaje se
+  lee completo.
+
+### D-067 · Presupuesto de E8 y qué significa la tasa de éxito
+- **Modo completo:** los 60 órdenes (sin recorte), longitudes de 25 a 1.500 letras (12), 6, 8 y 10
+  cables y 24 mensajes por celda: 864 mensajes, unos 25 minutos en este escritorio. La tasa de
+  éxito es la del ataque tal cual, contra 1.054.560 ubicaciones.
+- **Modo rápido:** solo los rotores I–III (6 órdenes; la clave también sale de ellos), 4 longitudes,
+  6 y 10 cables y 4 mensajes por celda (unos 25 s). Su tasa es la de un atacante que sabe que los
+  rotores son I–III: compite con 10 veces menos ubicaciones falsas en la fase 1. No se compara con
+  el modo completo.
+- **El «oráculo»:** el hill climbing desde la ubicación verdadera (orden, posición y anillos). Es
+  lo que lograría el ataque si la fase 1 nunca fallara: una cota superior. Ostwald y Weierud se
+  acercan a ella haciendo el hill climbing en las 27.418.560 ubicaciones, con días de cómputo.
+- **Diagnóstico de la fase 1:** el puesto de la ubicación verdadera entre todas (sus 9 vecinas
+  cuentan, D-066) y el que tendría con sus anillos verdaderos. Si la fase 1 probara también los
+  anillos, la competencia crecería en proporción (por 26 con el anillo derecho).
+- **La corrida.** El primer `make reproduce` (sobre `103df6c`) guardó los datos de E8 y se detuvo
+  al dibujar su figura: con 0 éxitos de 24, el límite inferior de Wilson salía a un error de
+  redondeo por encima de la proporción, y Matplotlib rechaza un bigote negativo. Se corrigió la
+  figura (`67e022b`) y se repitió `make reproduce` entero sobre ese commit; las cifras de E1 a E8
+  salieron idénticas en las dos corridas (todo usa la semilla 2026; solo cambian fechas y
+  tiempos).
+
+### D-068 · E7 y E8 en el informe y en las diapositivas
+El informe sigue con sus 3 figuras (E4, E5 y E6; D-052): E7 y E8 entran en el texto, con sus
+cifras por macros (`\ELrej…`, `\ELkuhl…`, `\ELataque…`), en lugar de la limitación «no se hizo la
+fase opcional». Para las diapositivas hay respaldo 16:9 de las dos figuras (`make figuras`) y sus
+datos en `r5_rejewski.csv` y `r6_ataque.csv`.
+
+### D-069 · Página Rejewski
+- **El día** se simula con la máquina real (D-064) y el control elige cuántos de sus 250 mensajes se
+  ven. La página dice, por producto, cuántas letras se conocen y si la estructura o la permutación
+  ya quedaron determinadas por el teorema.
+- **Los ciclos** los dibuja `components/cycles.html` con las coordenadas que calcula Python
+  (`ui/rejewski_view.py`): ciclos cerrados (el mismo color para la misma longitud en los tres
+  productos), cadenas abiertas que terminan en «?» y letras sin datos. Si el teorema deja una sola
+  completación, se dibuja la permutación completa y los arcos deducidos, no vistos, van punteados.
+- **El catálogo** se construye una vez por proceso (1,4 s, con indicador) y se busca la
+  característica del día; con la clave revelada se marca la configuración verdadera. La columna
+  «verdadera» solo aparece al revelar la clave.
+
+### D-070 · Página Ataque moderno
+- El ataque corre al pulsar «Atacar» (de 1 a 6 s con los 60 órdenes), no a cada cambio de un
+  control. Se guarda solo lo que se dibuja: el histograma del IC de la fase 1 (no el millón de
+  valores), la traza del hill climbing y el descifrado.
+- Se puede elegir entre los 60 órdenes (las ubicaciones de la Bombe) y los 6 de I–III.
+- El puesto de la ubicación verdadera y las letras correctas solo se muestran con la clave revelada.
+
 ## Pendientes de decidir
 
 ### P-001 · Equipo de las mediciones de la demo 2

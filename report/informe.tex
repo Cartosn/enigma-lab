@@ -99,9 +99,13 @@ que hace de demostración en vivo; la lógica de Enigma existe una sola vez, en 
   prueba secuencial de Wald decide con $\alpha=\beta=1~\%$ (umbrales de
   $\pm$\ELumbral{}~dB), con \ELparesBanbu{} pares por condición y, para letras sueltas, un
   cálculo exacto del tiempo de parada.
+  \item \textbf{Rejewski y ataque moderno (E7 y E8).} El catálogo exacto de los ciclos de AD, BE y
+  CF en las \ELrejConfiguraciones{} configuraciones de I--III con el reflector A, y \ELrejDias{}
+  días de tráfico; el ataque de Gillogly (IC sin plugboard, anillos y hill climbing con trigramas)
+  sobre \ELataqueMensajes{} mensajes de 25 a 1.500 letras con 6, 8 y 10 cables.
 \end{itemize}
 Semilla \ELsemilla; intervalos de Wilson para proporciones y normales para medias.
-\texttt{make reproduce} repite los seis experimentos en unos \ELminutosExperimentos{} minutos.
+\texttt{make reproduce} repite los ocho experimentos en unos \ELminutosExperimentos{} minutos.
 
 \section{Resultados}
 
@@ -175,6 +179,16 @@ cálculo exacto, \ELexactoProfundidad{} y \ELexactoAzar. Con alemán real y los 
 Turing bastan \ELalemanLetrasProfundidad{} letras, y \ELalemanTrigramasProfundidad{} puntuando
 bigramas y trigramas.
 
+% REVISAR
+\textbf{Rejewski y ataque moderno.} El catálogo tiene \ELrejCaracteristicas{} características,
+\ELrejUnicas{} de una sola configuración y \ELrejMayor{} en la más frecuente (Kuhl:
+\ELkuhlCaracteristicas, \ELkuhlUnicas{} y \ELkuhlMayor). Ver las 26 letras de AD, BE y CF pide
+\ELrejTodas{} mensajes (teoría: \ELrejTodasTeoria); con el teorema de los ciclos en parejas,
+\ELrejPermutacion: los «unos sesenta» de Rejewski. Con 6 cables, el ataque de Gillogly lee la
+mitad de los mensajes desde unas \ELataqueLseis{} letras (él reportaba unas \ELgilloglySeis); con
+10, el \ELataqueDiezLargo{} de los de \ELataqueLargo{} (él, un solo éxito con \ELgilloglyDiez): falla
+la fase 1, que supone los anillos.
+
 \begin{figure}[t]
   \centering
   \includegraphics[width=\textwidth]{figuras/e6_sprt.pdf}
@@ -208,10 +222,9 @@ la profundidad se confirma en un tercio de las letras porque el alemán literari
 
 % REVISAR
 \textbf{Lecciones y límites.} El tamaño de la clave no es la seguridad: cuenta el mejor ataque;
-cualquier sesgo es un distinguidor y reutilizar un nonce deja dos mensajes en profundidad. No se
-hizo la fase opcional (el catálogo de Rejewski y el ataque moderno de solo texto cifrado de
-Gillogly y de Ostwald y Weierud): la presentación solo cita la literatura. El corpus es
-literario, no naval, y los tiempos son de un escritorio, no del portátil de la presentación.
+cualquier sesgo es un distinguidor y reutilizar un nonce deja dos mensajes en profundidad. E7 no
+reproduce del todo a Kuhl; E8 usa \ELataqueN{} mensajes por celda. El corpus es literario, no
+naval, y los tiempos son de un escritorio, no del portátil.
 
 \section*{Referencias}
 {\footnotesize
@@ -234,8 +247,8 @@ literario, no naval, y los tiempos son de un escritorio, no del portátil de la 
   \emph{Cryptologia} 41(5), 395--421.
   \item J.~Weinbaum. \emph{Action This Day} (tesis de maestría, Dartmouth College).
   \item K.~Pommerening. Notas de criptología clásica: Enigma. Universidad de Mainz.
-  \item Wikipedia: «Bombe» (tabla de paradas de Turing, revisión 1385546242), «Banburismus»
-  (revisión 1372577431) y «Enigma rotor details» (revisión 1275803743).
+  \item Wikipedia: «Bombe» (rev.~1385546242), «Banburismus» (rev.~1372577431) y «Enigma rotor
+  details» (rev.~1275803743).
   \item D.~Rijmenants. \emph{The M4 Project} (mensaje del U-264, 1942). Cipher Machines and
   Cryptology.
   \item B.~Neal. py-enigma 1.0.2; GCHQ, CyberChef (operaciones Enigma y Bombe).

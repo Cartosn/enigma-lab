@@ -57,6 +57,36 @@ de una de estas fuentes (spec, sección 0). Las de la sección 12 del spec van t
     consultada el 21-11-2026. Umbrales a ≈ log(β/(1 − α)) y b ≈ log((1 − β)/α), y la nota de
     que son aproximados en el caso discreto porque el puntaje cruza el umbral entre dos
     observaciones.
+- **Catálogo de Rejewski (fase 5, E7, diapositiva 9):** Kuhl, A. (2007). Rejewski's Catalog.
+  *Cryptologia*, 31(4), 326–331. DOI 10.1080/01611190701299487. Leído el 22-11-2026 en
+  https://archive.math.arizona.edu/mbbush/enigma/Rejewskis%20catalog.pdf (el PDF del artículo,
+  descargado por la Universidad de Arizona). Transcrito en `data/reference/kuhl_2007.json`:
+  - el modelo: rotores I–III, reflector A (el del primer catálogo polaco, con el cableado de
+    Marks y Weierud, 2000), 6 × 26³ = 105.456 configuraciones; su programa «simula el proceso
+    del ciclómetro», sin más detalle sobre el rotor central ni los anillos;
+  - las cifras: 21.230 características, 11.466 únicas y 1.771 configuraciones en
+    (13 13)(13 13)(13 13); 101 estructuras por producto y 101³ = 1.030.301 ternas;
+  - la tabla 1 (las 15 características más frecuentes) y la tabla 2 (cuántas tienen 1 a 14 y 16
+    configuraciones);
+  - las citas de Rejewski (en Kozaczuk, 1984): unos sesenta mensajes del mismo día (apéndice D)
+    y unos ochenta (apéndice E) para formar AD, BE y CF;
+  - sus erratas: 105.465 en lugar de 105.456, 54,40 % (es 54,01 %) y 20.433 con 10 o menos
+    (su tabla 2 suma 19.604, que es su 92,34 %).
+- **Ataque moderno (fase 5, E8):** Ostwald, O. y Weierud, F. (2017). Modern breaking of Enigma
+  ciphertexts. *Cryptologia*, 41(5), 395–421. DOI 10.1080/01611194.2016.1238423. Leída el
+  22-11-2026 la versión 5 del manuscrito (marzo de 2017), en
+  https://www.cryptocellar.org/pubs/enigma-modern-breaking.pdf. Transcrito en
+  `data/reference/ostwald_weierud_2017.json`:
+  - el método de Gillogly (1995) y sus límites: unas 300 letras con 6 cables o menos; con 10, un
+    solo éxito, con 1.463 letras; su texto de prueba, de 647 letras;
+  - el reglamento del ejército alemán: ningún mensaje de más de 250 letras;
+  - la distancia de unicidad: H/D con H ≈ 72 bits y D ≈ 3,1 bits por letra, unas 23 letras;
+  - el mensaje real más corto que rompieron, AMERI, de 32 letras;
+  - el plugboard vacío con 10 cables: 10,1 % de letras planas y 18,5 % de sustitutos
+    monoalfabéticos en la ubicación correcta;
+  - la búsqueda parcial del plugboard: E-Stecker (26 arranques), R-Stecker (73) e I-Stecker (136).
+
+  El artículo de Gillogly (1995) no está libre: sus cifras se citan desde Ostwald y Weierud.
 - **Bombe de CyberChef (referencia de diseño y validación):** código fuente de GCHQ,
   `src/core/lib/Bombe.mjs`, `src/core/operations/Bombe.mjs` y `MultipleBombe.mjs`
   (licencia Apache 2.0), leído el 21-11-2026. https://github.com/gchq/CyberChef · La

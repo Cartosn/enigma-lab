@@ -4,11 +4,11 @@ Proyecto final de Criptografía, Universidad Nacional de Colombia (2026) · Carl
 Guarin Ortiz.
 
 **¿Por qué se rompió un cifrado con unas 1,6 × 10²⁰ claves, y cuánta información necesita
-cada ataque?** Enigma Lab simula la máquina Enigma, la Bombe de Turing-Welchman y el
-Banburismus, y mide con experimentos Monte Carlo cuánto cuesta cada ataque y con qué
-probabilidad funciona. La hipótesis es «divide y vencerás»: el plugboard aporta 47 de los 67
-bits de la clave, pero la Bombe lo aparta y solo recorre 60 órdenes × 17.576 posiciones,
-unos 20 bits.
+cada ataque?** Enigma Lab simula la máquina Enigma, el catálogo de Rejewski, la Bombe de
+Turing-Welchman, el Banburismus y el ataque moderno solo con texto cifrado, y mide con
+experimentos (exactos y Monte Carlo) cuánto cuesta cada ataque y con qué probabilidad
+funciona. La hipótesis es «divide y vencerás»: el plugboard aporta 47 de los 67 bits de la
+clave, pero la Bombe lo aparta y solo recorre 60 órdenes × 17.576 posiciones, unos 20 bits.
 
 La app sirve de demostración en vivo en la presentación y produce las cifras de sus
 diapositivas: cada número sale del código o de una fuente citada.
@@ -25,8 +25,10 @@ mensaje.*
 | **Inicio.** La pregunta y la cifra «67 → 20 bits». | **Máquina.** La animación dibuja la traza que calcula Python; la lámpara de la tecla pulsada nunca se enciende. |
 | ![Cribs y menús: el crib se desliza sobre el cifrado](docs/img/cribs.jpg) | ![La Bombe: paradas y tambores](docs/img/bombe.jpg) |
 | **Cribs y menús.** Las alineaciones imposibles, en rojo. | **La Bombe.** Paradas, tambores en la parada y «Verificar». |
-| ![Banburismus: trayectoria de decibanes con los umbrales de Wald](docs/img/banburismus.jpg) | |
-| **Banburismus.** Decibanes acumulados y los umbrales de Wald. | |
+| ![Banburismus: trayectoria de decibanes con los umbrales de Wald](docs/img/banburismus.jpg) | ![Rejewski: AD como dos ciclos de 13 letras](docs/img/rejewski.jpg) |
+| **Banburismus.** Decibanes acumulados y los umbrales de Wald. | **Rejewski.** Un día de indicadores; AD, BE y CF como ciclos (punteado: lo que deduce el teorema). |
+| ![Ataque moderno: la subida del plugboard y el mensaje leído](docs/img/ataque.jpg) | |
+| **Ataque moderno.** Solo con el cifrado: el IC de 1.054.560 ubicaciones y el hill climbing del plugboard. | |
 
 ## Inicio rápido
 
@@ -65,7 +67,7 @@ recomendó `make bench-demo` en ese equipo, y «Caso de respaldo» es el plan B.
 
 | Comando | Qué hace |
 | --- | --- |
-| `make reproduce` | Descarga el corpus completo (SHA-256 verificado), corre E1 a E6 en modo completo con semilla 2026, arma `results/presentacion/` y dibuja las figuras |
+| `make reproduce` | Descarga el corpus completo (SHA-256 verificado), corre E1 a E8 en modo completo con semilla 2026, arma `results/presentacion/` y dibuja las figuras |
 | `make rapido` | Los mismos experimentos en modo rápido, con las muestras del corpus (sin internet) |
 | `make resumen` | Rehace `results/presentacion/` (RESUMEN.md, cifras.json y los CSV) sin correr nada |
 | `make figuras` | Figuras del informe (`report/figuras/`) y de respaldo para las diapositivas (`results/figures/slides/`) |
@@ -84,6 +86,8 @@ vienen en `results/`, así que la app y el informe los muestran sin correr nada.
 | E4 | ¿Cuántas posiciones descarta un crib? (frente a (25/26)^L) |
 | E5 | ¿Cuántas paradas falsas deja la Bombe? (frente a la tabla de Turing) |
 | E6 | ¿Cuánto solapamiento necesita el Banburismus? (SPRT frente a la aproximación de Wald) |
+| E7 | ¿Qué tan única es una característica de Rejewski? (el catálogo frente a Kuhl 2007; mensajes por día) |
+| E8 | ¿Cuánto texto necesita el ataque moderno solo con texto cifrado? (frente a Gillogly y a la unicidad) |
 
 ## Estructura
 
@@ -96,15 +100,17 @@ enigma-lab/
 │   ├── cribs/           arrastre del crib y menú
 │   ├── bombe/           aleatorizador, barrido con union-find en Numba y verificador
 │   ├── banburismus/     mensajes en profundidad, decibanes y prueba secuencial de Wald
-│   ├── experiments/     E1 a E6 (python -m enigma_lab.experiments)
+│   ├── rejewski/        indicador doble, característica de AD, BE y CF, catálogo y tráfico de un día
+│   ├── attacks/         el ataque de Gillogly y el hill climbing del plugboard (Numba)
+│   ├── experiments/     E1 a E8 (python -m enigma_lab.experiments)
 │   ├── viz/             tema «Bletchley nocturno», formato de números y gráficos Plotly
 │   └── cifras.py · resumen.py · figuras.py · informe.py
-├── data/                vectores y tabla de Turing (reference/), muestras del corpus (corpora/), casos de la demo (demo/)
+├── data/                vectores, tabla de Turing, Kuhl y Ostwald-Weierud (reference/), muestras del corpus (corpora/), casos de la demo (demo/)
 ├── results/             resultados generados: Parquet, summary.json, figures/ y presentacion/
 ├── report/              informe.tex, numbers.tex (generado), figuras/ e informe.pdf
 ├── docs/                spec, progreso, decisiones, arquitectura, validación, guía de estudio, fuentes e img/
 ├── tests/               pytest + hypothesis; test_presentacion.py comprueba cada cifra de las diapositivas
-├── scripts/             instalación, corpus, banco de la demo 2, URL de CyberChef y el piloto original
+├── scripts/             instalación, corpus, banco de la demo 2, URL de CyberChef, variantes del catálogo de Kuhl y el piloto original
 └── Dockerfile · docker-compose.yml · Makefile · pyproject.toml · uv.lock · requirements.txt
 ```
 
@@ -132,14 +138,27 @@ El detalle está en [`docs/VALIDACION.md`](docs/VALIDACION.md); las cifras, en
   quedan entre la mitad y el doble de la tabla de Turing en 15 de sus 17 celdas.
 - **Banburismus (E6):** la simulación del SPRT se explica con un cálculo exacto: la diferencia con
   la aproximación de Wald es el sobrepaso de los umbrales.
+- **Rejewski (E7):** la característica no depende del plugboard (hypothesis, con 0 a 13 cables) y
+  el catálogo coincide con la máquina real; frente a Kuhl (2007) la forma de la distribución
+  coincide, pero sus cifras no (21.225, 11.578 y 1.728 frente a 21.230, 11.466 y 1.771), y
+  ninguna de 33 variantes de los supuestos las reproduce. El tráfico simulado coincide con la
+  teoría exacta del coleccionista de cupones.
+- **Ataque moderno (E8):** el núcleo de Numba coincide con Python puro, la clave que encuentra
+  descifra igual con la máquina, y la regresión logística recupera una curva conocida.
 - **Presentación:** `tests/test_presentacion.py` comprueba cada cifra de las diapositivas contra
   el código.
 
 ## Limitaciones
 
-- **La fase 5 (P2, opcional) no se hizo:** ni el catálogo de Rejewski (E7, que se compararía con
-  Kuhl 2007) ni el ataque moderno de solo texto cifrado (E8: Gillogly 1995; Ostwald y Weierud
-  2017). La presentación solo cita esa literatura, y la app los marca como no incluidos.
+- **El catálogo de Rejewski no reproduce exactamente a Kuhl (2007):** da 21.225 características,
+  11.578 únicas y 1.728 en la más frecuente, frente a 21.230, 11.466 y 1.771. Kuhl no dice qué
+  supone del rotor central ni de los anillos, y ninguna de 33 variantes de los supuestos da sus
+  cifras (`scripts/kuhl_variantes.py`); se reporta la diferencia, sin ajustar nada.
+- **El tráfico de E7 usa claves de mensaje al azar:** no modela cómo las elegían los operadores.
+- **E8 mide el ataque de Gillogly,** cuya fase 1 supone los anillos: con 10 cables lee solo el
+  25 % de los mensajes de 1.500 letras. Ostwald y Weierud evitan esa fase haciendo el hill climbing
+  en las 27 millones de ubicaciones, con días de cómputo; aquí solo se mide lo que eso daría (el
+  hill climbing con la ubicación dada). Con 24 mensajes por celda, los intervalos son anchos.
 - **El corpus es literario, no naval:** el alemán de Fontane y Kafka repite letras más que el
   tráfico naval (1 de cada 12,5 frente a 1 de cada 17), lo que acelera el Banburismus con texto
   real.

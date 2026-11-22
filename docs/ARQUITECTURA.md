@@ -7,12 +7,10 @@ y nunca reimplementan la máquina.
 
 ## Módulos y flujo de datos
 
-En gris punteado, la fase 5 (P2, opcional), que no se hizo.
-
 ```mermaid
 flowchart LR
     subgraph data["data/"]
-        ref["reference/<br/>vectores · Turing"]
+        ref["reference/<br/>vectores · Turing · Kuhl · Ostwald y Weierud"]
         corp["corpora/<br/>muestras · completo"]
         demo["demo/<br/>portada · respaldo"]
     end
@@ -23,9 +21,9 @@ flowchart LR
         cribs["cribs<br/>arrastre · menú"]
         bombe["bombe<br/>aleatorizador · Numba · verificador"]
         banb["banburismus<br/>decibanes · SPRT"]
-        rej["rejewski<br/>características"]
+        rej["rejewski<br/>característica · catálogo · tráfico"]
         att["attacks<br/>Gillogly · hill climbing"]
-        exp["experiments<br/>E1 a E6"]
+        exp["experiments<br/>E1 a E8"]
         viz["viz<br/>tema · numfmt · Plotly"]
         cif["cifras.py<br/>cifras de la presentación"]
         res["resumen.py"]
@@ -35,7 +33,7 @@ flowchart LR
 
     subgraph appdir["app/"]
         ui["ui/<br/>layout · charts · vistas"]
-        pages["pages/<br/>8 páginas"]
+        pages["pages/<br/>10 páginas"]
         comp["components/<br/>HTML + SVG + JS"]
     end
 
@@ -52,25 +50,24 @@ flowchart LR
     core --> banb
     stats --> bombe
     stats --> banb
-    core -.-> rej
-    stats -.-> att
-    core & stats & cribs & bombe & banb --> exp
+    core & bombe --> rej
+    bombe & stats --> att
+    ref --> rej & att
+    core & stats & cribs & bombe & banb & rej & att --> exp
     exp --> results
     results & cif --> res --> pres
     results --> fig --> slides
     fig & results --> inf --> report
     viz --> pages
     viz --> fig
-    core & stats & cribs & bombe & banb --> pages
+    core & stats & cribs & bombe & banb & rej & att --> pages
     results --> pages
     ui --> pages
     pages -- "traza JSON" --> comp
     lib & appdir & data & results --> docker
 
     classDef done fill:#171B21,stroke:#F2B134,color:#E8E6E3
-    classDef todo fill:#0F1216,stroke:#2A3038,color:#9AA3AD,stroke-dasharray: 4 3
-    class core,viz,exp,results,pres,ref,demo,stats,cribs,corp,bombe,banb,cif,res,fig,inf,ui,pages,comp,slides,report,docker done
-    class rej,att todo
+    class core,viz,exp,results,pres,ref,demo,stats,cribs,corp,bombe,banb,rej,att,cif,res,fig,inf,ui,pages,comp,slides,report,docker done
 ```
 
 **De dónde sale cada número.** Los experimentos escriben `results/summary.json` y sus
@@ -110,7 +107,15 @@ Parquet; de ahí salen, sin volver a correr nada, el resumen para las diapositiv
 | `banburismus/sprt.py` | Umbrales y aproximación de Wald, cálculo exacto con sobrepaso y SPRT en Numba | 4 |
 | `experiments/` E6 | SPRT frente a Wald, aciertos por solapamiento, identificación del desplazamiento y ROC | 4 |
 | `app/pages/banburismus.py` | Página Banburismus y pestaña E6 en Experimentos | 4 |
-| `rejewski/`, `attacks/` | Extensiones P2: no se hicieron (la diapositiva 9 solo cita a Kuhl) | 5 |
+| `rejewski/characteristic.py` | El indicador doble, AD, BE y CF, su estructura de ciclos y las 101 particiones de 13 | 5 |
+| `rejewski/catalog.py` | El catálogo de las 105.456 configuraciones (I–III, reflector A) con las tablas de la Bombe | 5 |
+| `rejewski/traffic.py` | Un día de tráfico con la máquina real, la completación con el teorema y el coleccionista de cupones | 5 |
+| `attacks/gillogly.py` | Las tres fases de Gillogly en Numba, con vecinas y reajuste de anillos | 5 |
+| `attacks/hillclimb.py` | Hill climbing del plugboard con IC y trigramas, y la búsqueda parcial de la E | 5 |
+| `experiments/` E7, E8 | El catálogo frente a Kuhl y los mensajes por día; el éxito del ataque según la longitud | 5 |
+| `app/pages/rejewski.py`, `components/cycles.html` | Página Rejewski: el tráfico, los ciclos y la búsqueda en el catálogo | 5 |
+| `app/pages/ataque.py` | Página Ataque moderno: la curva del IC, el hill climbing y la curva de éxito | 5 |
+| `scripts/kuhl_variantes.py` | 33 variantes de los supuestos del catálogo frente a Kuhl | 5 |
 | `app/ui/layout.py` | Modo demo: 20 px, paneles ocultos, resultado en grande y `?demo=1` en la URL | 6 |
 | `app/ui/charts.py` | Gráficos con su descarga de datos (CSV) y figuras del informe diferidas | 6 |
 | `figuras.py` | Figuras del informe (`report/figuras/`) y respaldo 16:9 de las diapositivas | 6 |
@@ -180,6 +185,43 @@ sequenceDiagram
 E6 usa las mismas piezas con miles de pares y corre la prueba con el núcleo de Numba
 (`sprt.run_sprt`); la página solo usa NumPy.
 
+## Flujo de la página Rejewski
+
+```mermaid
+sequenceDiagram
+    participant U as Persona
+    participant P as pages/rejewski.py
+    participant T as rejewski.traffic
+    participant C as rejewski.catalog
+    participant V as ui/rejewski_view.py
+    participant J as cycles.html (JS)
+    U->>P: mensajes interceptados («Otro día»)
+    P->>T: simulate_day: clave de 1932 y 250 indicadores con la máquina real
+    P->>T: known_after, completions: lo conocido de AD, BE y CF y si ya quedó determinado
+    P->>V: cycles_payload: ciclos, cadenas y coordenadas
+    V->>J: JSON incrustado en el HTML
+    J-->>U: los ciclos (solo dibuja; no calcula)
+    P->>C: build_catalog (una vez) y la característica del día
+    C-->>P: las configuraciones candidatas
+```
+
+## Flujo del ataque moderno
+
+```mermaid
+sequenceDiagram
+    participant U as Persona
+    participant P as pages/ataque.py (o E8)
+    participant G as attacks.gillogly
+    participant H as attacks.hillclimb
+    U->>P: «Atacar» un cifrado
+    P->>G: phase1: IC con anillos AAA en órdenes × 17.576 (Numba, en paralelo)
+    P->>G: phase2: 676 anillos de las 200 mejores y sus vecinas
+    P->>G: phase3: hill climbing en las 20 mejores y reajuste de anillos
+    G->>H: climb_plugboard: IC y luego trigramas
+    G-->>P: la mejor clave, el texto y la traza
+    P-->>U: histograma del IC, subida del plugboard y descifrado
+```
+
 ## La imagen de Docker
 
 ```mermaid
@@ -187,7 +229,7 @@ flowchart TB
     base["python:3.12-slim + uv 0.13.9"] --> deps["uv sync --frozen --no-dev --no-install-project<br/>(capa de dependencias, de uv.lock)"]
     deps --> code["COPY . (sin lo que excluye .dockerignore)<br/>uv sync --frozen --no-dev"]
     code --> user["usuario «enigma» sin privilegios<br/>NUMBA_CACHE_DIR y MPLCONFIGDIR con escritura"]
-    user --> warm["warm_up(): núcleos de Numba compilados en la imagen"]
+    user --> warm["warm_up(): núcleos de Numba de la Bombe y del ataque,<br/>compilados en la imagen"]
     warm --> run["streamlit run app/Inicio.py<br/>headless, 0.0.0.0:8501, sin vigilar archivos"]
 ```
 

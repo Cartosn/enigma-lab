@@ -11,7 +11,7 @@ relativas a `src/enigma_lab/` salvo que digan otra cosa.
 3. [Estadística del idioma, cribs y menús](#3-estadística-del-idioma-cribs-y-menús) (fase 2)
 4. [La Bombe, el diagonal board y el verificador](#4-la-bombe-el-diagonal-board-y-el-verificador) (fase 3)
 5. [Banburismus, decibanes y la prueba secuencial](#5-banburismus-decibanes-y-la-prueba-secuencial) (fase 4)
-6. [Rejewski y el ataque moderno](#6-rejewski-y-el-ataque-moderno-solo-teoría) (fase 5: no se hizo; solo teoría)
+6. [Rejewski y el ataque moderno](#6-rejewski-y-el-ataque-moderno) (fase 5)
 7. [Las 15 preguntas más probables](#las-15-preguntas-más-probables)
 
 ## 0. Dónde está cada algoritmo
@@ -37,7 +37,12 @@ relativas a `src/enigma_lab/` salvo que digan otra cosa.
 | Mensajes en profundidad | Dos claves de mensaje que solo difieren en el derecho | `banburismus/depth.py` · `make_pairs`, `true_offset` |
 | Decibanes | 10·log₁₀ del cociente de verosimilitudes por columna | `banburismus/scoring.py` · `decibans`, `column_weights`, `offset_scores` |
 | Prueba secuencial | Umbrales de Wald, cálculo exacto y descomposición del sobrepaso | `banburismus/sprt.py` · `thresholds`, `wald_letters`, `exact_letters`, `wald_gap` |
-| Experimentos | E1 a E6: `run`, `summary`, `figure` y `main` | `experiments/e1_validation.py` … `e6_banburismus.py` |
+| Característica de Rejewski | AD, BE y CF del indicador doble; su estructura de ciclos | `rejewski/characteristic.py` · `indicator_permutations`, `products`, `characteristic` |
+| Catálogo de Rejewski | La característica de las 105.456 configuraciones; clases | `rejewski/catalog.py` · `build_catalog`, `Catalog.matches` |
+| Tráfico de un día | Indicadores con la máquina real; completar con el teorema | `rejewski/traffic.py` · `simulate_day`, `completions`, `coupon_expectation` |
+| Ataque de Gillogly | IC sin plugboard, anillos y plugboard, en Numba | `attacks/gillogly.py` · `phase1`, `phase2`, `phase3`, `attack` |
+| Hill climbing del plugboard | IC y trigramas; búsqueda parcial de la E | `attacks/hillclimb.py` · `climb_plugboard`, `e_stecker` |
+| Experimentos | E1 a E8: `run`, `summary`, `figure` y `main` | `experiments/e1_validation.py` … `e8_coa.py` |
 | Cifras de la presentación | Un solo registro, comprobado por las pruebas | `cifras.py` · `CIFRAS`; `tests/test_presentacion.py` |
 | Resumen, figuras e informe | RESUMEN.md y CSV; figuras; `numbers.tex` y el PDF | `resumen.py`; `figuras.py`; `informe.py` |
 
@@ -455,37 +460,135 @@ de repetir.
 - *¿Por qué 1/17, si su corpus repite 1 de cada 12,5?* Es la tasa del tráfico naval que da
   Wikipedia. Nuestro texto es literario; no se ajustó nada para coincidir.
 
-## 6. Rejewski y el ataque moderno (solo teoría)
+## 6. Rejewski y el ataque moderno
 
-La fase 5 (P2, opcional) no se hizo: no hay código de esto en el repositorio, y la
-diapositiva 9 solo cita a Kuhl. Lo que sigue es lo que hay que saber explicar.
+### 6.1 El indicador doble y la característica
 
-**El catálogo de Rejewski (1932–1938).**
-- *El dato.* Antes de mayo de 1940, cada mensaje empezaba con su clave de 3 letras cifrada
-  dos veces. Las letras 1 y 4 son la misma letra plana cifrada en dos posiciones, así que
-  cada mensaje da una pareja de la permutación AD = A₄·A₁ (y lo mismo con BE y CF). Con unas
-  80 claves de un día se completan las tres permutaciones.
-- *La matemática.* Con el plugboard S, cada Aᵢ = S·Rᵢ·S⁻¹, donde Rᵢ depende solo de los
-  rotores. Entonces AD = S·(R₄R₁)·S⁻¹: es un conjugado. Conjugar no cambia la estructura de
-  ciclos (las longitudes de los ciclos), así que esa estructura no depende del plugboard.
-- *El catálogo.* Basta tabular la «característica» (la estructura de ciclos de AD, BE y CF)
-  de las 6 × 17.576 = 105.456 configuraciones de rotores. Kuhl (2007) la calculó con el
-  reflector A: 21.230 características distintas; 11.466 señalan una sola configuración y la
-  más frecuente, 1.771.
-- *Qué medía E7.* Reproducir esos tres números y el histograma de tamaños de clase.
+**El dato.** Hasta mayo de 1940, cada mensaje empezaba con su clave de tres letras k₁k₂k₃
+tecleada dos veces en la posición del día: seis letras cifradas c₁…c₆, por seis permutaciones
+de la máquina, A, B, C, D, E y F (una por pulsación).
 
-**El ataque moderno, solo con texto cifrado.**
-- *Gillogly (1995).* Barre 60 órdenes × 17.576 posiciones con anillos fijos y sin plugboard
-  y puntúa cada descifrado con el índice de coincidencia: con la clave correcta salvo el
-  plugboard, el texto se parece más al idioma que al azar. Luego ajusta los anillos y
-  completa el plugboard por hill climbing con trigramas. Según el artículo, funcionaba con
-  unas 300 letras y hasta 6 cables.
-- *Ostwald y Weierud (2017).* Búsqueda parcial exhaustiva del plugboard más un hill climbing
-  optimizado; estiman la distancia de unicidad en unas 23 letras y rompieron un mensaje
-  real de 32.
-- *Qué medía E8.* La tasa de éxito según la longitud y los cables, con regresión logística.
-- *Lo que sí tenemos que se parece:* el verificador de la Bombe hace hill climbing del
-  plugboard con cuadrigramas (`bombe/checker.py` · `hill_climb`).
+    c₁ = A(k₁), c₂ = B(k₂), c₃ = C(k₃), c₄ = D(k₁), c₅ = E(k₂), c₆ = F(k₃).
+
+Como A es una involución, k₁ = A(c₁), y entonces c₄ = D(A(c₁)): cada mensaje da una pareja
+c₁ → c₄ de la permutación **AD** (primero A, luego D). Igual c₂ → c₅ de BE y c₃ → c₆ de CF. El
+criptoanalista no conoce A ni D, pero sí su producto
+(`rejewski/characteristic.py` · `products`; `rejewski/traffic.py` · `indicators`, `known_after`).
+
+**Teorema 1: los ciclos de AD van en parejas.** Sea X = AD (como función, x → D(A(x))). Como A y
+D son involuciones, A·X·A = X⁻¹: A lleva cada ciclo C de X a un ciclo de X⁻¹ de la misma
+longitud, es decir, a un ciclo de X recorrido al revés. Ese ciclo no puede ser el mismo C: si A
+lo dejara en C, A o D tendrían un punto fijo dentro de C (se comprueba escribiendo A(Xⁱx) =
+X^(m−i)x), y no tienen. Así que los ciclos vienen de a dos, de igual longitud. Al revés, toda
+permutación con los ciclos en parejas es el producto de dos involuciones sin puntos fijos. La
+mitad de los ciclos forma una partición de 13: hay p(13) = 101 estructuras posibles para cada
+producto y 101³ = 1.030.301 para la terna (`characteristic.HALF_TYPES`, `is_paired`).
+
+**Teorema 2: la estructura no depende del plugboard.** Con el plugboard P, cada pulsación es
+P·S·P con S el aleatorizador. Entonces AD = P·(A′D′)·P, la conjugada de A′D′ por P, y conjugar
+solo renombra las letras de cada ciclo: las longitudes no cambian. La estructura de ciclos de
+AD, BE y CF (la **característica**) depende solo de los rotores. Una prueba con hypothesis lo
+comprueba con 0 a 13 cables (`tests/test_rejewski.py` ·
+`test_characteristic_does_not_depend_on_the_plugboard`). Kuhl cita a Deavours: «el teorema que
+ganó la Segunda Guerra Mundial».
+
+### 6.2 El catálogo
+
+**Qué es** (`rejewski/catalog.py` · `build_catalog`). La característica de las 6 órdenes ×
+17.576 posiciones = 105.456 configuraciones de los rotores I–III con el reflector A, agrupadas
+por característica: cada grupo es una **clase**. Con la característica de un día se busca su
+clase y quedan unas pocas configuraciones para probar a mano.
+
+**Supuestos** (D-062). Durante el indicador solo gira el rotor derecho (así lo suponemos; Kuhl
+solo dice que su programa simula el ciclómetro). Así los anillos no importan y el catálogo se
+indexa por la posición del núcleo. Las seis permutaciones salen de las tablas del aleatorizador
+de la Bombe (`bombe/scrambler.scrambler_table` con el reflector A).
+
+**Lo que da** (E7, exacto): 21.225 características distintas; 11.578 señalan una sola
+configuración (el 54,5 %) y la más frecuente, (13 13)(13 13)(13 13), 1.728. Kuhl (2007) da
+21.230, 11.466 y 1.771. Una configuración al azar comparte su característica con 111,7
+configuraciones en promedio (mediana: 20): las clases grandes pesan mucho.
+
+**Por qué no coincide con Kuhl.** Kuhl no dice qué supone del rotor central ni de los anillos, ni
+publica su programa. `scripts/kuhl_variantes.py` prueba 33 variantes y ninguna da sus cifras; la
+forma de la distribución sí coincide (VALIDACION, E7). No se ajustó nada: se reporta.
+
+**Cuándo falla el catálogo.** El central se mueve durante las seis letras del indicador en 176 de
+cada 676 posiciones del día (26,0 %): el derecho pasa su muesca en alguna de las 6 pulsaciones
+(6 de 26) o el central parte de la suya. Esos días la característica no es la del catálogo.
+
+### 6.3 ¿Cuántos mensajes hacen falta?
+
+**El coleccionista de cupones.** Si las claves de mensaje son al azar, la primera letra de cada
+indicador es un sorteo uniforme de 26 letras. Ver las 26 pide en promedio 26·H₂₆ =
+26·(1 + 1/2 + … + 1/26) = 100,2 mensajes para una permutación; para las tres a la vez (el máximo
+de tres sorteos independientes), 127,1. Con 25 basta, porque la última imagen sale por
+eliminación: 74,2 y 90,0 (`traffic.coupon_expectation`, exacto con una cadena de Markov).
+
+**Con el teorema bastan menos.** Lo conocido forma ciclos cerrados y cadenas abiertas; completar
+la permutación es agrupar las cadenas en ciclos. Solo valen las completaciones con los ciclos en
+parejas, y a menudo queda una sola antes de ver todas las letras (`traffic.completions`,
+comprobado contra la fuerza bruta). En E7 (4.000 días, semilla 2026): ver las 26
+letras de las tres permutaciones pidió 128,0 mensajes (IC 95 % 127,0–129,1; la teoría da
+127,1) y de una sola, 100,9 (26·H₂₆ = 100,2); por eliminación, 90,5 (teoría: 90,0). Con el
+teorema, la característica quedó determinada en 49,1 mensajes y las tres permutaciones en
+60,7 (IC 60,3–61,0): los «unos sesenta» que pedía Rejewski según Kuhl (en otro texto dice unos
+ochenta). El catálogo encontró la configuración del día en el 75,4 % de los días: en todos
+aquellos en que el central no se movió durante el indicador, y en el 1,4 % de los demás, por
+coincidencia.
+
+### 6.4 El ataque de Gillogly (1995)
+
+**Fase 1: el IC sin plugboard** (`attacks/gillogly.py` · `phase1`). Con los anillos en AAA se
+descifra el mensaje en cada orden y posición (1.054.560 ubicaciones con los rotores I–V, las de la
+Bombe) y se mide el índice de coincidencia. ¿Por qué funciona sin el plugboard? Ostwald y Weierud
+lo cuentan: con 10 cables y el plugboard vacío, en la ubicación correcta el 10,1 % de las letras
+sale bien y otro 18,5 % sale como sustituto monoalfabético del plano. El IC ve las dos cosas, así
+que sube un poco sobre 1/26.
+
+**Fase 2: los anillos** (`phase2`). Para las 200 mejores ubicaciones se prueban los 676 anillos
+del central y del derecho, con la misma posición del núcleo: solo cambia en qué letra avanza el
+central. También se prueban las vecinas con el izquierdo o el central una posición atrás (D-066).
+
+**Fase 3: el plugboard por hill climbing** (`attacks/hillclimb.py` · `climb_plugboard`). Se
+prueban los 325 cambios de un cable y se queda cada uno si sube el puntaje: primero el IC (que ve
+los sustitutos monoalfabéticos) y después los trigramas del alemán (que afinan). Al final, con el
+plugboard hallado, se reajustan los anillos por trigramas (`refine`).
+
+**La búsqueda parcial de Ostwald y Weierud (2017)** (`hillclimb.e_stecker`). En lugar de arrancar
+solo con el plugboard vacío, se arranca también con cada pareja posible de la E (26 arranques).
+Con mensajes cortos el IC no distingue los primeros cables; probar las parejas de la letra más
+frecuente da buenos puntos de partida.
+
+**Lo que da** (E8): En E8 (864 mensajes, 24 por celda, con los 60 órdenes), con 6
+cables la regresión logística da que la mitad de los mensajes se lee desde unas 314 letras (IC
+95 % 273–362), lo que reportaba Gillogly (unas 300); con 8 cables, desde unas 845 (752–950); con
+10 cables no se llega a la mitad: el 25 % con 1.500 letras (Gillogly tuvo un solo éxito, con
+1.463). Con la ubicación dada, el hill climbing lee todos los mensajes desde 200 letras; con 100,
+el 79 % con 6 cables y el 29 % con 10, que la búsqueda parcial de la E sube al 100 % y al 46 %. El
+cuello de botella es la fase 1: con los anillos verdaderos la ubicación correcta quedaría primera
+(puesto mediano 0) desde 200 letras con 6 cables, 600 con 8 y 1.500 con 10; con los anillos
+supuestos, con 10 cables su puesto mediano sigue en miles aun con 1.500 letras (7.190). Cada
+mensaje tomó 1,7 s en promedio (5,6 s con 1.500 letras) en este escritorio.
+
+**La distancia de unicidad.** Shannon: un cifrado se puede romper, en principio, desde unas H/D
+letras, con H los bits de la clave y D la redundancia del idioma por letra. Ostwald y Weierud:
+H ≈ 72 bits y D ≈ 3,1 bits por letra dan unas 23 letras. Con menos, hay muchas claves que dan un
+texto que parece alemán.
+
+### 6.5 Preguntas de este tema
+
+- *¿Por qué la característica no depende del plugboard?* Porque cada producto queda conjugado por
+  el plugboard, y conjugar no cambia la longitud de los ciclos (6.1, teorema 2).
+- *¿Por qué los ciclos van en parejas?* Porque A convierte cada ciclo de AD en otro de igual
+  longitud, y no puede ser el mismo sin dar un punto fijo (6.1, teorema 1).
+- *¿Por qué su catálogo no da lo mismo que Kuhl?* No sabemos qué supuso Kuhl; probamos 33
+  variantes, ninguna da sus cifras, y su artículo tiene erratas. La forma coincide (6.2).
+- *¿Cuántos mensajes necesitaba Rejewski?* Él decía unos 60 u 80. Ver todas las letras pide unos
+  127; con el teorema de los ciclos en parejas, cerca de 60 (6.3, E7).
+- *¿Por qué el ataque moderno falla con 10 cables?* Por la fase 1: con los anillos supuestos, el
+  central y el izquierdo giran en otra letra y corren parte del texto, y con 10 cables la señal
+  del IC es débil. Con la ubicación dada, el hill climbing sí lee esos mensajes (6.4, E8).
 
 ## Las 15 preguntas más probables
 
@@ -508,9 +611,12 @@ el código.
    se propagan más. Sin él, con un lazo hay unas 648 veces más paradas (E5); la página La
    Bombe lo compara para cada menú.
 5. *¿Hoy se rompería por fuerza bruta?* No hace falta. Probar las 1,6 × 10²⁰ claves a 10⁹
-   por segundo tomaría unos 5.037 años (`core/keyspace.py` · `brute_force_years`), pero los
-   ataques de solo texto cifrado (Gillogly 1995; Ostwald y Weierud 2017) usan el índice de
-   coincidencia y hill climbing (tema 6; no los implementamos).
+   por segundo tomaría unos 5.037 años (`core/keyspace.py` · `brute_force_years`). Los ataques
+   de solo texto cifrado no prueban claves: buscan los rotores con el índice de coincidencia y el
+   plugboard por hill climbing (Gillogly 1995; Ostwald y Weierud 2017). E8 implementa el de
+   Gillogly (`attacks/gillogly.py`): con 6 cables lee la mitad de los mensajes desde unas
+   314 letras, en 1,7 s por mensaje; con 10 cables casi no lee nada, porque su fase 1 supone los
+   anillos (tema 6.4).
 6. *¿Qué es un decibán?* 10·log₁₀ del factor de Bayes, P(datos | profundidad) /
    P(datos | azar). La evidencia de observaciones independientes se suma, porque el
    logaritmo convierte el producto en una suma. Una repetición suma +1,845 dB a favor de la

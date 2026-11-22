@@ -247,6 +247,78 @@ y tasa 1/17, el SPRT pide 983 letras en profundidad (IC 95 % 954–1.012) y 1.09
 - *El cálculo exacto* da 959,7 y 1.067,4, dentro de los dos IC.
 - *La identidad de Wald* con el puntaje final medido da 963 y 1.072 letras.
 
+## Fase 5 · Rejewski (E7)
+
+**La característica no depende del plugboard** (`tests/test_rejewski.py`, con hypothesis): en
+claves al azar de Enigma I, M3 y M4, con 0 a 13 cables, la estructura de AD, BE y CF con la
+máquina real es la misma que sin plugboard, y cada producto tiene sus ciclos en parejas.
+
+**El catálogo contra la máquina.** En claves de 1932 al azar (rotores I–III, reflector A,
+anillos, posición y 0 a 13 cables), cuando el central no se mueve durante el indicador, la
+entrada del catálogo en la posición del núcleo es la característica que da la máquina real. La
+búsqueda devuelve la configuración consultada, y la clase tiene tantas configuraciones como
+dice su tamaño. El central se mueve en exactamente 176 de las 676 posiciones del central y del
+derecho.
+
+**El catálogo contra Kuhl (2007)** (exacto, sin azar):
+
+| | E7 | Kuhl | Diferencia |
+| --- | --- | --- | --- |
+| Configuraciones | 105.456 | 105.456 | 0 |
+| Características distintas | 21.225 | 21.230 | −5 (−0,02 %) |
+| Únicas (una sola configuración) | 11.578 | 11.466 | +112 (+1,0 %) |
+| La más frecuente, (13 13)(13 13)(13 13) | 1.728 | 1.771 | −43 (−2,4 %) |
+| Con 10 configuraciones o menos | 19.556 | 19.604 (su tabla 2) | −48 |
+
+- *La forma coincide:* los tamaños de 1 a 16 difieren poco (por ejemplo, 3.345 frente a 3.381 de
+  tamaño 2), y 14 de las 15 características de su tabla 1 están entre nuestras 15 más
+  frecuentes, con tamaños a menos del 13 % de los suyos.
+- *Las cifras no:* `scripts/kuhl_variantes.py` prueba 33 variantes de los supuestos (D-062).
+  Ninguna da 21.230, 11.466 y 1.771; la suma de diferencias con su tabla 2 va de 256 a 895
+  (442 con nuestros supuestos). Girar el reflector A no cambia nada (es renombrar posiciones), y
+  las distribuciones de los reflectores B y C se parecen tanto como la nuestra.
+- *Erratas del artículo:* escribe dos veces 105.465 configuraciones; da 11.466 como el 54,40 %
+  (11.466/21.230 es el 54,01 %); y dice que 20.433 características tienen 10 configuraciones o
+  menos, cuando su tabla 2 suma 19.604 para esos tamaños (y 19.604/21.230 es el 92,34 % que él
+  mismo da). Su tabla 2 salta del tamaño 14 al 16.
+- *Conclusión:* no ajustamos nada. Kuhl no publica su programa ni dice qué supone del rotor
+  central y de los anillos; nuestros supuestos están escritos y probados contra la máquina real.
+
+**Completar con el teorema** (`traffic.completions`): el conteo de completaciones con los ciclos
+en parejas coincide con la fuerza bruta (todas las formas de cerrar las cadenas) en 150 de 150
+productos con 1 a 5 letras desconocidas.
+
+## Fase 5 · Ataque moderno (E8)
+
+- **La tabla de sucesores** del paso (`gillogly.step_table`) coincide con `core/stepping.step` en
+  600 ventanas al azar de tres órdenes.
+- **El núcleo de la fase 1** (Numba, en paralelo) da el mismo IC que un cálculo en Python puro en
+  cuatro posiciones (D-065 cuenta el error que esta prueba atrapó).
+- **La ubicación y el plugboard verdaderos descifran como la máquina:** el aleatorizador de cada
+  letra (`paths_for`) con el plugboard verdadero da el texto plano exacto (10 cables, 700 letras,
+  rotores I–V), y la clave equivalente que arma `location_config` descifra igual con
+  `core/machine.py`.
+- **El hill climbing** desde la ubicación verdadera recupera los 10 cables exactos en 300 letras.
+- **El ataque completo** lee un mensaje de 800 letras con 6 cables entre los 6 órdenes de I–III,
+  con el orden verdadero, y la ubicación verdadera queda entre las 100 mejores de la fase 1.
+- **La regresión logística** de E8 recupera la longitud con 50 % de éxito de datos simulados con
+  una curva conocida (L₅₀ = 200 dentro de su IC).
+- **La figura** se dibuja con celdas sin éxitos. La primera corrida completa se detuvo ahí: con 0
+  de 24, el límite inferior de Wilson salía a un error de redondeo sobre la proporción y el bigote
+  quedaba negativo. `67e022b` lo recorta y la corrida se repitió entera (D-067).
+
+**E8 frente a las referencias** (modo completo, 864 mensajes, los 60 órdenes, semilla 2026):
+- *Gillogly, «unas 300 letras con 6 cables o menos»:* la regresión logística da que, con 6
+  cables, la mitad de los mensajes se lee desde unas 314 letras (IC 95 % 273–362).
+- *Gillogly, «un solo éxito con 10 cables, con 1.463 letras»:* con 10 cables el ataque lee el 25 %
+  de los mensajes de 1.500 letras, el 12,5 % de los de 1.000 y casi ninguno más corto.
+- *La distancia de unicidad, unas 23 letras:* con 25 letras ni siquiera el hill climbing desde la
+  ubicación verdadera lee los mensajes (ninguno con el plugboard vacío; con la búsqueda parcial
+  de la E, 1 de 24 con 6 cables y 1 de 24 con 8). Ostwald y Weierud dicen que bajo unas 20 letras los mensajes son
+  prácticamente irrompibles y que en sus pruebas el umbral rondó las 24; su método agota todas las
+  ubicaciones, y aquí la fase 1 es la de Gillogly.
+- *Sin falsos éxitos:* ningún mensaje se leyó con el orden equivocado.
+
 ## Otras comprobaciones
 
 - **Cableados:** coinciden con los de py-enigma (`tests/test_wiring.py`). Cada rotor es
@@ -260,7 +332,7 @@ y tasa 1/17, el SPRT pide 983 letras en profundidad (IC 95 % 954–1.012) y 1.09
   `Enigma.trace`, y su HTML no contiene ningún cableado: no reimplementa la máquina. En
   el navegador, la letra 1 de «Vector BDZGO» recorre A → A → C → D → F → S → S → E → B
   → B → B, como en la diapositiva 4.
-- **Cifras de la presentación (`tests/test_presentacion.py`):** comprueba las 43 que ya
-  tienen código, entre ellas las de Turing de la diapositiva 16 contra
-  `data/reference/turing_stops.csv` y las seis del Banburismus (diapositivas 13 y 17). La
-  de Kuhl (diapositiva 9) aparece como pendiente de la fase 5.
+- **Cifras de la presentación (`tests/test_presentacion.py`):** comprueba las 45, entre ellas
+  las de Turing de la diapositiva 16 contra `data/reference/turing_stops.csv`, las seis del
+  Banburismus (diapositivas 13 y 17) y las dos de la diapositiva 9: las 105.456 configuraciones
+  del catálogo y las cifras de Kuhl contra `data/reference/kuhl_2007.json` (D-063).
