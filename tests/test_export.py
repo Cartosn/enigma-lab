@@ -51,3 +51,26 @@ def test_figure_downloads_are_valid_png_and_svg() -> None:
     assert png.startswith(b"\x89PNG")
     assert b"<svg" in svg[:500]
     assert csv_bytes(table).decode("utf-8").startswith("tabla,modelo,componente")
+
+
+def test_saved_results_download_the_saved_figure(tmp_path) -> None:  # type: ignore[no-untyped-def]
+    """Con los resultados guardados se baja la figura de ``results/figures/`` sin dibujarla.
+
+    Dibujar la de E4 pediría el corpus completo, que no está en Docker ni en un clon sin
+    ``make corpus`` (D-071). Si el archivo guardado no existe, la figura se dibuja.
+    """
+    from enigma_lab import paths
+    from enigma_lab.experiments import e2_keyspace
+    from ui.charts import figure_data
+
+    def never() -> None:
+        raise AssertionError("con la figura guardada no se dibuja nada")
+
+    saved = paths.FIGURES / "e4_cribs"
+    png = figure_data(never, "png", saved)
+    assert png == (paths.FIGURES / "e4_cribs.png").read_bytes()
+    assert png.startswith(b"\x89PNG")
+    assert b"<svg" in figure_data(never, "svg", saved)[:500]
+    table = e2_keyspace.run()
+    drawn = figure_data(lambda: e2_keyspace.figure(table), "png", tmp_path / "no_existe")
+    assert drawn.startswith(b"\x89PNG")

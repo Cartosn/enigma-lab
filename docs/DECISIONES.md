@@ -736,6 +736,27 @@ datos en `r5_rejewski.csv` y `r6_ataque.csv`.
 - Se puede elegir entre los 60 órdenes (las ubicaciones de la Bombe) y los 6 de I–III.
 - El puesto de la ubicación verdadera y las letras correctas solo se muestran con la clave revelada.
 
+## Después de la fase 5 (22-11-2026)
+
+### D-071 · Experimentos muestra lo guardado sin leer el corpus completo
+- **El problema.** Al probar la imagen de Docker después de la fase 5, la página Experimentos se
+  cortaba en la pestaña E4 con `FileNotFoundError`: para mostrar la tabla guardada,
+  `e4_cribs.aggregate` recalculaba κ con el corpus completo, que no está en la imagen
+  (`.dockerignore`) ni en un clon sin `make corpus`. E4 a E8 no se veían. Por la misma causa
+  fallaban las descargas PNG y SVG de E4 y E6, y la tabla de E3 de la app usaba las frecuencias
+  de la muestra: 8,07 % en lugar del 8,00 % guardado (alemán, 1.000 letras).
+- **La decisión.** Con los resultados guardados, la página no recalcula nada que dependa del
+  corpus. Las tablas de E3, E4 y E6 son las de `results/` (`e3_condiciones`, `e4_cribs` y
+  `e6_banburismus`), y las descargas PNG y SVG de las ocho pestañas son las figuras de
+  `results/figures/`, las mismas del informe (`ui/charts.figure_data`). «Correr ahora» sigue
+  calculando con la muestra del corpus, que está en el repositorio.
+- **No cambia ninguna cifra.** La tabla guardada de E4 es idéntica a la recalculada con el corpus
+  completo, y la de E3 es la que ya usaba el resumen.
+- **Las pruebas.** `test_experiments_page_without_the_full_corpus` corre la página sin el corpus
+  completo y compara las tablas de E3 y E4 con las guardadas; con la versión anterior falla con
+  el mismo error que en Docker. `test_saved_results_download_the_saved_figure` comprueba que la
+  descarga es el archivo guardado y que no se dibuja nada.
+
 ## Pendientes de decidir
 
 ### P-001 · Equipo de las mediciones de la demo 2

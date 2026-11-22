@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from pathlib import Path
 
 import pytest
 from streamlit.testing.v1 import AppTest
@@ -17,6 +18,45 @@ PAGES = [paths.APP / m.page for m in MODULES if m.page]
 def test_page_runs(page) -> None:  # type: ignore[no-untyped-def]
     app = AppTest.from_file(str(page), default_timeout=120).run()
     assert not app.exception, app.exception
+
+
+def test_experiments_page_without_the_full_corpus(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Docker y un clon sin ``make corpus`` no traen el corpus completo (D-071).
+
+    Con los resultados guardados, Experimentos no lo lee: se dibujan las ocho pestañas, y las
+    tablas de E3 y E4 son las de ``results/``, con la teoría calculada con el corpus completo.
+    """
+    import pandas as pd
+    import streamlit as st
+
+    from enigma_lab.stats import corpus
+
+    def clear_caches() -> None:
+        for cached in (corpus.load_text, corpus.load_letters, corpus.load_codes):
+            cached.cache_clear()
+        st.cache_data.clear()
+
+    monkeypatch.setattr(corpus, "FULL_DIR", tmp_path)  # carpeta vacía: no hay corpus completo
+    clear_caches()
+    try:
+        page = str(paths.APP / "pages" / "experimentos.py")
+        app = AppTest.from_file(page, default_timeout=120).run()
+        assert not app.exception, app.exception
+        assert len([r for r in app.radio if r.label == "Resultados"]) == 8
+        shown = [d.value for d in app.dataframe]
+        for name, column in (
+            ("e3_condiciones", "rechaza_cifrado_teoria"),
+            ("e4_cribs", "teorico_kappa"),
+        ):
+            table = next(t for t in shown if column in t.columns).reset_index(drop=True)
+            saved = pd.read_parquet(paths.RESULTS / f"{name}.parquet")
+            pd.testing.assert_frame_equal(
+                table, saved, check_dtype=False, check_column_type=False, check_index_type=False
+            )
+    finally:
+        clear_caches()
 
 
 def test_cribs_page_shows_slide_11_menu() -> None:

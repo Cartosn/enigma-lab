@@ -75,7 +75,9 @@ Parquet; de ahí salen, sin volver a correr nada, el resumen para las diapositiv
 (`make resumen`), las figuras (`make figuras`) y las cifras del informe
 (`report/numbers.tex`, `make report`). Las cifras de las diapositivas que no son resultados
 (espacio de claves, vectores, pesos de Turing) las calcula `cifras.py`, y
-`tests/test_presentacion.py` las compara con la presentación.
+`tests/test_presentacion.py` las compara con la presentación. La página Experimentos muestra
+esos Parquet y las figuras de `results/figures/` tal como se guardaron, sin leer el corpus
+completo, que no está en Docker ni en un clon sin `make corpus` (D-071).
 
 ## Estado por fase
 

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import io
 from collections.abc import Callable
+from pathlib import Path
 from typing import Any
 
 import pandas as pd
@@ -80,12 +81,31 @@ def figure_bytes(make_figure: Callable[[], Any], fmt: str) -> bytes:
     return buffer.getvalue()
 
 
+def figure_data(make_figure: Callable[[], Any], fmt: str, saved: Path | None = None) -> bytes:
+    """La figura en PNG o SVG: el archivo guardado si existe; si no, la dibuja ahora.
+
+    ``saved`` es la figura de ``results/figures/`` sin extensión (la del informe, con el PNG
+    a 2x). Bajarla tal como se guardó evita volver a calcularla: algunas figuras piden el
+    corpus completo, que no traen ni la imagen de Docker ni un clon sin ``make corpus``
+    (D-071).
+    """
+    if saved is not None:
+        path = saved.parent / f"{saved.name}.{fmt}"
+        if path.is_file():
+            return path.read_bytes()
+    return figure_bytes(make_figure, fmt)
+
+
 def figure_downloads(
-    name: str, table: Callable[[], pd.DataFrame], make_figure: Callable[[], Any]
+    name: str,
+    table: Callable[[], pd.DataFrame],
+    make_figure: Callable[[], Any],
+    saved: Path | None = None,
 ) -> None:
     """Tres botones: los datos en CSV y la figura del informe en PNG y en SVG.
 
-    La figura se dibuja solo cuando alguien pulsa su botón (descarga diferida), así que
+    Con ``saved`` (los resultados guardados) se baja la figura de ``results/figures/``; sin
+    él, la figura se dibuja solo cuando alguien pulsa su botón (descarga diferida), así que
     la página no paga el costo de Matplotlib al abrirse.
     """
     cols = st.columns(3)
@@ -96,7 +116,7 @@ def figure_downloads(
     ):
         col.download_button(
             f"Figura ({fmt.upper()})",
-            data=lambda fmt=fmt: figure_bytes(make_figure, fmt),
+            data=lambda fmt=fmt: figure_data(make_figure, fmt, saved),
             file_name=f"{name}.{fmt}",
             mime=mime,
             icon=icon,

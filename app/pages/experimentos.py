@@ -7,6 +7,11 @@ sesión, sin tocar los resultados guardados.
 Las tablas y cifras de cada pestaña se calculan una sola vez (``st.cache_data``), y las
 figuras para descargar (PNG y SVG, estilo ``enigma_print``) solo cuando alguien pulsa el
 botón: así la página abre rápido (spec 8.3).
+
+Con los resultados guardados, las tablas que dependen del corpus (E3, E4 y E6) y las figuras
+para descargar se leen de ``results/`` tal como se guardaron: recalcularlas pediría el corpus
+completo, que no traen ni la imagen de Docker ni un clon sin ``make corpus`` (D-071). «Correr
+ahora» usa la muestra del corpus, que sí está en el repositorio.
 """
 
 from __future__ import annotations
@@ -179,8 +184,12 @@ def _prepared(experiment: str, run_now: bool) -> dict[str, Any] | None:
         df = _raw("e3", run_now, "e3_estadistica")
         if df is None:
             return None
+        # La guardada usa las frecuencias del corpus completo, que la app no lee (D-071).
+        table = e3_statistics.by_condition(df, "muestra") if run_now else _saved("e3_condiciones")
+        if table is None:
+            return None
         return {
-            "table": e3_statistics.by_condition(df),
+            "table": table,
             "pairs": _e3_pairs(run_now),
             "fixed": int(df["puntos_fijos"].sum()),
             "letters": int(df["L"].sum()),
@@ -189,8 +198,12 @@ def _prepared(experiment: str, run_now: bool) -> dict[str, Any] | None:
         df = _raw("e4", run_now, "e4_cribs_mensajes")
         if df is None:
             return None
-        source = "muestra" if run_now else summary.get("e4", {}).get("fuente", "completo")
-        return {"table": e4_cribs.aggregate(df, source), "source": source}
+        if run_now:
+            return {"table": e4_cribs.aggregate(df, "muestra"), "source": "muestra"}
+        # La guardada trae la teoría con el κ del corpus completo, que la app no lee (D-071).
+        table = _saved("e4_cribs")
+        source = summary.get("e4", {}).get("fuente", "completo")
+        return None if table is None else {"table": table, "source": source}
     if experiment == "e5":
         df = _raw("e5", run_now, "e5_bombe_menus")
         if df is None:
@@ -202,8 +215,10 @@ def _prepared(experiment: str, run_now: bool) -> dict[str, Any] | None:
         if df is None:
             return None
         corpus = "muestra" if run_now else summary.get("e6", {}).get("corpus", "completo")
-        saved_table = None if run_now else _saved("e6_banburismus")
-        table = saved_table if saved_table is not None else e6_banburismus.aggregate(df, corpus)
+        # La guardada trae las referencias de Wald con el corpus completo (D-071).
+        table = e6_banburismus.aggregate(df, "muestra") if run_now else _saved("e6_banburismus")
+        if table is None:
+            return None
         return {"table": table, "corpus": corpus, "roc": _e6_roc(df)}
     if experiment == "e7":
         df = _raw("e7", run_now, "e7_rejewski")
@@ -236,10 +251,17 @@ def _e6_roc(df: pd.DataFrame) -> list[tuple[str, Any, Any, float]]:
 # ---------------------------------------------------------------- descargas
 
 
-def _downloads(name: str, table: pd.DataFrame, make_figure: Callable[[], Any]) -> None:
-    """Datos (CSV) y figura (PNG o SVG) de una pestaña; la figura se dibuja al pulsar."""
+def _downloads(
+    name: str, table: pd.DataFrame, make_figure: Callable[[], Any], run_now: bool
+) -> None:
+    """Datos (CSV) y figura (PNG o SVG) de una pestaña.
+
+    Con los resultados guardados, la figura es la de ``results/figures/`` (D-071); con
+    «Correr ahora», se dibuja al pulsar el botón.
+    """
     if not demo:
-        figure_downloads(name, lambda: table, make_figure)
+        saved = None if run_now else paths.FIGURES / name
+        figure_downloads(name, lambda: table, make_figure, saved)
 
 
 def _plot(fig: Any) -> None:
@@ -276,7 +298,7 @@ def _show_e1(data: dict[str, Any], run_now: bool) -> None:
     )
     cols[2].metric("Vectores de 6.1", f"{figures['vectores_ok']} de {figures['vectores_total']}")
     st.dataframe(vectors, hide_index=True, width="stretch")
-    _downloads("e1_vectores", vectors, lambda: e1_validation.figure(vectors))
+    _downloads("e1_vectores", vectors, lambda: e1_validation.figure(vectors), run_now)
 
 
 def _show_e2(data: dict[str, Any], run_now: bool) -> None:
@@ -289,7 +311,7 @@ def _show_e2(data: dict[str, Any], run_now: bool) -> None:
     with cols[1]:
         _plot(plotly_figs.plugboard_curve(ks.DEFAULT_CABLES, demo))
     _table(table)
-    _downloads("e2_espacio_de_claves", table, lambda: e2_keyspace.figure(table))
+    _downloads("e2_espacio_de_claves", table, lambda: e2_keyspace.figure(table), run_now)
 
 
 def _show_e3(data: dict[str, Any], run_now: bool) -> None:
@@ -303,7 +325,7 @@ def _show_e3(data: dict[str, Any], run_now: bool) -> None:
         f"{fmt_int(data['fixed'])} puntos fijos en {fmt_int(data['letters'])} letras."
     )
     df = _raw("e3", run_now, "e3_estadistica")
-    _downloads("e3_estadistica", table, lambda: e3_statistics.figure(df, pairs=pairs))
+    _downloads("e3_estadistica", table, lambda: e3_statistics.figure(df, pairs=pairs), run_now)
 
 
 def _show_e4(data: dict[str, Any], run_now: bool) -> None:
@@ -320,7 +342,7 @@ def _show_e4(data: dict[str, Any], run_now: bool) -> None:
         )
     _table(table)
     df = _raw("e4", run_now, "e4_cribs_mensajes")
-    _downloads("e4_cribs", table, lambda: e4_cribs.figure(df, source=source))
+    _downloads("e4_cribs", table, lambda: e4_cribs.figure(df, source=source), run_now)
 
 
 def _show_e5(data: dict[str, Any], run_now: bool) -> None:
@@ -343,7 +365,7 @@ def _show_e5(data: dict[str, Any], run_now: bool) -> None:
     )
     _table(table)
     df = _raw("e5", run_now, "e5_bombe_menus")
-    _downloads("e5_bombe", table, lambda: e5_bombe.figure(df))
+    _downloads("e5_bombe", table, lambda: e5_bombe.figure(df), run_now)
 
 
 def _show_e6(data: dict[str, Any], run_now: bool) -> None:
@@ -368,6 +390,7 @@ def _show_e6(data: dict[str, Any], run_now: bool) -> None:
         "e6_banburismus",
         table,
         lambda: e6_banburismus.figure(df, trajectories=trajectories, corpus=corpus),
+        run_now,
     )
 
 
@@ -408,7 +431,7 @@ def _show_e7(data: dict[str, Any], run_now: bool) -> None:
         "con las de Kuhl (VALIDACION, D-062)."
     )
     _table(table)
-    _downloads("e7_rejewski", table, lambda: e7_rejewski.figure(table, days=days))
+    _downloads("e7_rejewski", table, lambda: e7_rejewski.figure(table, days=days), run_now)
 
 
 def _e8_curves(df: pd.DataFrame, fit: dict[str, Any] | None) -> dict[int, Any]:
@@ -455,7 +478,7 @@ def _show_e8(data: dict[str, Any], run_now: bool) -> None:
         + _e8_l50(fit)
     )
     _table(table)
-    _downloads("e8_coa", table, lambda: e8_coa.figure(df))
+    _downloads("e8_coa", table, lambda: e8_coa.figure(df), run_now)
 
 
 SHOW: dict[str, Callable[[dict[str, Any], bool], None]] = {

@@ -1,6 +1,7 @@
 # Progreso
 
-Última actualización: 22-11-2026 · fase 5 cerrada: E7 (Rejewski) y E8 (ataque moderno).
+Última actualización: 22-11-2026 · fase 5 cerrada: E7 (Rejewski) y E8 (ataque moderno). Docker
+probado después de la fase 5; Experimentos ya funciona sin el corpus completo (D-071).
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
@@ -35,6 +36,33 @@ dibujar la figura de E8 (un bigote de Wilson negativo por redondeo, con 0 éxito
 corrigió en `67e022b` y se repitió entera, con cifras idénticas (D-067). `make rapido`, con los
 ocho experimentos en modo rápido, tarda 1 min 19 s (E8, 26 s). `make report`: 9 s; el informe
 queda en 3 páginas justas, con poco margen para reescribir los párrafos `% REVISAR`.
+
+**Docker después de la fase 5** (22-11-2026). La imagen que había era de antes de la fase 5 (el
+Dockerfile cambió en `103df6c`). Desde un clon limpio de `9e55377`, `docker compose build
+--no-cache` tarda 2 min 21 s: las dependencias, 26 s; Numba de la Bombe y de Gillogly, 18,6 s
+dentro de la imagen; exportar la imagen, de 2,8 GB, 87 s. La app responde a `/_stcore/health`
+3,1 s después de `docker compose up -d`. En el navegador integrado, contra el contenedor:
+- Inicio, con 9 de 9 vectores, a lo sumo 6,3 s después de abrirla por primera vez.
+- Rejewski carga en 3,3 s: el tráfico del día, los ciclos, el catálogo (3 candidatas, entre ellas
+  la verdadera) y la comparación con Kuhl.
+- Ataque moderno: 600 letras, 6 cables y 60 órdenes en 3,4 s, con el 100 % de las letras.
+- Demo 1: «Vector BDZGO» y «Portada» responden al instante («Portada», 0,24 s después del clic).
+  Caso de respaldo: barrido en 0,8 s y «Verificar» en 0,5 s.
+- Demo 2 con un mensaje de 86 letras cifrado con «Clave aleatoria» en Máquina (menú de 15 letras
+  y 0 lazos): barrido robusto de los 60 órdenes en 7,8 s y el mensaje descifrado letra por letra.
+- Ninguna petición sale de localhost en las diez páginas, tampoco desde los componentes.
+- **Experimentos fallaba; quedó corregido (D-071).** Al preparar la pestaña E4,
+  `e4_cribs.aggregate` recalculaba κ con `data/corpora/completo/aleman.txt`, que la imagen no
+  trae (`.dockerignore`), y la página se cortaba con `FileNotFoundError`: E4 a E8 no se veían.
+  Pasaba lo mismo en un clon sin `make corpus` (comprobado con `ENIGMA_LAB_ROOT` apuntando al
+  clon) y, por la misma causa, en las descargas PNG y SVG de E4 y E6. Además, la tabla de E3 de
+  la app calculaba la columna teórica de la χ² con la muestra: 8,07 % frente al 8,00 % guardado
+  (alemán, 1.000 letras). Ahora, con los resultados guardados, la página lee las tablas y las
+  figuras de `results/`, y ninguna cifra cambia. Con la imagen reconstruida (30 s, con las
+  dependencias en caché), las ocho pestañas se ven en el contenedor con las cifras guardadas
+  (E4: 61,6 %, y la teoría con el IC del alemán, 61,4 %), las descargas de E4 y E6 entregan los
+  archivos guardados sin dibujar nada, «Correr ahora» funciona con la muestra y ninguna petición
+  sale de localhost. `make test`: 337 pruebas (2 nuevas) en 2 min 11 s; `make lint`, sin errores.
 
 **Qué quedó:**
 - **`rejewski/`:**
