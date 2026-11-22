@@ -340,10 +340,14 @@ def _success_panel(ax: Any, df: pd.DataFrame, theme: str) -> None:
     for k, (color, cables) in enumerate(zip(CATEGORICAL, levels, strict=False)):
         part = table[table["cables"] == cables].sort_values("L")
         dodge = 1 + 0.035 * (k - (len(levels) - 1) / 2)  # separa los bigotes de cada serie
+        # Con 0 o N éxitos, el límite de Wilson sale a un error de redondeo de la proporción:
+        # sin recortar, el bigote puede quedar en −1e-17 y Matplotlib no lo acepta.
+        below = np.clip(part["exito"] - part["ic_bajo"], 0, None)
+        above = np.clip(part["ic_alto"] - part["exito"], 0, None)
         ax.errorbar(
             part["L"] * dodge,
             part["exito"],
-            yerr=[part["exito"] - part["ic_bajo"], part["ic_alto"] - part["exito"]],
+            yerr=[below, above],
             fmt="o",
             color=color,
             markersize=4,
@@ -363,16 +367,17 @@ def _success_panel(ax: Any, df: pd.DataFrame, theme: str) -> None:
     )
     for k, (x, label) in enumerate(marks):
         ax.axvline(x, color=t.text_muted, linestyle="--", linewidth=0.9)
+        # Los rótulos van sobre el marco, en dos alturas: abajo hay datos.
         ax.annotate(
             label,
-            xy=(x, 0.02 + 0.09 * (k % 2)),
+            xy=(x, 1),
             xycoords=("data", "axes fraction"),
-            xytext=(3, 0),
+            xytext=(0, 3 + 10 * (k % 2)),
             textcoords="offset points",
-            rotation=90,
+            ha="center",
+            va="bottom",
             fontsize="x-small",
             color=t.text_muted,
-            va="bottom",
         )
     ax.set_xscale("log")
     ax.set_xlim(min(20, table["L"].min() * 0.8), max(1_800, table["L"].max() * 1.15))
@@ -388,7 +393,7 @@ def _success_panel(ax: Any, df: pd.DataFrame, theme: str) -> None:
         title_fontsize="x-small",
     )
     per_cell = int(df.groupby(["L", "cables"]).size().min())
-    ax.set_title(f"Éxito del ataque de Gillogly ({fmt_int(per_cell)} mensajes por punto)")
+    ax.set_title(f"Éxito del ataque de Gillogly ({fmt_int(per_cell)} mensajes por punto)", pad=26)
 
 
 def _time_panel(ax: Any, df: pd.DataFrame, theme: str) -> None:

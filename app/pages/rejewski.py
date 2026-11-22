@@ -115,7 +115,7 @@ n_messages = controls[0].slider(
 if controls[1].button("Otro día", icon=":material/casino:", width="stretch"):
     state[K + "seed"] += 1
     state[K + "reveal"] = False
-reveal = controls[2].toggle("Revelar la clave del día", key=K + "reveal")
+reveal = controls[2].toggle("Revelar la clave", key=K + "reveal")
 
 day = _day(state[K + "seed"])
 shown = day.indicators[:n_messages]
@@ -127,11 +127,7 @@ metrics = st.columns(4)
 metrics[0].metric("Mensajes", fmt_int(n_messages))
 for column, name, s in zip(metrics[1:], PRODUCTS, states, strict=True):
     verdict = (
-        "permutación completa"
-        if s["permutation"]
-        else "estructura lista"
-        if s["characteristic"]
-        else "faltan letras"
+        "completa" if s["permutation"] else "estructura" if s["characteristic"] else "faltan letras"
     )
     column.metric(
         f"Letras de {name}",

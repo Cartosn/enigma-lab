@@ -33,8 +33,8 @@ what_am_i_seeing(
     "«67 → 20 bits» compara las claves de Enigma I sin anillos con lo que de verdad "
     "recorre la Bombe. Lo calcula `core/keyspace.py`.",
     "La barra reparte los bits entre los componentes de la clave; en ámbar, lo que barre la Bombe.",
-    "Las tarjetas llevan a cada módulo. Rejewski y el ataque moderno (fase 5, opcional) no "
-    "se hicieron: la presentación solo cita la literatura.",
+    "Las tarjetas llevan a cada módulo: de la máquina y el catálogo de Rejewski a la Bombe, el "
+    "Banburismus y el ataque moderno solo con texto cifrado.",
 )
 
 st.markdown(

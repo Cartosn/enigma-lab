@@ -166,6 +166,34 @@ def test_e8_attack_small() -> None:
     assert figures["referencias"]["unicidad_letras"] == 23
 
 
+def test_e8_figure_with_cells_without_success() -> None:
+    """La figura de E8 se dibuja aunque una celda no tenga éxitos (bigotes de Wilson de 0)."""
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    rows = []
+    for length, hits in ((50, 0), (200, 3), (800, 8)):
+        for k in range(8):
+            rows.append(
+                {
+                    "L": length,
+                    "cables": 6,
+                    "exito": k < hits,
+                    "aciertos": 1.0 if k < hits else 0.04,
+                    "fase1_encontrada": k < hits,
+                    "fase1_puesto": 0 if k < hits else 5_000,
+                    "fase1_puesto_anillos_verdaderos": 0,
+                    "top1": 200,
+                    "oraculo_exito": True,
+                    "oraculo_e_exito": True,
+                    "segundos": 1.0,
+                    "segundos_fase1": 0.5,
+                }
+            )
+    fig = e8_coa.figure(pd.DataFrame(rows))
+    plt.close(fig)
+
+
 def test_e8_logistic_recovers_a_known_curve() -> None:
     """La regresión logística de E8 recupera L₅₀ de datos simulados con una curva conocida."""
     rng = np.random.default_rng(SEED)
