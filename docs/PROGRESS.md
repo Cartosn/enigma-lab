@@ -1,6 +1,6 @@
 # Progreso
 
-Última actualización: 22-11-2026 · fase 6 cerrada: entrega lista.
+Última actualización: 22-11-2026 · fase 5 cerrada: E7 (Rejewski) y E8 (ataque moderno).
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
@@ -9,8 +9,100 @@
 | 2 · Estadística y cribs | Cerrada (20-11-2026) | 1–2 (reunión con el profe) |
 | 3 · Bombe | Cerrada (21-11-2026) | 2 |
 | 4 · Banburismus | Cerrada (21-11-2026) | 3 |
-| 5 · Extensiones P2 | No se hizo (opcional; ver limitaciones del README) | 3 |
+| 5 · Extensiones P2 | Cerrada (22-11-2026), después de la fase 6 | 3 |
 | 6 · Pulido y entrega | Cerrada (22-11-2026) | Fin de la 3 |
+
+## Fase 5 · Extensiones P2
+
+Se hizo después de cerrar la fase 6, sobre la entrega ya armada: lo que la fase 6 marcó como
+«no se hizo» quedó actualizado (README, informe, `cifras.py`, la página Experimentos y este
+documento).
+
+**Criterio de aceptación** (spec, sección 9: «E7 comparado con Kuhl; E8 con su curva de éxito»):
+se cumple.
+
+| Criterio | Resultado |
+| --- | --- |
+| E7 comparado con Kuhl (21.230 / 11.466 / 1.771) | El catálogo da 21.225 / 11.578 / 1.728 con los supuestos documentados (D-062). No coincide del todo y no se ajustó nada: ninguna de 33 variantes de los supuestos reproduce las cifras de Kuhl (`scripts/kuhl_variantes.py`); la forma coincide (14 de las 15 clases de su tabla 1) y su artículo tiene erratas (VALIDACION) |
+| Supuestos de E7, documentados y comparados | Solo gira el derecho durante el indicador (Kuhl dice que simula el ciclómetro, sin más); los anillos no importan; el catálogo se comprueba contra la máquina real con hypothesis; el central se mueve en 176 de cada 676 posiciones del día |
+| E8 con su curva de éxito | Éxito según la longitud (25 a 1.500 letras) y los cables (6, 8 y 10), con 24 mensajes por celda y los 60 órdenes, con IC de Wilson y regresión logística (statsmodels): con 6 cables, la mitad de los mensajes se lee desde unas 314 letras (IC 95 % 273–362; Gillogly: unas 300); con 8, desde unas 845 (752–950); con 10 no se llega a la mitad (25 % con 1.500 letras; Gillogly: un solo éxito, con 1.463). Tiempo: 1,7 s por mensaje (5,6 s con 1.500 letras) |
+
+`make test` da 335 pruebas que pasan en 2 min 4 s, con las lentas incluidas. `make lint` pasa sin
+errores. `make reproduce` completo (corpus, E1 a E8, resumen y figuras) tarda **30 min 48 s** en
+un clon limpio de `67e022b`, en este escritorio: E8, 25 min (1,7 s por mensaje); E5, 3 min 22 s;
+E6, 49 s; E7, 21 s. La primera corrida, sobre `103df6c`, guardó todos los datos y se detuvo al
+dibujar la figura de E8 (un bigote de Wilson negativo por redondeo, con 0 éxitos de 24); se
+corrigió en `67e022b` y se repitió entera, con cifras idénticas (D-067). `make rapido`, con los
+ocho experimentos en modo rápido, tarda 1 min 19 s (E8, 26 s). `make report`: 9 s; el informe
+queda en 3 páginas justas, con poco margen para reescribir los párrafos `% REVISAR`.
+
+**Qué quedó:**
+- **`rejewski/`:**
+  - `characteristic.py`: las seis permutaciones del indicador con la máquina real, AD, BE y CF, su
+    estructura de ciclos y las 101 particiones de 13;
+  - `catalog.py`: el catálogo de las 105.456 configuraciones con las tablas del aleatorizador de la
+    Bombe (1,4 s), sus clases y la búsqueda;
+  - `traffic.py`: un día de tráfico, la completación con el teorema de los ciclos en parejas
+    (comprobada contra la fuerza bruta) y el coleccionista de cupones exacto.
+- **`attacks/`:** `gillogly.py` (las tres fases en Numba, con vecinas y reajuste de anillos,
+  D-066) y `hillclimb.py` (IC y trigramas, y la búsqueda parcial de la E de Ostwald y Weierud).
+- **Experimentos:** E7 (exacto el catálogo; 4.000 días de tráfico) y E8 (864 mensajes con los 60
+  órdenes), con sus figuras y sus datos de referencia: `data/reference/kuhl_2007.json` y
+  `ostwald_weierud_2017.json`.
+- **App:** páginas Rejewski (el tráfico de un día, AD, BE y CF dibujadas como ciclos con
+  `components/cycles.html`, la búsqueda en el catálogo y los tamaños de clase frente a Kuhl) y
+  Ataque moderno (la curva del IC de la fase 1, la subida del hill climbing, el descifrado y la
+  curva de éxito de E8); pestañas E7 y E8 en Experimentos; las dos páginas respetan el modo demo y
+  se revisaron en el navegador. Los núcleos nuevos se precalientan al abrir la app y en la
+  construcción de la imagen de Docker (el Dockerfile cambió, pero la imagen no se volvió a
+  construir: Docker Desktop estaba apagado).
+- **Integración:** la sección de la diapositiva 9 en `RESUMEN.md`, E8 en «Otros resultados» (para
+  «¿Hoy se rompería por fuerza bruta?»), la diferencia con Kuhl en «Discrepancias»,
+  `r5_rejewski.csv` y `r6_ataque.csv`; dos cifras de la diapositiva 9 en `cifras.py` (D-063); el
+  respaldo 16:9 de E7 y E8; las macros `\ELrej…`, `\ELkuhl…` y `\ELataque…` del informe, con el
+  párrafo nuevo marcado `% REVISAR`.
+- **Documentos:** DECISIONES D-062 a D-070, VALIDACION, FUENTES (Kuhl y Ostwald y Weierud, leídos
+  el 22-11-2026), ARQUITECTURA, el tema 6 de la guía de estudio, README (dos capturas nuevas).
+
+**Cifras obtenidas** (modo completo, semilla 2026, commit `103df6c`):
+- **E7, el catálogo** (exacto): 105.456 configuraciones; 21.225 características distintas; 11.578
+  únicas (54,5 %); la más frecuente, (13 13)(13 13)(13 13), con 1.728 (Kuhl: 21.230, 11.466 y
+  1.771). Una configuración al azar comparte su característica con 111,7 en promedio (mediana 20).
+- **E7, el tráfico** (4.000 días):
+  - ver las 26 letras de AD, BE y CF: 128,0 mensajes (IC 95 % 127,0–129,1; teoría exacta 127,1); de
+    una sola permutación, 100,9 (26·H₂₆ = 100,2);
+  - por eliminación: 90,5 (teoría 90,0);
+  - con el teorema de los ciclos en parejas: la característica en 49,1 y las tres permutaciones en
+    60,7 (IC 60,3–61,0), los «unos sesenta» de Rejewski;
+  - el catálogo encuentra la configuración del día en el 75,4 % de los días (IC 74,0 %–76,7 %): en
+    el 100 % de los días en que el central no se mueve durante el indicador y en el 1,4 % de los
+    demás.
+- **E8:** (864 mensajes, 24 por celda, con los 60 órdenes):
+  - éxito: 43,1 % de los mensajes con 6 cables, 21,9 % con 8 y 3,5 % con 10 (de 25 a 1.500 letras);
+    con 1.500 letras, 96 %, 83 % y 25 %;
+  - regresión logística: logit p = −6,85 + 5,67·log₁₀ L − 1,22·cables (pseudo-R² 0,55); la mitad
+    de los mensajes se lee desde unas 314 letras con 6 cables (IC 95 % 273–362) y 845 con 8
+    (752–950); con 10, fuera de las longitudes medidas;
+  - con la ubicación dada: todos los mensajes desde 200 letras; con 100, el 79 %, el 63 % y el 29 %
+    (6, 8 y 10 cables), y con la búsqueda parcial de la E, el 100 %, el 79 % y el 46 %; con 25
+    letras, casi ninguno (1 de 24 con 6 y con 8 cables, con la búsqueda parcial);
+  - la fase 1: con los anillos verdaderos, la ubicación correcta quedaría primera (en mediana) desde
+    200, 600 y 1.500 letras con 6, 8 y 10 cables; con los supuestos, con 10 cables y 1.500 letras,
+    su puesto mediano es el 7.190;
+  - los resultados son bimodales: el 22,7 % de los mensajes se leyó completo, el 76,0 % quedó bajo
+    el 20 % de letras correctas y el 1,2 %, entre el 20 % y el 36 %; ningún mensaje se leyó con el
+    orden equivocado;
+  - tiempo: 1,7 s por mensaje en promedio (5,6 s con 1.500 letras), unos 25 min todo E8.
+- **Cifras de la presentación:** 45 de 45 coinciden; ninguna queda sin calcular.
+
+**Qué falta:** nada del código.
+
+**Pendiente del autor:**
+- actualizar con `results/presentacion/` la diapositiva 9 (la diferencia con Kuhl
+  está en «Discrepancias») y la respuesta a «¿Hoy se rompería por fuerza bruta?» (E8);
+- reescribir con su voz el párrafo nuevo del informe (`% REVISAR`, «Rejewski y ataque moderno»);
+- lo que ya estaba pendiente: `make bench-demo` y el ensayo en el portátil (P-001), y el
+  repositorio remoto.
 
 ## Fase 6 · Pulido y entrega
 
@@ -98,8 +190,8 @@ corrida final las reprodujo. Las del informe están en `report/numbers.tex`:
 - E6: 983 letras en profundidad (Wald: 929; exacto: 959,7).
 - **Cifras de la presentación:** 43 de 43 coinciden; la de Kuhl queda sin calcular (fase 5).
 
-**Qué falta:** nada del código. La fase 5 (Rejewski y el ataque moderno) no se hizo: el README
-y el informe la listan entre las limitaciones, y la diapositiva 9 solo cita a Kuhl.
+**Qué falta:** nada del código. La fase 5 (Rejewski y el ataque moderno) no se hizo en esta fase;
+se hizo después (ver «Fase 5»).
 
 **Pendiente del autor:**
 - correr `make bench-demo` en el portátil y ensayar allí las dos demos (P-001);
