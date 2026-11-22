@@ -1,7 +1,7 @@
 # Resumen de resultados para la presentación
 
-- **Fecha:** 2026-11-22 17:13 UTC
-- **Commit:** 67e022b
+- **Fecha:** 2026-11-22 17:29 UTC
+- **Commit:** a494161+cambios
 - **Semilla:** 2026
 - **Modo:** completo
 - **Corridas:** E1: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E2: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E3: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E4: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E5: modo completo, 2026-11-22 16:47 UTC, commit 67e022b; E6: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E7: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E8: modo completo, 2026-11-22 17:13 UTC, commit 67e022b
@@ -15,7 +15,7 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 - **Cifra para la diapositiva:** el catálogo de los rotores I–III con el reflector A tiene 105.456 configuraciones (6 × 17.576) y 21.225 características distintas; 11.578 señalan una sola configuración (54,5 %) y la más frecuente, (13 13)(13 13)(13 13), 1.728. Es exacto (sin azar).
 - **Kuhl (2007):** 21.230, 11.466 y 1.771. Diferencias: −0,02 %, 1,0 % y −2,4 %. De las 15 características de su tabla 1, 14 están entre nuestras 15 más frecuentes (ver Discrepancias).
 - Con 41.088 configuraciones en clases de 10 o menos, una configuración al azar comparte su característica con 111,7 en promedio (mediana 20): las clases grandes pesan mucho.
-- **Mensajes de un día** (4.000 días con claves de mensaje al azar, semilla 2026): ver las 26 letras de AD, BE y CF pide 128,0 (IC 95 % 127,0–129,1) mensajes (teoría exacta: 127,1; una sola permutación, 100,9 frente a 26·H₂₆ = 100,2). Por eliminación, 90,5 (IC 95 % 89,9–91,0). Con el teorema de los ciclos en parejas, la característica queda determinada en 49,1 (IC 95 % 48,8–49,4) mensajes y las tres permutaciones en 60,7 (IC 95 % 60,3–61,0): los «unos sesenta» de Rejewski.
+- **Mensajes de un día** (4.000 días con claves de mensaje al azar, semilla 2026): ver las 26 letras de AD, BE y CF pide 128,0 mensajes (IC 95 % 127,0–129,1); la teoría exacta da 127,1 (una sola permutación: 100,9, frente a 26·H₂₆ = 100,2). Por eliminación, 90,5 mensajes (IC 95 % 89,9–91,0). Con el teorema de los ciclos en parejas, la característica queda determinada en 49,1 mensajes (IC 95 % 48,8–49,4) y las tres permutaciones en 60,7 mensajes (IC 95 % 60,3–61,0): los «unos sesenta» de Rejewski.
 - **El catálogo encuentra el día** en el 75,4 % de los días (IC 95 % 74,0 %–76,7 %): en el 100,0 % de los días en que el rotor central no se mueve durante el indicador y en el 1,4 % de los demás. El central se mueve en 176 de cada 676 posiciones del día (26,0 %).
 - Datos para dibujarla: `r5_rejewski.csv` (tamaños de clase con la tabla 2 de Kuhl).
 
@@ -66,7 +66,7 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 - **Antifrecuencia:** como ninguna letra se cifra a sí misma, la letra c sale cifrada con probabilidad (1 − f_c)/25. Las letras comunes del idioma salen un poco menos: la E, el 17,1 % del alemán, debería ser el 3,32 % del cifrado y no el 3,85 %. Con esa distribución, la χ² no central predice un 8,0 % de rechazos con 1.000 letras; se midió 10,0 %. Las frecuencias del idioma se filtran débiles y al revés.
 - Puntos fijos: 0 en 3.850.000 letras.
 - **E2 (diapositiva 7):** 1,6 × 10²⁰ claves (67,11 bits); el plugboard aporta el 70,2 %; la Bombe barre 1.054.560 configuraciones; máximo de N(k) con 11 cables.
-- **E8 · Ataque moderno (pregunta «¿Hoy se rompería por fuerza bruta?»):** el ataque de Gillogly prueba 1.054.560 ubicaciones con el IC y sube el plugboard por hill climbing; 1,7 s por mensaje en este equipo. Con 24 mensajes por celda (864 en total), lee 6 cables: 43,1 % de los mensajes; 8 cables: 21,9 % de los mensajes; 10 cables: 3,5 % de los mensajes.
+- **E8 · Ataque moderno (pregunta «¿Hoy se rompería por fuerza bruta?»):** el ataque de Gillogly prueba 1.054.560 ubicaciones con el IC y sube el plugboard por hill climbing; 1,7 s por mensaje en este equipo. Con 24 mensajes por celda (864 en total, de 25 a 1.500 letras), lee el 43,1 % con 6 cables, el 21,9 % con 8 cables, el 3,5 % con 10 cables.
 - Regresión logística: la mitad de los mensajes se lee con 6 cables desde unas 314 letras (IC 95 % 273–362); con 8 cables desde unas 845 letras (IC 95 % 752–950); con 10 cables, el 50 % no se alcanza en las longitudes medidas.
 - Referencias: Gillogly, unas 300 letras con 6 cables o menos y un solo éxito con 10 cables (1.463 letras); distancia de unicidad, unas 23 letras; los mensajes reales no pasaban de 250 letras (Ostwald y Weierud 2017).
 - Con la ubicación dada (lo que queda si la fase 1 no falla), el hill climbing lee el 73,3 % de los mensajes y con la búsqueda parcial de la E, el 80,0 %. El cuello de botella es la fase 1: supone los anillos, y el central y el izquierdo giran en otra letra (D-067). Datos: `r6_ataque.csv`.
@@ -126,7 +126,7 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 
 ## 3. Demos
 
-- **Demo 1 (diapositiva 4):** el cálculo es instantáneo. La traza de «Vector BDZGO» tarda 0,2 ms y la de «Portada» 0,7 ms en el equipo donde corrió `make resumen` (Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos). Los 45 s del guion los pone la interacción. Falta cronometrar el recorrido completo en el portátil del autor.
+- **Demo 1 (diapositiva 4):** el cálculo es instantáneo. La traza de «Vector BDZGO» tarda 0,2 ms y la de «Portada» 0,6 ms en el equipo donde corrió `make resumen` (Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos). Los 45 s del guion los pone la interacción. Falta cronometrar el recorrido completo en el portátil del autor.
 - **La app en clase:** abre `http://localhost:8501/maquina?demo=1` (el modo demo queda en la URL y sobrevive a una recarga) y, en otra pestaña, `http://localhost:8501/bombe?demo=1`; pliega la barra lateral para ganar ancho. En modo demo, Máquina muestra solo «Vector BDZGO» y «Portada», y La Bombe, «Cifrado del compañero» y «Caso de respaldo» (plan B).
 - **Demo 2 (diapositiva 12):** `make bench-demo` del 2026-11-21 18:25 UTC (commit 5b34896) en Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos, Windows 11. Casos de compañero: clave como la de «Clave aleatoria» (10 cables), mensaje alemán de 78 letras que empieza por el crib, crib en la posición 0. Flujo completo de la página La Bombe: barrido, máquina de verificación y «Verificar». Éxito: el descifrado es el mensaje letra por letra.
 
