@@ -220,6 +220,92 @@ def _demo_macros(bench: dict[str, Any] | None) -> dict[str, str]:
     }
 
 
+REJEWSKI_MACROS = (
+    "ELrejConfiguraciones",
+    "ELrejCaracteristicas",
+    "ELrejUnicas",
+    "ELrejMayor",
+    "ELkuhlCaracteristicas",
+    "ELkuhlUnicas",
+    "ELkuhlMayor",
+    "ELrejDias",
+    "ELrejTodas",
+    "ELrejTodasTeoria",
+    "ELrejPermutacion",
+    "ELrejCaracteristicaMensajes",
+    "ELrejEncontrada",
+    "ELrejVuelta",
+)
+ATTACK_MACROS = (
+    "ELataqueMensajes",
+    "ELataqueN",
+    "ELataqueUbicaciones",
+    "ELataqueSegundos",
+    "ELataqueLseis",
+    "ELataqueSeisLargo",
+    "ELataqueDiezLargo",
+    "ELataqueLargo",
+    "ELataqueOraculoCorto",
+    "ELataqueOraculoECorto",
+    "ELataqueCorto",
+    "ELataqueDiezCorto",
+)
+
+
+def _rejewski_macros(e7: dict[str, Any] | None) -> dict[str, str]:
+    """El catálogo de Rejewski frente a Kuhl y los mensajes de un día (E7)."""
+    if not e7:
+        return dict.fromkeys(REJEWSKI_MACROS, "—")
+    cat, traffic = e7["catalogo"], e7["trafico"]
+    kuhl, levels = cat["kuhl"], traffic["por_nivel"]
+    return {
+        "ELrejConfiguraciones": fmt_int(cat["configuraciones"]),
+        "ELrejCaracteristicas": fmt_int(cat["caracteristicas_distintas"]),
+        "ELrejUnicas": fmt_int(cat["caracteristicas_unicas"]),
+        "ELrejMayor": fmt_int(cat["mayor_clase"]),
+        "ELkuhlCaracteristicas": fmt_int(kuhl["caracteristicas_distintas"]["kuhl"]),
+        "ELkuhlUnicas": fmt_int(kuhl["caracteristicas_unicas"]["kuhl"]),
+        "ELkuhlMayor": fmt_int(kuhl["mayor_clase"]["kuhl"]),
+        "ELrejDias": fmt_int(traffic["dias"]),
+        "ELrejTodas": fmt_dec(levels["todas"]["dia"][0], 1),
+        "ELrejTodasTeoria": fmt_dec(levels["todas"]["teoria_dia"], 1),
+        "ELrejPermutacion": fmt_dec(levels["permutacion"]["dia"][0], 1),
+        "ELrejCaracteristicaMensajes": fmt_dec(levels["caracteristica"]["dia"][0], 1),
+        "ELrejEncontrada": fmt_pct(traffic["catalogo"]["encontrada"]),
+        "ELrejVuelta": fmt_pct(e7["vuelta"]["fraccion"]),
+    }
+
+
+def _attack_macros(e8: dict[str, Any] | None) -> dict[str, str]:
+    """El ataque moderno (E8): éxito en los extremos de longitud y con la ubicación dada."""
+    if not e8:
+        return dict.fromkeys(ATTACK_MACROS, "—")
+    cells = e8["celdas"]
+    lengths, cables = e8["longitudes"], e8["cables"]
+    short, long_ = lengths[0], lengths[-1]
+    probe = 100 if 100 in lengths else lengths[len(lengths) // 3]
+    few, many = min(cables), max(cables)
+
+    def cell(k: int, length: int, field: str = "exito") -> str:
+        return fmt_pct(cells[f"{k}/{length}"][field], 0)
+
+    l50 = ((e8.get("logistica") or {}).get("l50") or {}).get(str(few))
+    return {
+        "ELataqueMensajes": fmt_int(e8["mensajes"]),
+        "ELataqueN": fmt_int(e8["n_por_celda"]),
+        "ELataqueUbicaciones": fmt_int(e8["ubicaciones_fase1"]),
+        "ELataqueSegundos": fmt_dec(e8["segundos_por_mensaje"], 1),
+        "ELataqueLseis": fmt_int(round(l50["letras"])) if l50 else "—",
+        "ELataqueSeisLargo": cell(few, long_),
+        "ELataqueDiezLargo": cell(many, long_),
+        "ELataqueLargo": fmt_int(long_),
+        "ELataqueOraculoCorto": cell(many, probe, "oraculo"),
+        "ELataqueOraculoECorto": cell(many, probe, "oraculo_e"),
+        "ELataqueCorto": fmt_int(probe),
+        "ELataqueDiezCorto": cell(many, short, "oraculo_e"),
+    }
+
+
 def macros(results_dir: Path | None = None) -> dict[str, str]:
     """Todas las cifras del informe, como texto listo para LaTeX, por nombre de macro."""
     folder = results_dir or paths.RESULTS
@@ -234,6 +320,8 @@ def macros(results_dir: Path | None = None) -> dict[str, str]:
         | _crib_macros(summary["e4"], summary["e3"])
         | _bombe_macros(summary["e5"], pd.read_parquet(folder / "e5_bombe.parquet"))
         | _banburismus_macros(summary["e6"])
+        | _rejewski_macros(summary.get("e7"))
+        | _attack_macros(summary.get("e8"))
         | _demo_macros(bench)
         | {
             "ELsemilla": str(run["semilla"]),

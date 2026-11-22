@@ -66,9 +66,15 @@ def test_report_figures_are_vector_pdfs(tmp_path: Path) -> None:
 def test_slide_figures_are_16_9(tmp_path: Path) -> None:
     from PIL import Image
 
+    from enigma_lab import paths
+
     saved = slide_figures(out_dir=tmp_path)
     pngs = [p for p in saved if p.suffix == ".png"]
-    assert len(pngs) == 5
+    phase5 = sum(
+        (paths.RESULTS / name).is_file()
+        for name in ("e7_rejewski_trafico.parquet", "e8_coa_mensajes.parquet")
+    )
+    assert len(pngs) == 5 + phase5
     for path in pngs:
         width, height = Image.open(path).size
         assert 1.6 < width / height < 2.0, path.name

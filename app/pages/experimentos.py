@@ -26,6 +26,8 @@ from enigma_lab.experiments import (
     e4_cribs,
     e5_bombe,
     e6_banburismus,
+    e7_rejewski,
+    e8_coa,
 )
 from enigma_lab.experiments.common import read_summary
 from enigma_lab.viz import plotly_figs
@@ -82,10 +84,27 @@ INFO: dict[str, dict[str, str]] = {
         "referencia": "Aproximación de Wald con letras sueltas y tasas 1/17 y 1/26 (Wikipedia "
         "«Banburismus»): 929 letras en profundidad y 1.062 al azar.",
     },
-}
-NOT_DONE = {
-    "e7": ("E7 · Rejewski", "el catálogo de Rejewski, comparado con Kuhl (2007)"),
-    "e8": ("E8 · Ataque moderno", "el ataque de solo texto cifrado (Gillogly; Ostwald y Weierud)"),
+    "e7": {
+        "tab": "E7 · Rejewski",
+        "pregunta": "¿Qué tan única es una característica de Rejewski?",
+        "metodo": "El catálogo exacto: la estructura de ciclos de AD, BE y CF en las 105.456 "
+        "configuraciones de los rotores I–III con el reflector A, con el supuesto del ciclómetro "
+        "(durante el indicador solo gira el rotor derecho). Y días de tráfico de 1932 cifrados con "
+        "la máquina real: mensajes hasta reconstruir AD, BE y CF y búsqueda en el catálogo.",
+        "referencia": "Kuhl (2007): 21.230 características, 11.466 únicas y 1.771 en la más "
+        "frecuente. Coleccionista de cupones: 26·H₂₆ = 100,2 mensajes. Rejewski: unos 60 u 80.",
+    },
+    "e8": {
+        "tab": "E8 · Ataque moderno",
+        "pregunta": "¿Cuánto texto necesita el ataque moderno solo con texto cifrado?",
+        "metodo": "Mensajes alemanes de 25 a 1.500 letras con 6, 8 o 10 cables y clave al azar. "
+        "El ataque de Gillogly: IC con anillos fijos y sin plugboard en todas las ubicaciones, "
+        "los anillos de las mejores y el plugboard por hill climbing (IC y trigramas). Éxito: el "
+        "90 % de las letras. También el hill climbing con la ubicación dada, con la búsqueda "
+        "parcial de Ostwald y Weierud.",
+        "referencia": "Gillogly (1995), según Ostwald y Weierud (2017): unas 300 letras con 6 "
+        "cables o menos; con 10, un solo éxito, con 1.463 letras. Unicidad: unas 23 letras.",
+    },
 }
 SAVED_ONLY = "Aún no hay resultados guardados: corre  make reproduce."
 
@@ -120,6 +139,11 @@ def _run_quick(experiment: str) -> dict[str, Any]:
             e6_banburismus.PARAMS["rapido"], SEED
         )
         return {"df": df, "trayectorias": trajectories}
+    if experiment == "e7":
+        params = e7_rejewski.PARAMS["rapido"]
+        return {"df": e7_rejewski.run(params), "dias": e7_rejewski.run_traffic(params, SEED)}
+    if experiment == "e8":
+        return {"df": e8_coa.run(e8_coa.PARAMS["rapido"], SEED)}
     return {"df": e2_keyspace.run()}
 
 
@@ -181,6 +205,17 @@ def _prepared(experiment: str, run_now: bool) -> dict[str, Any] | None:
         saved_table = None if run_now else _saved("e6_banburismus")
         table = saved_table if saved_table is not None else e6_banburismus.aggregate(df, corpus)
         return {"table": table, "corpus": corpus, "roc": _e6_roc(df)}
+    if experiment == "e7":
+        df = _raw("e7", run_now, "e7_rejewski")
+        days = _raw("e7", run_now, "e7_rejewski_trafico", "dias")
+        if df is None or days is None:
+            return None
+        return {"table": df, "days": days}
+    if experiment == "e8":
+        df = _raw("e8", run_now, "e8_coa_mensajes")
+        if df is None:
+            return None
+        return {"df": df, "table": e8_coa.aggregate(df), "fit": e8_coa.logistic(df)}
     return None
 
 
@@ -336,6 +371,93 @@ def _show_e6(data: dict[str, Any], run_now: bool) -> None:
     )
 
 
+def _show_e7(data: dict[str, Any], run_now: bool) -> None:
+    from enigma_lab.rejewski.traffic import coupon_pmf
+
+    table, days = data["table"], data["days"]
+    reference = e7_rejewski.kuhl()
+    sizes = table.set_index("tamano")["caracteristicas"]
+    ours = (int(sizes.sum()), int(sizes.get(1, 0)), int(table["tamano"].max()))
+    theirs = (
+        reference["caracteristicas_distintas"],
+        reference["caracteristicas_unicas"],
+        reference["mayor_clase"]["configuraciones"],
+    )
+    labels = ("Características distintas", "Únicas", "La clase más grande")
+    for col, label, value, kuhl in zip(st.columns(3), labels, ours, theirs, strict=True):
+        col.metric(
+            label, fmt_int(value), f"Kuhl: {fmt_int(kuhl)}", delta_color="off", delta_arrow="off"
+        )
+    largest = reference["mayor_clase"]
+    chart(
+        plotly_figs.rejewski_class_sizes(
+            table, (largest["caracteristica"], largest["configuraciones"]), demo
+        ),
+        "e7_tamanos_de_clase",
+        demo,
+        data=table,
+    )
+    _plot(plotly_figs.rejewski_messages(days, coupon_pmf(26, 3), demo))
+    still = days.loc[~days["vuelta"], "encontrada"]
+    moved = days.loc[days["vuelta"], "encontrada"]
+    st.caption(
+        f"{fmt_int(len(days))} días. El catálogo encuentra la configuración del día en el "
+        f"{fmt_pct(days['encontrada'].mean())} de los días: en el {fmt_pct(still.mean())} de los "
+        f"días en que el rotor central no se mueve durante el indicador y en el "
+        f"{fmt_pct(moved.mean())} de los demás. Las cifras del catálogo no coinciden del todo "
+        "con las de Kuhl (VALIDACION, D-062)."
+    )
+    _table(table)
+    _downloads("e7_rejewski", table, lambda: e7_rejewski.figure(table, days=days))
+
+
+def _e8_curves(df: pd.DataFrame, fit: dict[str, Any] | None) -> dict[int, Any]:
+    """La logística ajustada de E8 para cada número de cables."""
+    import numpy as np
+
+    if fit is None:
+        return {}
+    grid = np.geomspace(df["L"].min(), df["L"].max(), 120)
+    return {
+        int(c): (grid, e8_coa.predicted(fit, grid, int(c))) for c in sorted(df["cables"].unique())
+    }
+
+
+def _e8_l50(fit: dict[str, Any] | None) -> str:
+    """La longitud con 50 % de éxito de cada número de cables, en una frase."""
+    if fit is None:
+        return ""
+    parts = []
+    for cables, value in fit["l50"].items():
+        if value:
+            low, high = value["ic"]
+            parts.append(
+                f"con {cables} cables, desde unas {fmt_int(round(value['letras']))} letras "
+                f"(IC 95 % {fmt_int(round(low))}–{fmt_int(round(high))})"
+            )
+        else:
+            parts.append(f"con {cables} cables, el 50 % queda fuera de las longitudes medidas")
+    return " Regresión logística, la mitad de los mensajes se lee: " + "; ".join(parts) + "."
+
+
+def _show_e8(data: dict[str, Any], run_now: bool) -> None:
+    df, table, fit = data["df"], data["table"], data["fit"]
+    ref = e8_coa.references()
+    marks = [
+        (ref["unicidad"]["letras"], "unicidad ≈ 23"),
+        (ref["limite_reglamentario_letras"], "límite real: 250"),
+        (ref["gillogly_1995"]["letras_hasta_6_cables"], "Gillogly, ≤ 6 cables: ~300"),
+        (ref["gillogly_1995"]["letras_unico_exito_10_cables"], "Gillogly, 10 cables: 1.463"),
+    ]
+    _plot(plotly_figs.e8_success(table, _e8_curves(df, fit), marks, demo))
+    st.caption(
+        f"{fmt_int(len(df))} mensajes; {fmt_dec(float(df['segundos'].mean()), 1)} s por mensaje."
+        + _e8_l50(fit)
+    )
+    _table(table)
+    _downloads("e8_coa", table, lambda: e8_coa.figure(df))
+
+
 SHOW: dict[str, Callable[[dict[str, Any], bool], None]] = {
     "e1": _show_e1,
     "e2": _show_e2,
@@ -343,6 +465,8 @@ SHOW: dict[str, Callable[[dict[str, Any], bool], None]] = {
     "e4": _show_e4,
     "e5": _show_e5,
     "e6": _show_e6,
+    "e7": _show_e7,
+    "e8": _show_e8,
 }
 
 
@@ -371,7 +495,7 @@ what_am_i_seeing(
     "PNG y SVG, y sus datos en CSV.",
 )
 summary = read_summary()
-tabs = st.tabs([info["tab"] for info in INFO.values()] + [t for t, _ in NOT_DONE.values()])
+tabs = st.tabs([info["tab"] for info in INFO.values()])
 
 for tab, (experiment, info) in zip(tabs, INFO.items(), strict=False):
     with tab:
@@ -391,14 +515,6 @@ for tab, (experiment, info) in zip(tabs, INFO.items(), strict=False):
             st.info(SAVED_ONLY)
             continue
         SHOW[experiment](data, run_now)
-
-for tab, (name, what) in zip(tabs[len(INFO) :], NOT_DONE.values(), strict=True):
-    with tab:
-        st.info(
-            f"{name}: {what} era de la fase 5 (P2, opcional) y no se hizo. La presentación "
-            "solo cita la literatura; el README lo lista entre las limitaciones.",
-            icon=":material/block:",
-        )
 
 st.caption(
     "Las tablas muestran los datos tal como se descargan en CSV (con punto decimal); los "

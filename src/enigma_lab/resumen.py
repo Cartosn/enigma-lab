@@ -7,7 +7,9 @@ volver a correr experimentos:
 - ``cifras.json``: las mismas cifras, para máquina.
 - Un CSV por diapositiva de resultados, en formato largo: ``r1_validacion.csv`` (14),
   ``r2_cribs.csv`` (15), ``r3_bombe.csv`` (16) y ``r4_banburismus.csv`` (17). Para dibujar
-  la 17 van además ``r4_roc.csv`` (curvas ROC) y ``r4_trayectorias.csv`` (D-046).
+  la 17 van además ``r4_roc.csv`` (curvas ROC) y ``r4_trayectorias.csv`` (D-046). De la
+  fase 5: ``r5_rejewski.csv`` (diapositiva 9, tamaños de clase frente a Kuhl) y
+  ``r6_ataque.csv`` (E8, para la pregunta sobre la fuerza bruta).
 
 La sección «Demos» toma la demo 2 de ``results/bench_demo2.json`` (``make bench-demo``).
 
@@ -36,11 +38,6 @@ from enigma_lab.experiments.e5_bombe import turing_agreement
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 
 PHASES_LEFT = [
-    (
-        "Fase 5 · Rejewski (E7) y ataque moderno (E8), opcionales",
-        "no se hicieron; la diapositiva 9 solo cita a Kuhl y el README los lista entre las "
-        "limitaciones",
-    ),
     (
         "Demos · correr `make bench-demo` en el portátil del autor (P-001) y ensayar las dos "
         "demos allí",
@@ -608,6 +605,134 @@ def _demo_2(bench: dict[str, Any]) -> list[str]:
     return lines
 
 
+def _slide_9(e7: dict[str, Any]) -> list[str]:
+    """Diapositiva 9: el catálogo frente a Kuhl y los mensajes de un día (E7)."""
+    if not e7:
+        return ["Sin resultados de E7: corre `make reproduce` y luego `make resumen`."]
+    cat, traffic = e7["catalogo"], e7["trafico"]
+    kuhl = cat["kuhl"]
+    levels = traffic["por_nivel"]
+
+    def mean_ci(level: str, key: str = "dia") -> str:
+        mean, low, high = levels[level][key]
+        return f"{fmt_dec(mean, 1)} (IC 95 % {fmt_dec(low, 1)}–{fmt_dec(high, 1)})"
+
+    found = traffic["catalogo"]
+    return [
+        f"- **Cifra para la diapositiva:** el catálogo de los rotores I–III con el reflector A "
+        f"tiene {fmt_int(cat['configuraciones'])} configuraciones (6 × 17.576) y "
+        f"{fmt_int(cat['caracteristicas_distintas'])} características distintas; "
+        f"{fmt_int(cat['caracteristicas_unicas'])} señalan una sola configuración "
+        f"({fmt_pct(cat['fraccion_unicas'])}) y la más frecuente, "
+        f"{cat['mayor_caracteristica']}, {fmt_int(cat['mayor_clase'])}. Es exacto (sin azar).",
+        f"- **Kuhl (2007):** {fmt_int(kuhl['caracteristicas_distintas']['kuhl'])}, "
+        f"{fmt_int(kuhl['caracteristicas_unicas']['kuhl'])} y "
+        f"{fmt_int(kuhl['mayor_clase']['kuhl'])}. Diferencias: "
+        f"{fmt_pct(kuhl['caracteristicas_distintas']['relativa'], 2)}, "
+        f"{fmt_pct(kuhl['caracteristicas_unicas']['relativa'], 1)} y "
+        f"{fmt_pct(kuhl['mayor_clase']['relativa'], 1)}. De las 15 características de su tabla "
+        f"1, {cat['tabla_1']['comunes']} están entre nuestras 15 más frecuentes (ver "
+        "Discrepancias).",
+        f"- Con {fmt_int(cat['configuraciones_en_hasta_10'])} configuraciones en clases de 10 o "
+        f"menos, una configuración al azar comparte su característica con "
+        f"{fmt_dec(cat['candidatos_esperados'], 1)} en promedio "
+        f"(mediana {cat['mediana_candidatos']}): "
+        "las clases grandes pesan mucho.",
+        f"- **Mensajes de un día** ({fmt_int(traffic['dias'])} días con claves de mensaje al azar, "
+        f"semilla {e7['corrida']['semilla']}): ver las 26 letras de AD, BE y CF pide "
+        f"{mean_ci('todas')} mensajes (teoría exacta: "
+        f"{fmt_dec(levels['todas']['teoria_dia'], 1)}; una sola permutación, "
+        f"{fmt_dec(levels['todas']['ad'][0], 1)} frente a 26·H₂₆ = "
+        f"{fmt_dec(traffic['coleccionista_26H26'], 1)}). Por eliminación, "
+        f"{mean_ci('eliminacion')}. Con el teorema de los ciclos en parejas, la característica "
+        f"queda determinada en {mean_ci('caracteristica')} mensajes y las tres permutaciones en "
+        f"{mean_ci('permutacion')}: los «unos sesenta» de Rejewski.",
+        f"- **El catálogo encuentra el día** en el {fmt_pct(found['encontrada'])} de los días "
+        f"(IC 95 % {fmt_pct(found['ic'][0])}–{fmt_pct(found['ic'][1])}): en el "
+        f"{fmt_pct(found['encontrada_sin_vuelta'])} de los días en que el rotor central no se "
+        f"mueve durante el indicador y en el {fmt_pct(found['encontrada_con_vuelta'])} de los "
+        f"demás. El central se mueve en {e7['vuelta']['posiciones']} de cada "
+        f"{e7['vuelta']['de']} posiciones del día ({fmt_pct(e7['vuelta']['fraccion'])}).",
+        "- Datos para dibujarla: `r5_rejewski.csv` (tamaños de clase con la tabla 2 de Kuhl).",
+    ]
+
+
+def _attack(e8: dict[str, Any]) -> list[str]:
+    """E8, para la pregunta «¿Hoy se rompería por fuerza bruta?» (guion, preguntas probables)."""
+    if not e8:
+        return []
+    fit = e8.get("logistica") or {}
+    halves = []
+    for cables, value in (fit.get("l50") or {}).items():
+        if value:
+            low, high = value["ic"]
+            halves.append(
+                f"con {cables} cables desde unas {fmt_int(round(value['letras']))} letras "
+                f"(IC 95 % {fmt_int(round(low))}–{fmt_int(round(high))})"
+            )
+        else:
+            halves.append(f"con {cables} cables, el 50 % no se alcanza en las longitudes medidas")
+    by_cables = "; ".join(
+        f"{cables} cables: {fmt_pct(v['exito'])} de los mensajes"
+        for cables, v in e8["por_cables"].items()
+    )
+    ref = e8["referencias"]
+    lines = [
+        f"- **E8 · Ataque moderno (pregunta «¿Hoy se rompería por fuerza bruta?»):** el ataque de "
+        f"Gillogly prueba {fmt_int(e8['ubicaciones_fase1'])} ubicaciones con el IC y sube el "
+        f"plugboard por hill climbing; {fmt_dec(e8['segundos_por_mensaje'], 1)} s por mensaje en "
+        f"este equipo. Con {e8['n_por_celda']} mensajes por celda ({fmt_int(e8['mensajes'])} en "
+        f"total), lee {by_cables}.",
+    ]
+    if halves:
+        lines.append(
+            "- Regresión logística: la mitad de los mensajes se lee " + "; ".join(halves) + "."
+        )
+    lines.append(
+        f"- Referencias: Gillogly, unas {ref['gillogly_letras_hasta_6_cables']} letras con 6 "
+        "cables o menos y un solo éxito con 10 cables "
+        f"({fmt_int(ref['gillogly_letras_10_cables'])} "
+        f"letras); distancia de unicidad, unas {ref['unicidad_letras']} letras; los mensajes "
+        f"reales no pasaban de {ref['limite_reglamentario']} letras (Ostwald y Weierud 2017)."
+    )
+    lines.append(
+        f"- Con la ubicación dada (lo que queda si la fase 1 no falla), el hill climbing lee el "
+        f"{fmt_pct(e8['oraculo'])} de los mensajes y con la búsqueda parcial de la E, el "
+        f"{fmt_pct(e8['oraculo_e'])}. El cuello de botella es la fase 1: supone los anillos, y "
+        "el central y el izquierdo giran en otra letra (D-067). Datos: `r6_ataque.csv`."
+    )
+    lines.append(
+        "- Respuesta corta: no hace falta fuerza bruta; un computador de escritorio lee en "
+        "segundos un mensaje largo con pocos cables, y los ataques de hoy (Ostwald y Weierud) "
+        "llegan cerca de la unicidad agotando todas las ubicaciones con hill climbing durante "
+        "días."
+    )
+    return lines
+
+
+def _kuhl_notes(e7: dict[str, Any]) -> list[str]:
+    """La diferencia del catálogo con Kuhl, para «Discrepancias»."""
+    if not e7:
+        return []
+    cat = e7["catalogo"]
+    k = cat["kuhl"]
+    return [
+        f"- Diapositiva 9: nuestro catálogo da {fmt_int(k['caracteristicas_distintas']['e7'])} "
+        f"características, {fmt_int(k['caracteristicas_unicas']['e7'])} únicas y "
+        f"{fmt_int(k['mayor_clase']['e7'])} en la más frecuente; Kuhl, "
+        f"{fmt_int(k['caracteristicas_distintas']['kuhl'])}, "
+        f"{fmt_int(k['caracteristicas_unicas']['kuhl'])} y {fmt_int(k['mayor_clase']['kuhl'])}. "
+        "No se ajustó nada: Kuhl no dice qué supone del rotor central ni de los anillos, y "
+        "ninguna de las 33 variantes de los supuestos que probamos reproduce sus cifras "
+        "(`scripts/kuhl_variantes.py`, VALIDACION). Su artículo tiene además erratas: escribe "
+        "105.465 configuraciones, da 11.466 como el 54,40 % (es el 54,01 %) y dice que 20.433 "
+        f"tienen 10 o menos cuando su tabla 2 suma {fmt_int(cat['kuhl_hasta_10_tabla'])}. "
+        "Sugerencia: la diapositiva puede seguir citando a Kuhl («Kuhl calculó…») y agregar, si "
+        f"cabe, «nuestro catálogo: {fmt_int(k['caracteristicas_distintas']['e7'])} y "
+        f"{fmt_int(k['caracteristicas_unicas']['e7'])}».",
+    ]
+
+
 def _other_results(e2: dict[str, Any], e3: dict[str, Any]) -> list[str]:
     lines = []
     if e3:
@@ -746,6 +871,10 @@ def build_markdown(
         "",
         "## 1. Por diapositiva de resultados",
         "",
+        "### Diapositiva 9 · Rejewski (E7)",
+        "",
+        *_slide_9(summary.get("e7", {})),
+        "",
         "### Diapositiva 14 · Validación (E1)",
         "",
         *_slide_14(summary.get("e1", {})),
@@ -765,6 +894,7 @@ def build_markdown(
         "### Otros resultados útiles",
         "",
         *_other_results(summary.get("e2", {}), summary.get("e3", {})),
+        *_attack(summary.get("e8", {})),
         "",
         "## 2. Cifras de la presentación",
         "",
@@ -784,8 +914,8 @@ def build_markdown(
     cpu = f"{platform.processor() or platform.machine()}, {os.cpu_count()} núcleos lógicos"
     lines += [
         "",
-        f"{ok} de {len(ready)} cifras calculadas coinciden; "
-        f"{len(cifras) - len(ready)} sin calcular, de la fase 5, que no se hizo.",
+        f"{ok} de {len(ready)} cifras calculadas coinciden"
+        + (f"; {len(cifras) - len(ready)} sin calcular." if len(ready) < len(cifras) else "."),
         "",
         "## 3. Demos",
         "",
@@ -804,6 +934,7 @@ def build_markdown(
         "## 4. Discrepancias",
         "",
         *_discrepancies(summary.get("e4", {}), e4_table, e5_table, bench, summary.get("e6", {})),
+        *_kuhl_notes(summary.get("e7", {})),
         "",
         "## 5. Pendientes",
         "",
@@ -837,6 +968,12 @@ def main(results_dir: Path | None = None) -> Path:
         r4_table(results).to_csv(out / "r4_banburismus.csv", index=False)
         for name, extra in r4_extras(results).items():
             extra.to_csv(out / f"{name}.csv", index=False)
+    if (results / "e7_rejewski.parquet").is_file():
+        pd.read_parquet(results / "e7_rejewski.parquet").to_csv(
+            out / "r5_rejewski.csv", index=False
+        )
+    if (results / "e8_coa.parquet").is_file():
+        pd.read_parquet(results / "e8_coa.parquet").to_csv(out / "r6_ataque.csv", index=False)
     bench = read_bench(results)
     demo2 = {k: v for k, v in bench.items() if k != "configuraciones"}
     if bench:

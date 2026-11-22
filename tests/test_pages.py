@@ -78,6 +78,32 @@ def test_bombe_page_backup_case_decrypts() -> None:
     assert groups_of_five(data["plaintext"]) in text
 
 
+def test_rejewski_page_reconstructs_a_day_and_searches_the_catalog() -> None:
+    page = str(paths.APP / "pages" / "rejewski.py")
+    app = AppTest.from_file(page, default_timeout=180).run()
+    assert not app.exception
+    app.slider(key="rej_messages").set_value(150).run()
+    assert not app.exception
+    values = {m.label: m.value for m in app.metric}
+    assert values["Letras de AD"] == "26 de 26"
+    big = [m.value for m in app.markdown if 'class="el-result' in m.value]
+    assert big and "configuraciones del catálogo" in big[0]
+    app.toggle(key="rej_reveal").set_value(True).run()
+    assert not app.exception
+
+
+def test_attack_page_runs_the_three_phases() -> None:
+    page = str(paths.APP / "pages" / "ataque.py")
+    app = AppTest.from_file(page, default_timeout=300).run()
+    assert not app.exception
+    app.slider(key="att_length").set_value(800).run()
+    app.radio(key="att_orders").set_value("I-III").run()
+    next(b for b in app.button if b.label == "Atacar").click().run()
+    assert not app.exception
+    values = {m.label: m.value for m in app.metric}
+    assert values["Ubicaciones de la fase 1"] == "105.456"
+
+
 @pytest.mark.parametrize("page", PAGES, ids=[p.stem for p in PAGES])
 def test_every_page_explains_itself_except_in_demo_mode(page) -> None:  # type: ignore[no-untyped-def]
     """Spec 8.3: cada página tiene su «¿Qué estoy viendo?»; el modo demo lo oculta (8.2.11)."""

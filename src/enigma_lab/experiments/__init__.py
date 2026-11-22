@@ -15,5 +15,7 @@ EXPERIMENTS = {
     "e4": "enigma_lab.experiments.e4_cribs",
     "e5": "enigma_lab.experiments.e5_bombe",
     "e6": "enigma_lab.experiments.e6_banburismus",
+    "e7": "enigma_lab.experiments.e7_rejewski",
+    "e8": "enigma_lab.experiments.e8_coa",
 }
 """Experimentos disponibles, por identificador (crecen con cada fase)."""

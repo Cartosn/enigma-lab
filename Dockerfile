@@ -39,8 +39,9 @@ RUN useradd --create-home --uid 1000 enigma \
  && chown -R enigma:enigma /var/cache/enigma-lab
 USER enigma
 
-# 4. Precalienta Numba dentro de la imagen (la caché queda en NUMBA_CACHE_DIR).
-RUN python -c "from enigma_lab.bombe.sweep import warm_up; print(f'Numba listo en {warm_up():.1f} s')"
+# 4. Precalienta Numba dentro de la imagen (la caché queda en NUMBA_CACHE_DIR): la Bombe y el
+#    ataque moderno.
+RUN python -c "from enigma_lab.bombe.sweep import warm_up; from enigma_lab.attacks.gillogly import warm_up as attack; print(f'Numba listo en {warm_up() + attack():.1f} s')"
 
 EXPOSE 8501
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \

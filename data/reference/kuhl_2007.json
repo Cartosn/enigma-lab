@@ -1,0 +1,65 @@
+{
+  "fuente": "Kuhl, A. (2007). Rejewski's Catalog. Cryptologia, 31(4), 326–331. DOI 10.1080/01611190701299487",
+  "url": "https://archive.math.arizona.edu/mbbush/enigma/Rejewskis%20catalog.pdf",
+  "consultado": "2026-11-22",
+  "modelo": {
+    "rotores": ["I", "II", "III"],
+    "reflector": "A",
+    "ordenes": 6,
+    "posiciones": 17576,
+    "nota": "Kuhl usa el reflector A, el del primer catálogo polaco, con el cableado de Marks y Weierud (2000). Dice que su programa simula el proceso del ciclómetro; no dice qué supone del rotor central durante el indicador ni de los anillos."
+  },
+  "configuraciones": 105456,
+  "caracteristicas_distintas": 21230,
+  "caracteristicas_unicas": 11466,
+  "porcentaje_unicas_impreso": 54.40,
+  "hasta_10_impreso": 20433,
+  "porcentaje_hasta_10_impreso": 92.34,
+  "mayor_clase": {"caracteristica": "(13 13)(13 13)(13 13)", "configuraciones": 1771},
+  "estructuras_posibles": {"por_producto": 101, "terna": 1030301},
+  "tabla_1": [
+    {"caracteristica": "(13 13)(13 13)(13 13)", "configuraciones": 1771},
+    {"caracteristica": "(12 12 1 1)(13 13)(13 13)", "configuraciones": 898},
+    {"caracteristica": "(13 13)(13 13)(12 12 1 1)", "configuraciones": 866},
+    {"caracteristica": "(13 13)(12 12 1 1)(13 13)", "configuraciones": 854},
+    {"caracteristica": "(11 11 2 2)(13 13)(13 13)", "configuraciones": 509},
+    {"caracteristica": "(13 13)(12 12 1 1)(12 12 1 1)", "configuraciones": 494},
+    {"caracteristica": "(13 13)(13 13)(11 11 2 2)", "configuraciones": 480},
+    {"caracteristica": "(12 12 1 1)(13 13)(12 12 1 1)", "configuraciones": 479},
+    {"caracteristica": "(13 13)(11 11 2 2)(13 13)", "configuraciones": 469},
+    {"caracteristica": "(12 12 1 1)(12 12 1 1)(13 13)", "configuraciones": 466},
+    {"caracteristica": "(13 13)(10 10 3 3)(13 13)", "configuraciones": 370},
+    {"caracteristica": "(13 13)(13 13)(10 10 3 3)", "configuraciones": 360},
+    {"caracteristica": "(10 10 3 3)(13 13)(13 13)", "configuraciones": 358},
+    {"caracteristica": "(13 13)(13 13)(9 9 4 4)", "configuraciones": 315},
+    {"caracteristica": "(9 9 4 4)(13 13)(13 13)", "configuraciones": 307}
+  ],
+  "tabla_2": [
+    {"tamano": 1, "caracteristicas": 11466},
+    {"tamano": 2, "caracteristicas": 3381},
+    {"tamano": 3, "caracteristicas": 1658},
+    {"tamano": 4, "caracteristicas": 958},
+    {"tamano": 5, "caracteristicas": 660},
+    {"tamano": 6, "caracteristicas": 456},
+    {"tamano": 7, "caracteristicas": 343},
+    {"tamano": 8, "caracteristicas": 265},
+    {"tamano": 9, "caracteristicas": 234},
+    {"tamano": 10, "caracteristicas": 183},
+    {"tamano": 11, "caracteristicas": 146},
+    {"tamano": 12, "caracteristicas": 118},
+    {"tamano": 13, "caracteristicas": 103},
+    {"tamano": 14, "caracteristicas": 95},
+    {"tamano": 16, "caracteristicas": 74}
+  ],
+  "rejewski_mensajes": {
+    "apendice_D": 60,
+    "apendice_E": 80,
+    "nota": "Kuhl cita a Rejewski (en Kozaczuk 1984): unos sesenta mensajes del mismo día (apéndice D) y unos ochenta (apéndice E) bastan para formar AD, BE y CF."
+  },
+  "erratas": [
+    "El texto escribe dos veces 105.465 configuraciones; en la introducción da 6 × 26³ = 105.456.",
+    "Da 11.466 únicas como el 54,40 %; 11.466 / 21.230 es el 54,01 %.",
+    "Dice que 20.433 características corresponden a 10 configuraciones o menos, pero su tabla 2 suma 19.604 para los tamaños 1 a 10, y 19.604 / 21.230 es su 92,34 %.",
+    "La tabla 2 salta del tamaño 14 al 16 (no trae el 15)."
+  ]
+}

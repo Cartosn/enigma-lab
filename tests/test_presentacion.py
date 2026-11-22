@@ -21,10 +21,12 @@ def test_cifra(cifra: Cifra) -> None:
     assert cifra.compute() == cifra.expected, f"diapositivas {cifra.slides}"
 
 
-@pytest.mark.parametrize(
-    "cifra",
-    [pytest.param(c, marks=pytest.mark.skip(reason=c.pending)) for c in PENDING],
-    ids=[f"diap {c.slides}" for c in PENDING],
-)
-def test_cifra_pendiente(cifra: Cifra) -> None:  # pragma: no cover
-    raise AssertionError("pendiente")
+if PENDING:  # desde la fase 5 no queda ninguna
+
+    @pytest.mark.parametrize(
+        "cifra",
+        [pytest.param(c, marks=pytest.mark.skip(reason=c.pending)) for c in PENDING],
+        ids=[f"diap {c.slides}" for c in PENDING],
+    )
+    def test_cifra_pendiente(cifra: Cifra) -> None:  # pragma: no cover
+        raise AssertionError("pendiente")

@@ -3,8 +3,9 @@
 Un solo registro para dos usos: ``tests/test_presentacion.py`` comprueba cada cifra y
 ``make resumen`` las lista en ``RESUMEN.md``. ``expected`` es la cifra como la escribe
 el spec o la diapositiva; ``compute`` la calcula con el formato español de
-:mod:`enigma_lab.viz.numfmt`. Las de módulos que aún no existen quedan como
-pendientes, con la fase en que llegan.
+:mod:`enigma_lab.viz.numfmt`. Las que la diapositiva cita de una fuente externa (Turing
+en la 16, Kuhl en la 9) se comprueban contra lo transcrito en ``data/reference/``. Una
+cifra de un módulo que aún no exista quedaría como pendiente, con la fase en que llega.
 """
 
 from __future__ import annotations
@@ -181,6 +182,27 @@ def _wald_letters() -> str:
     return f"{fmt_int(round(depth))} y {fmt_int(round(chance))}"
 
 
+def _catalog_size() -> str:
+    """Configuraciones del catálogo de Rejewski: 6 órdenes × 17.576 posiciones (E7)."""
+    from enigma_lab.rejewski.catalog import build_catalog
+
+    return fmt_int(build_catalog().n_configurations)
+
+
+def _kuhl_figures() -> str:
+    """Lo que la diapositiva 9 cita de Kuhl (2007), tal como está en ``data/reference/``.
+
+    El catálogo de E7 da otras cifras (21.225 y 11.578); la diferencia va en «Discrepancias»
+    de ``RESUMEN.md`` (D-063).
+    """
+    import json
+
+    data = json.loads((paths.REFERENCE / "kuhl_2007.json").read_text(encoding="utf-8"))
+    return (
+        f"{fmt_int(data['caracteristicas_distintas'])} · {fmt_int(data['caracteristicas_unicas'])}"
+    )
+
+
 def _turing_slide_16() -> str:
     """Turing con 12 letras (diapositiva 16): paradas por orden y, con 2 y 3 lazos, en 60."""
     from enigma_lab.experiments.e5_bombe import ORDERS_PER_DAY, turing_value
@@ -342,12 +364,18 @@ CIFRAS: tuple[Cifra, ...] = (
     Cifra(
         "6.5", "letra de prueba del caso de respaldo", "T, grado 4", lambda: _test_letter("backup")
     ),
-    # Pendientes
+    # Diapositiva 9 · rejewski/ (el catálogo) y data/reference/kuhl_2007.json (la cita)
     Cifra(
         "9",
-        "Kuhl: 105.456 · 21.230 · 11.466",
-        "105.456 · 21.230 · 11.466",
-        pending="fase 5 (P2), que no se hizo: la diapositiva solo cita a Kuhl (2007)",
+        "configuraciones del catálogo: 6 órdenes × 17.576 posiciones (E7)",
+        "105.456",
+        _catalog_size,
+    ),
+    Cifra(
+        "9",
+        "Kuhl (2007): características distintas y únicas (E7 da 21.225 y 11.578: Discrepancias)",
+        "21.230 · 11.466",
+        _kuhl_figures,
     ),
     # Diapositivas 13 y 17 · banburismus/ (tasas 1/17 y 1/26 de Wikipedia, «Banburismus»)
     Cifra(

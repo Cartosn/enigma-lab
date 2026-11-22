@@ -668,6 +668,296 @@ def e6_identification(table: pd.DataFrame, demo: bool = False) -> go.Figure:
     return fig
 
 
+def rejewski_class_sizes(
+    table: pd.DataFrame, kuhl_largest: tuple[str, int] | None = None, demo: bool = False
+) -> go.Figure:
+    """E7: cuántas características tienen cada tamaño de clase (log-log), frente a Kuhl.
+
+    ``table`` es ``Catalog.distribution()`` con la columna ``kuhl`` (su tabla 2).
+    """
+    fig = go.Figure()
+    fig.add_scatter(
+        x=table["tamano"],
+        y=table["caracteristicas"],
+        mode="markers",
+        name="este catálogo (E7)",
+        marker={"color": CATEGORICAL[0], "size": 7},
+        hovertemplate="clases de %{x} configuraciones: %{y}<extra>E7</extra>",
+    )
+    if "kuhl" in table:
+        ref = table.dropna(subset=["kuhl"])
+        fig.add_scatter(
+            x=ref["tamano"],
+            y=ref["kuhl"].astype(float),
+            mode="markers",
+            name="Kuhl (2007), tabla 2",
+            marker={
+                "color": CATEGORICAL[2],
+                "size": 11,
+                "symbol": "diamond-open",
+                "line": {"width": 2},
+            },
+            hovertemplate="clases de %{x} configuraciones: %{y}<extra>Kuhl</extra>",
+        )
+    if kuhl_largest is not None:
+        label, size = kuhl_largest
+        fig.add_scatter(
+            x=[size],
+            y=[1],
+            mode="markers",
+            name=f"Kuhl: la mayor, {label}",
+            marker={
+                "color": CATEGORICAL[2],
+                "size": 11,
+                "symbol": "diamond-open",
+                "line": {"width": 2},
+            },
+            showlegend=False,
+            hovertemplate=f"{label}: %{{x}} configuraciones<extra>Kuhl</extra>",
+        )
+    unique = int(table.loc[table["tamano"] == 1, "caracteristicas"].sum())
+    total = int(table["caracteristicas"].sum())
+    fig.update_layout(
+        template=_template(demo),
+        title=f"{fmt_int(unique)} de {fmt_int(total)} características señalan una configuración",
+        xaxis={
+            "type": "log",
+            "dtick": 1,
+            "tickformat": ",d",
+            "title": "tamaño de la clase (configuraciones con la misma característica)",
+        },
+        yaxis={
+            "type": "log",
+            "dtick": 1,
+            "tickformat": ",d",
+            "title": "características con ese tamaño",
+        },
+        height=440,
+        legend={"orientation": "h", "yanchor": "top", "y": -0.22, "x": 0, "xanchor": "left"},
+        margin={"b": 120},
+    )
+    return fig
+
+
+def rejewski_messages(days: pd.DataFrame, theory: np.ndarray, demo: bool = False) -> go.Figure:
+    """E7: mensajes del día hasta reconstruir AD, BE y CF, por nivel, con la teoría y Rejewski."""
+    from enigma_lab.rejewski.traffic import LEVEL_LABELS
+
+    fig = go.Figure()
+    order = ("caracteristica", "permutacion", "eliminacion", "todas")
+    for color, level in zip(CATEGORICAL, order, strict=False):
+        values = days[level].to_numpy()
+        fig.add_histogram(
+            x=values,
+            xbins={"start": 0, "end": 320, "size": 5},
+            histnorm="probability",
+            name=f"{LEVEL_LABELS[level]}: {fmt_dec(float(values.mean()), 1)}",
+            marker_color=color,
+            opacity=0.55,
+            hovertemplate="%{x} mensajes: %{y:.1%} de los días<extra></extra>",
+        )
+    n = np.arange(len(theory))
+    binned = np.add.reduceat(theory, np.arange(0, len(theory), 5))
+    fig.add_scatter(
+        x=n[::5][: len(binned)] + 2.5,
+        y=binned,
+        mode="lines",
+        name="teoría de las 26 letras (coleccionista de cupones)",
+        line={"color": DARK.text_muted, "dash": "dash", "width": 2},
+        hoverinfo="skip",
+    )
+    for value, label in ((60, "Rejewski: unos 60"), (80, "unos 80")):
+        fig.add_vline(
+            x=value,
+            line_dash="dot",
+            line_color=DARK.text_muted,
+            annotation_text=label,
+            annotation_position="top right",
+        )
+    perm = float(days["permutacion"].mean())
+    fig.update_layout(
+        template=_template(demo),
+        barmode="overlay",
+        title=f"Con el teorema, AD, BE y CF quedan determinadas en {fmt_dec(perm, 1)} mensajes",
+        xaxis={"title": "mensajes del día", "range": [0, 320]},
+        yaxis={"title": "fracción de los días", "tickformat": ".0%"},
+        height=460,
+        legend={"orientation": "h", "yanchor": "top", "y": -0.2, "x": 0, "xanchor": "left"},
+        margin={"b": 150},
+    )
+    return fig
+
+
+def attack_ic_histogram(
+    counts: np.ndarray, edges: np.ndarray, marks: list[tuple[str, float, str]], demo: bool = False
+) -> go.Figure:
+    """Fase 1 del ataque: cuántas ubicaciones dan cada IC, con las marcas de referencia.
+
+    ``counts`` y ``edges`` son el histograma de los IC (escala log en y); cada marca es
+    (rótulo, IC, color).
+    """
+    centers = (edges[:-1] + edges[1:]) / 2
+    fig = go.Figure(
+        go.Bar(
+            x=centers,
+            y=np.where(counts > 0, counts, np.nan),
+            width=np.diff(edges),
+            marker_color=DARK.text_muted,
+            name="ubicaciones",
+            hovertemplate="IC %{x:.4f}: %{y} ubicaciones<extra></extra>",
+        )
+    )
+    for k, (label, value, color) in enumerate(marks):
+        fig.add_vline(
+            x=value,
+            line_color=color,
+            line_dash="dot" if k else "solid",
+            annotation_text=label,
+            annotation_position="top left" if k % 2 else "top right",
+        )
+    total = int(counts.sum())
+    fig.update_layout(
+        template=_template(demo),
+        title=f"Fase 1: el IC de las {fmt_int(total)} ubicaciones, sin plugboard",
+        xaxis_title="índice de coincidencia del descifrado",
+        yaxis={"type": "log", "title": "ubicaciones", "dtick": 1, "tickformat": ",d"},
+        bargap=0,
+        height=420,
+        showlegend=False,
+    )
+    return fig
+
+
+def attack_climb(trace: np.ndarray, demo: bool = False) -> go.Figure:
+    """Fase 3: la subida del hill climbing, cambio por cambio (IC y trigramas por letra)."""
+    from plotly.subplots import make_subplots
+
+    steps = np.arange(1, len(trace) + 1)
+    stage = np.where(trace[:, 0] == 0, "IC", "trigramas")
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    fig.add_scatter(
+        x=steps,
+        y=trace[:, 1],
+        mode="lines+markers",
+        name="IC del texto",
+        line={"color": CATEGORICAL[0]},
+        customdata=np.stack([trace[:, 3], stage], axis=1),
+        hovertemplate="cambio %{x} (%{customdata[1]}): IC %{y:.4f}, %{customdata[0]} cables"
+        "<extra></extra>",
+    )
+    fig.add_scatter(
+        x=steps,
+        y=trace[:, 2],
+        mode="lines+markers",
+        name="log₁₀ p por trigrama",
+        line={"color": CATEGORICAL[2]},
+        secondary_y=True,
+        hovertemplate="cambio %{x}: %{y:.3f}<extra></extra>",
+    )
+    switch = int((trace[:, 0] == 0).sum())
+    final = int(trace[-1, 3]) if len(trace) else 0
+    if 0 < switch < len(trace):
+        fig.add_vline(
+            x=switch + 0.5,
+            line_dash="dot",
+            line_color=DARK.text_muted,
+            annotation_text="del IC a los trigramas",
+            annotation_position="top left",
+        )
+    fig.add_hline(y=1 / 26, line_dash="dash", line_color=DARK.text_muted, annotation_text="1/26")
+    fig.update_layout(
+        template=_template(demo),
+        title=f"Fase 3: {len(trace)} cambios de cable aceptados hasta {final} cables",
+        xaxis_title="cambio aceptado",
+        height=420,
+        legend={"orientation": "h", "yanchor": "top", "y": -0.22, "x": 0, "xanchor": "left"},
+        margin={"b": 110},
+    )
+    fig.update_yaxes(title_text="índice de coincidencia", secondary_y=False)
+    fig.update_yaxes(title_text="log₁₀ p por trigrama", secondary_y=True, showgrid=False)
+    return fig
+
+
+def e8_success(
+    table: pd.DataFrame,
+    curves: dict[int, tuple[np.ndarray, np.ndarray]],
+    references: list[tuple[float, str]],
+    demo: bool = False,
+) -> go.Figure:
+    """E8: mensajes leídos según la longitud y los cables, con IC de Wilson y la logística.
+
+    ``curves`` es la logística ajustada por número de cables (x, y); el punteado es el hill
+    climbing con la ubicación dada (el «oráculo»).
+    """
+    fig = go.Figure()
+    for color, cables in zip(CATEGORICAL, sorted(table["cables"].unique()), strict=False):
+        part = table[table["cables"] == cables].sort_values("L")
+        label = f"{cables} cables"
+        fig.add_scatter(
+            x=part["L"],
+            y=part["exito"],
+            mode="markers",
+            name=label,
+            marker={"color": color, "size": 9},
+            error_y={
+                "type": "data",
+                "symmetric": False,
+                "array": part["ic_alto"] - part["exito"],
+                "arrayminus": part["exito"] - part["ic_bajo"],
+                "color": color,
+            },
+            legendgroup=label,
+            hovertemplate="%{x} letras: %{y:.0%}<extra>" + label + "</extra>",
+        )
+        if int(cables) in curves:
+            x, y = curves[int(cables)]
+            fig.add_scatter(
+                x=x,
+                y=y,
+                mode="lines",
+                line={"color": color, "width": 2},
+                name=f"{label}: logística",
+                legendgroup=label,
+                showlegend=False,
+                hoverinfo="skip",
+            )
+        fig.add_scatter(
+            x=part["L"],
+            y=part["oraculo"],
+            mode="lines",
+            line={"color": color, "dash": "dot", "width": 1.5},
+            name=f"{label}, con la ubicación dada",
+            legendgroup=label,
+            hovertemplate="%{x} letras: %{y:.0%}<extra>con la ubicación dada</extra>",
+        )
+    for k, (value, label) in enumerate(references):
+        fig.add_vline(
+            x=value,
+            line_dash="dash",
+            line_color=DARK.text_muted,
+            annotation_text=label,
+            annotation_position="bottom right" if k % 2 else "top right",
+        )
+    fig.update_layout(
+        template=_template(demo),
+        title="Mensajes que lee el ataque de Gillogly, según su longitud",
+        xaxis={
+            "type": "log",
+            "title": "longitud del mensaje (letras, escala log)",
+            "range": [np.log10(20), np.log10(1_800)],
+        },
+        yaxis={
+            "title": "mensajes leídos (≥ 90 % de las letras)",
+            "tickformat": ".0%",
+            "range": [-0.03, 1.05],
+        },
+        height=480,
+        legend={"orientation": "h", "yanchor": "top", "y": -0.2, "x": 0, "xanchor": "left"},
+        margin={"b": 140},
+    )
+    return fig
+
+
 def plotly_config() -> dict[str, Any]:
     """Configuración de la barra de herramientas (descarga de la imagen a 2x)."""
     from enigma_lab.viz.theme import PLOTLY_CONFIG

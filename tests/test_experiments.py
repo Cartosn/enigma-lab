@@ -9,7 +9,15 @@ import numpy as np
 import pytest
 
 from enigma_lab import SEED, paths, resumen
-from enigma_lab.experiments import e2_keyspace, e3_statistics, e4_cribs, e5_bombe, e6_banburismus
+from enigma_lab.experiments import (
+    e2_keyspace,
+    e3_statistics,
+    e4_cribs,
+    e5_bombe,
+    e6_banburismus,
+    e7_rejewski,
+    e8_coa,
+)
 
 SMALL_E3 = {"n": 60, "lengths": [100, 300], "source": "muestra"}
 SMALL_E4 = {"n": 300, "lengths": [5, 13, 30], "message_length": 250, "source": "muestra"}
@@ -116,6 +124,62 @@ def test_e6_auc_matches_mann_whitney() -> None:
     fpr, tpr = e6_banburismus.roc_points(depth, chance)
     assert fpr[0] == tpr[0] == 0 and fpr[-1] == tpr[-1] == 1
     assert np.trapezoid(tpr, fpr) == pytest.approx(e6_banburismus.auc(depth, chance))
+
+
+def test_e7_catalog_and_traffic_small() -> None:
+    """El catálogo exacto frente a Kuhl y 40 días de tráfico, que concuerdan con la teoría."""
+    df = e7_rejewski.run()
+    assert df["configuraciones"].sum() == 105_456
+    assert df.loc[df["tamano"] == 1, "kuhl"].item() == 11_466
+    params = {"days": 40, "messages": 600}
+    days = e7_rejewski.run_traffic(params, SEED)
+    figures = e7_rejewski.summary(df, days, params)
+    catalog = figures["catalogo"]
+    assert catalog["kuhl"]["caracteristicas_distintas"]["kuhl"] == 21_230
+    assert catalog["kuhl_hasta_10_tabla"] == 19_604
+    assert figures["vuelta"]["posiciones"] == 176
+    levels = figures["trafico"]["por_nivel"]
+    assert levels["caracteristica"]["dia"][0] <= levels["permutacion"]["dia"][0]
+    assert levels["permutacion"]["dia"][0] < levels["eliminacion"]["dia"][0]
+    assert levels["todas"]["teoria_producto"] == pytest.approx(100.2149, abs=1e-3)
+    # El catálogo encuentra el día si y solo si el central no se mueve durante el indicador.
+    assert (days["encontrada"] == ~days["vuelta"]).mean() > 0.9
+
+
+def test_e8_attack_small() -> None:
+    params = {
+        "lengths": [600],
+        "cables": [6],
+        "n": 2,
+        "rotors": ["I", "II", "III"],
+        "top1": 100,
+        "top2": 10,
+        "source": "muestra",
+    }
+    df = e8_coa.run(params, SEED)
+    assert len(df) == 2 and df["oraculo_exito"].all()
+    table = e8_coa.aggregate(df)
+    expected = {"L", "cables", "n", "exito", "ic_bajo", "ic_alto", "fase1", "oraculo"}
+    assert expected <= set(table.columns)
+    figures = e8_coa.summary(df, params)
+    assert figures["ubicaciones_fase1"] == 6 * 17_576
+    assert figures["referencias"]["unicidad_letras"] == 23
+
+
+def test_e8_logistic_recovers_a_known_curve() -> None:
+    """La regresión logística de E8 recupera L₅₀ de datos simulados con una curva conocida."""
+    rng = np.random.default_rng(SEED)
+    lengths = np.repeat([50, 100, 200, 400, 800], 200)
+    true_l50 = 200.0
+    p = 1 / (1 + np.exp(-4 * (np.log10(lengths) - np.log10(true_l50))))
+    import pandas as pd
+
+    cables = np.where(np.arange(len(lengths)) % 2, 6, 10)  # dos niveles, misma curva: β₂ ≈ 0
+    df = pd.DataFrame({"L": lengths, "cables": cables, "exito": rng.random(len(lengths)) < p})
+    fit = e8_coa.logistic(df)
+    assert fit is not None
+    low, high = fit["l50"]["6"]["ic"]
+    assert low < true_l50 < high
 
 
 def test_turing_table_is_complete() -> None:

@@ -11,6 +11,7 @@ import importlib
 
 import streamlit as st
 
+from enigma_lab.attacks.gillogly import warm_up as warm_up_attack
 from enigma_lab.bombe.sweep import warm_up
 from enigma_lab.viz.theme import register_plotly_templates
 from ui.catalog import MODULES
@@ -35,6 +36,8 @@ PRELOAD = (
     "enigma_lab.experiments.e4_cribs",
     "enigma_lab.experiments.e5_bombe",
     "enigma_lab.experiments.e6_banburismus",
+    "enigma_lab.experiments.e7_rejewski",
+    "enigma_lab.experiments.e8_coa",
 )
 
 
@@ -45,10 +48,12 @@ def _setup_once() -> bool:
     Registra la plantilla de Plotly y precalienta la Bombe: compila los núcleos de Numba
     (o los carga de su caché en disco, ``cache=True``) y precalcula el aleatorizador de
     los 60 órdenes. Así la demo 2 no espera al compilador, aunque el salón no tenga red.
-    Carga además los módulos pesados de las demás páginas.
+    Precalienta también los núcleos del ataque moderno y carga los módulos pesados de las
+    demás páginas.
     """
     register_plotly_templates()
     warm_up(all_tables=True)
+    warm_up_attack()
     for module in PRELOAD:
         importlib.import_module(module)
     return True

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<!--
+  Enigma Lab · AD, BE y CF dibujadas como ciclos (spec 8.2, punto 9).
+  Solo dibuja lo que calcula Python (app/ui/rejewski_view.py, con enigma_lab.rejewski.traffic):
+  los ciclos cerrados, las cadenas abiertas y las letras sin datos de cada producto, ya con
+  sus coordenadas. Los ciclos de la misma longitud van del mismo color: el teorema dice que
+  vienen en parejas. Los arcos deducidos con el teorema (no vistos) van punteados.
+-->
+<style>
+  @font-face { font-family: "Inter"; src: url("/app/static/fonts/InterVariable.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "JetBrains Mono"; src: url("/app/static/fonts/JetBrainsMono-Bold.woff2") format("woff2"); font-weight: 700; }
+  html, body { margin: 0; background: var(--background); color: var(--text); font-family: Inter, system-ui, sans-serif; }
+  svg { display: block; width: 100%; max-width: 860px; height: auto; margin: 0 auto; }
+  .ring { fill: none; stroke-width: 1.5; opacity: 0.35; }
+  .arc { fill: none; stroke-width: 2.2; }
+  .arc.deduced { stroke-dasharray: 4 4; }
+  .link { stroke: var(--text_muted); stroke-width: 2; fill: none; }
+  .open { stroke: var(--text_muted); stroke-width: 2; stroke-dasharray: 5 4; fill: none; }
+  .node circle { fill: var(--surface); stroke-width: 2.5; }
+  .node text, .mark { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 15px;
+               fill: var(--text); text-anchor: middle; dominant-baseline: central; }
+  .loose circle { fill: none; stroke: var(--border); stroke-width: 2; stroke-dasharray: 3 3; }
+  .loose text { fill: var(--text_muted); }
+  .title { font-size: 26px; font-weight: 650; fill: var(--text); }
+  .status { font-size: 18px; fill: var(--text_muted); font-family: "JetBrains Mono", monospace; }
+  .status.done { fill: var(--accent); }
+  .caption { font-size: 15px; fill: var(--text_muted); }
+  .clen { font-size: 13px; fill: var(--text_muted); text-anchor: middle; dominant-baseline: central; }
+  .rule { stroke: var(--border); stroke-width: 1; }
+  .legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 22px;
+            font-size: 14px; color: var(--text_muted); margin: 6px 8px 0; }
+  .legend span { display: inline-flex; align-items: center; gap: 8px; }
+  .legend .ringkey { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 3px solid var(--accent); }
+  .legend .dash { display: inline-block; width: 28px; border-top: 3px dashed var(--text_muted); }
+  .legend .loosekey { display: inline-block; width: 14px; height: 14px; border-radius: 50%; border: 2px dashed var(--border); }
+  body.demo .node text, body.demo .mark { font-size: 18px; }
+  body.demo .title { font-size: 32px; }
+  body.demo .status, body.demo .caption { font-size: 21px; }
+  body.demo .clen { font-size: 17px; }
+  body.demo .legend { font-size: 20px; }
+</style>
+</head>
+<body>
+<svg id="g" role="img" aria-label="Las permutaciones AD, BE y CF como ciclos"></svg>
+<div class="legend">
+  <span><i class="ringkey"></i>ciclo cerrado (mismo color: misma longitud)</span>
+  <span><i class="dash"></i>arco deducido con el teorema, o cadena abierta (→ ?)</span>
+  <span><i class="loosekey"></i>letra sin datos</span>
+</div>
+<script id="payload" type="application/json">__PAYLOAD__</script>
+<script>
+(() => {
+  "use strict";
+  const P = JSON.parse(document.getElementById("payload").textContent);
+  for (const [k, v] of Object.entries(P.theme)) document.documentElement.style.setProperty("--" + k, v);
+  if (P.demo) document.body.classList.add("demo");
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("g");
+  svg.setAttribute("viewBox", `0 0 ${P.width} ${Math.max(P.height, 120)}`);
+  const make = (parent, tag, attrs, text) => { const n = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); if (text != null) n.textContent = text;
+    parent.appendChild(n); return n; };
+  const NODE = P.sizes.node;
+
+  // Puntas de flecha, una por color (los arcos de un ciclo llevan el color de su longitud).
+  const defs = make(svg, "defs", {});
+  const markers = {};
+  const marker = color => {
+    if (!(color in markers)) {
+      const id = "m" + Object.keys(markers).length;
+      const m = make(defs, "marker", { id, viewBox: "0 0 10 10", refX: 8, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto" });
+      make(m, "path", { d: "M0,0 L10,5 L0,10 z", fill: color });
+      markers[color] = `url(#${id})`;
+    }
+    return markers[color];
+  };
+
+  const node = (g, x, y, letter, color, loose) => {
+    const n = make(g, "g", { class: loose ? "node loose" : "node" });
+    make(n, "circle", { cx: x, cy: y, r: NODE, stroke: color || P.theme.border });
+    make(n, "text", { x, y }, letter);
+  };
+
+  function drawCycle(g, c) {
+    const n = c.letters.length;
+    if (n === 1) {
+      const d = `M${c.cx - 6},${c.cy - NODE} C${c.cx - 20},${c.cy - 38} ${c.cx + 20},${c.cy - 38} ${c.cx + 6},${c.cy - NODE}`;
+      make(g, "path", { class: "arc" + (c.deduced[0] ? " deduced" : ""), stroke: c.color, d, "marker-end": marker(c.color) });
+      node(g, c.cx, c.cy, c.letters[0], c.color);
+      return;
+    }
+    make(g, "circle", { class: "ring", cx: c.cx, cy: c.cy, r: c.r, stroke: c.color });
+    const angle = k => -Math.PI / 2 + 2 * Math.PI * k / n;
+    const pad = (NODE + 3) / c.r;
+    for (let k = 0; k < n; k++) {
+      const a0 = angle(k) + pad, a1 = angle(k + 1) - pad;
+      if (a1 <= a0) continue;
+      const x0 = c.cx + c.r * Math.cos(a0), y0 = c.cy + c.r * Math.sin(a0);
+      const x1 = c.cx + c.r * Math.cos(a1), y1 = c.cy + c.r * Math.sin(a1);
+      make(g, "path", { class: "arc" + (c.deduced[k] ? " deduced" : ""), stroke: c.color,
+        d: `M${x0},${y0} A${c.r},${c.r} 0 0 1 ${x1},${y1}`, "marker-end": marker(c.color) });
+    }
+    c.letters.forEach((letter, k) => node(g, c.cx + c.r * Math.cos(angle(k)), c.cy + c.r * Math.sin(angle(k)), letter, c.color));
+    make(g, "text", { class: "clen", x: c.cx, y: c.cy }, String(n));
+  }
+
+  function drawChain(g, chain) {
+    const muted = P.theme.text_muted;
+    chain.points.forEach(([x, y], k) => {
+      if (k > 0) {
+        const [px, py] = chain.points[k - 1];
+        if (py === y) make(g, "line", { class: "link", x1: px + NODE, y1: py, x2: x - NODE - 2, y2: y, "marker-end": marker(muted) });
+      }
+      node(g, x, y, chain.letters[k], muted);
+    });
+    const [lx, ly] = chain.points[chain.points.length - 1];
+    make(g, "line", { class: "open", x1: lx + NODE, y1: ly, x2: lx + 2 * NODE + 4, y2: ly });
+    make(g, "text", { class: "mark", x: lx + 2 * NODE + 14, y: ly, fill: muted }, "?");
+  }
+
+  P.products.forEach((p, i) => {
+    const g = make(svg, "g", {});
+    if (i > 0) make(g, "line", { class: "rule", x1: 10, y1: p.top + 2, x2: P.width - 10, y2: p.top + 2 });
+    make(g, "text", { class: "title", x: 10, y: p.top + 30 }, p.name);
+    make(g, "text", { class: "status" + (p.done ? " done" : ""), x: P.demo ? 70 : 60, y: p.top + 30 }, p.status);
+    make(g, "text", { class: "caption", x: 10, y: p.top + (P.demo ? 56 : 50) }, p.caption);
+    p.cycles.forEach(c => drawCycle(g, c));
+    p.chains.forEach(c => drawChain(g, c));
+    if (p.loose) {
+      make(g, "text", { class: "caption", x: p.loose.label[0], y: p.loose.label[1], "dominant-baseline": "central" }, "sin datos:");
+      p.loose.points.forEach(([x, y], k) => node(g, x, y, p.loose.letters[k], null, true));
+    }
+  });
+})();
+</script>
+</body>
+</html>

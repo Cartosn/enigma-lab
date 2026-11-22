@@ -1,0 +1,34 @@
+{
+  "fuente": "Ostwald, O. y Weierud, F. (2017). Modern breaking of Enigma ciphertexts. Cryptologia, 41(5), 395–421. DOI 10.1080/01611194.2016.1238423 (versión 5 del manuscrito, marzo de 2017)",
+  "url": "https://www.cryptocellar.org/pubs/enigma-modern-breaking.pdf",
+  "consultado": "2026-11-22",
+  "gillogly_1995": {
+    "fuente": "Gillogly, J. J. (1995). Ciphertext-only cryptanalysis of Enigma. Cryptologia, 19(4), 405–413, según Ostwald y Weierud (2017), sección 3",
+    "metodo": "Fase 1: los 60 órdenes y las 17.576 posiciones con los anillos fijos (todos en A) y el plugboard vacío, puntuando con el índice de coincidencia (1.054.560 casos). Fase 2: para las mejores, los 676 anillos del central y del derecho. Fase 3: hill climbing del plugboard con cables de prueba; para esta fase pasó del IC a una cuenta de trigramas.",
+    "letras_hasta_6_cables": 300,
+    "letras_unico_exito_10_cables": 1463,
+    "letras_texto_de_prueba": 647
+  },
+  "limite_reglamentario_letras": 250,
+  "mensajes_hg_nord": {"cantidad_aprox": 500, "minimo": 15, "maximo": 322, "media": 126, "mediana": 103},
+  "unicidad": {
+    "letras": 23,
+    "bits_clave": 72,
+    "redundancia_bits_por_letra": 3.1,
+    "nota": "Distancia de unicidad H/D de Shannon con H ≈ 72 bits (150.738.274.937.250 × 26.364.000 claves, sin vuelta del rotor izquierdo) y D ≈ 3,1 bits por letra en los textos de HG Nord; dicen que probablemente ronda las 20 letras."
+  },
+  "mensaje_real_mas_corto": {"letras": 32, "nombre": "AMERI", "fecha": "1941-08-27"},
+  "letras_frontera_experimentos": 24,
+  "plugboard_vacio_10_cables": {
+    "texto_plano": 0.101,
+    "sustitutos_monoalfabeticos": 0.185,
+    "pseudoaleatorias": 0.714,
+    "nota": "En la ubicación correcta con el plugboard vacío: 30/650 letras directas, 20/650 cruzadas y unas 16/650 por azar salen como texto plano (10,1 %); 120/650 como sustituto monoalfabético (18,5 %)."
+  },
+  "busqueda_parcial": {
+    "E_Stecker": 26,
+    "R_Stecker": 73,
+    "I_Stecker": 136,
+    "nota": "Arranques del hill climbing: las 25 parejas de la E más la E sola (E-Stecker); los cables con E, N o R (R-Stecker); con E, N, R, X, S o I (I-Stecker)."
+  }
+}

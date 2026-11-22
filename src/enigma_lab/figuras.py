@@ -8,9 +8,10 @@ No corre experimentos: lee ``results/summary.json`` y los Parquet de ``results/`
   2. E5, las paradas falsas por orden frente a la tabla de Turing;
   3. E6, las letras que pide el SPRT frente a la aproximación de Wald.
 - **Diapositivas** (``results/figures/slides/``, estilo ``enigma_slides``: 16:9, oscuro, letra
-  grande): las mismas tres en formato de diapositiva, más E2 y E3 con la figura de su
-  experimento. Son el respaldo de las diapositivas 6, 7, 15, 16 y 17; los gráficos de la
-  presentación se dibujan con los CSV de ``results/presentacion/``.
+  grande): las mismas tres en formato de diapositiva, más E2, E3, E7 y E8 con la figura de su
+  experimento. Son el respaldo de las diapositivas 6, 7, 9, 15, 16 y 17 y de la pregunta sobre
+  la fuerza bruta; los gráficos de la presentación se dibujan con los CSV de
+  ``results/presentacion/``. E7 y E8 no van en el informe: ya tiene sus 3 figuras (D-068).
 
 Reglas de 8.1: el título dice el hallazgo con su número, los ejes llevan unidades, los IC
 van como bigotes y la referencia publicada se dibuja en el gráfico.
@@ -374,7 +375,24 @@ def slide_figures(
         theme="enigma_slides",
         pairs=pairs.pivot(index="plano", columns="cifrado", values="n").to_numpy(),
     )
+    figures |= _phase5_slides(folder)
     return [p for name, fig in figures.items() for p in _save(fig, out_dir, name, ("png", "svg"))]
+
+
+def _phase5_slides(folder: Path) -> dict[str, Any]:
+    """Respaldo de la diapositiva 9 (E7) y de la pregunta de la fuerza bruta (E8), si hay datos."""
+    from enigma_lab.experiments import e7_rejewski, e8_coa
+
+    figures: dict[str, Any] = {}
+    sizes, days = folder / "e7_rejewski.parquet", folder / "e7_rejewski_trafico.parquet"
+    if sizes.is_file() and days.is_file():
+        figures["e7_rejewski"] = e7_rejewski.figure(
+            pd.read_parquet(sizes), theme="enigma_slides", days=pd.read_parquet(days)
+        )
+    messages = folder / "e8_coa_mensajes.parquet"
+    if messages.is_file():
+        figures["e8_coa"] = e8_coa.figure(pd.read_parquet(messages), theme="enigma_slides")
+    return figures
 
 
 def main() -> list[Path]:

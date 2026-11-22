@@ -1,8 +1,7 @@
 """Catálogo de los módulos de Enigma Lab (spec, sección 8.2).
 
 Lo usan la navegación (``Inicio.py``) y las tarjetas de la página Inicio, para que
-las dos digan lo mismo. ``page`` vale ``None`` si el módulo no existe: Rejewski y el
-ataque moderno eran de la fase 5 (P2, opcional), que no se hizo.
+las dos digan lo mismo. ``page`` vale ``None`` si el módulo no tiene página.
 """
 
 from __future__ import annotations
@@ -83,14 +82,16 @@ MODULES: tuple[Module, ...] = (
         "rejewski",
         "Rejewski",
         "Ciclos de AD, BE y CF y el catálogo de características.",
-        "Fase 5 · no incluido",
+        "Fase 5",
         ":material/cycle:",
+        page="pages/rejewski.py",
     ),
     Module(
         "ataque",
         "Ataque moderno",
         "Índice de coincidencia y hill climbing solo con texto cifrado.",
-        "Fase 5 · no incluido",
+        "Fase 5",
         ":material/bolt:",
+        page="pages/ataque.py",
     ),
 )
