@@ -1,7 +1,7 @@
 # Resumen de resultados para la presentación
 
-- **Fecha:** 2026-11-22 10:28 UTC
-- **Commit:** 82fda70
+- **Fecha:** 2026-11-22 10:30 UTC
+- **Commit:** de697e4
 - **Semilla:** 2026
 - **Modo:** completo
 - **Corridas:** E1: modo completo, 2026-11-22 10:24 UTC, commit 82fda70; E2: modo completo, 2026-11-22 10:24 UTC, commit 82fda70; E3: modo completo, 2026-11-22 10:24 UTC, commit 82fda70; E4: modo completo, 2026-11-22 10:24 UTC, commit 82fda70; E5: modo completo, 2026-11-22 10:27 UTC, commit 82fda70; E6: modo completo, 2026-11-22 10:28 UTC, commit 82fda70
@@ -98,7 +98,7 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 | 11 | letra de prueba y su grado | T, grado 6 | T, grado 6 | sí |
 | 6.5 | menú del caso de respaldo: letras, aristas, componentes y lazos | 11 · 13 · 1 · 3 | 11 · 13 · 1 · 3 | sí |
 | 6.5 | letra de prueba del caso de respaldo | T, grado 4 | T, grado 4 | sí |
-| 9 | Kuhl: 105.456 · 21.230 · 11.466 | 105.456 · 21.230 · 11.466 | — | pendiente (fase 5 (P2): rejewski/; si no se hace, la diapositiva solo cita a Kuhl) |
+| 9 | Kuhl: 105.456 · 21.230 · 11.466 | 105.456 · 21.230 · 11.466 | — | sin calcular (fase 5 (P2), que no se hizo: la diapositiva solo cita a Kuhl (2007)) |
 | 13, 17 | decibanes por repetición: 10·log₁₀((1/17)/(1/26)) | +1,845 dB | +1,845 dB | sí |
 | 5.6 | decibanes por no repetición: 10·log₁₀((16/17)/(25/26)) | −0,093 dB | −0,093 dB | sí |
 | 17 | decibanes por letra, en promedio, en profundidad | +0,0211 dB | +0,0211 dB | sí |
@@ -107,7 +107,7 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 | 13, 17 | letras esperadas según Wald, en profundidad y al azar | 929 y 1.062 | 929 y 1.062 | sí |
 | 16 | Turing, 12 letras: paradas por orden con 0, 1, 2 y 3 lazos; en 60 órdenes con 2 y 3 | 820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60 | 820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60 | sí |
 
-43 de 43 cifras calculadas coinciden; 1 llegan en fases siguientes.
+43 de 43 cifras calculadas coinciden; 1 sin calcular, de la fase 5, que no se hizo.
 
 ## 3. Demos
 
