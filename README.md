@@ -32,6 +32,11 @@ mensaje.*
 
 ## Inicio rápido
 
+```sh
+git clone https://github.com/Cartosn/enigma-lab.git
+cd enigma-lab
+```
+
 ### Con Docker
 
 ```sh
@@ -41,7 +46,8 @@ docker compose up
 y abrir http://localhost:8501. La primera vez construye la imagen (unos minutos: Python
 3.12, las dependencias de `uv.lock` y los núcleos de Numba ya compilados). La imagen trae
 las muestras del corpus y los resultados guardados, así que la app funciona sin internet.
-Para detenerla: `docker compose down`.
+Para detenerla: `docker compose down`. Si la imagen ya existía y el código cambió,
+`docker compose up --build` la reconstruye (sin `--build` se usa la imagen vieja).
 
 ### En local
 

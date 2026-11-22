@@ -1,7 +1,8 @@
 # Progreso
 
 Última actualización: 22-11-2026 · fase 5 cerrada: E7 (Rejewski) y E8 (ataque moderno). Docker
-probado después de la fase 5; Experimentos ya funciona sin el corpus completo (D-071).
+probado después de la fase 5; Experimentos ya funciona sin el corpus completo (D-071). Repositorio
+remoto creado, con la CI en verde.
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
@@ -63,6 +64,13 @@ dentro de la imagen; exportar la imagen, de 2,8 GB, 87 s. La app responde a `/_s
   (E4: 61,6 %, y la teoría con el IC del alemán, 61,4 %), las descargas de E4 y E6 entregan los
   archivos guardados sin dibujar nada, «Correr ahora» funciona con la muestra y ninguna petición
   sale de localhost. `make test`: 337 pruebas (2 nuevas) en 2 min 11 s; `make lint`, sin errores.
+
+**Repositorio remoto** (22-11-2026): https://github.com/Cartosn/enigma-lab, público, con `main`
+desde `0845913`. La CI (ruff, mypy y pytest en Ubuntu y Windows) corrió por primera vez y pasó:
+337 pruebas en los dos sistemas, sin el corpus completo; 2 min 16 s en Ubuntu y 3 min 17 s en
+Windows, con la instalación. El enlace ya está en el encabezado del informe (sigue en 3 páginas),
+en el inicio rápido del README y en el pendiente de la diapositiva 21 de `RESUMEN.md`
+(`resumen.py`).
 
 **Qué quedó:**
 - **`rejewski/`:**
@@ -127,10 +135,10 @@ dentro de la imagen; exportar la imagen, de 2,8 GB, 87 s. La app responde a `/_s
 
 **Pendiente del autor:**
 - actualizar con `results/presentacion/` la diapositiva 9 (la diferencia con Kuhl
-  está en «Discrepancias») y la respuesta a «¿Hoy se rompería por fuerza bruta?» (E8);
+  está en «Discrepancias»), la respuesta a «¿Hoy se rompería por fuerza bruta?» (E8) y el enlace
+  del repositorio en la diapositiva 21;
 - reescribir con su voz el párrafo nuevo del informe (`% REVISAR`, «Rejewski y ataque moderno»);
-- lo que ya estaba pendiente: `make bench-demo` y el ensayo en el portátil (P-001), y el
-  repositorio remoto.
+- lo que ya estaba pendiente: `make bench-demo` y el ensayo en el portátil (P-001).
 
 ## Fase 6 · Pulido y entrega
 

@@ -44,7 +44,8 @@ PHASES_LEFT = [
         "antes de ensayar",
     ),
     (
-        "Repositorio remoto · crearlo, para la CI y el enlace de la diapositiva 21",
+        "Diapositiva 21 · poner el enlace del repositorio, https://github.com/Cartosn/enigma-lab "
+        "(público; la CI corre en cada push)",
         "antes de la presentación",
     ),
 ]
