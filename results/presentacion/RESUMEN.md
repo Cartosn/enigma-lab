@@ -1,7 +1,7 @@
 # Resumen de resultados para la presentación
 
-- **Fecha:** 2026-11-22 17:29 UTC
-- **Commit:** a494161+cambios
+- **Fecha:** 2026-11-22 23:24 UTC
+- **Commit:** 7da5139
 - **Semilla:** 2026
 - **Modo:** completo
 - **Corridas:** E1: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E2: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E3: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E4: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E5: modo completo, 2026-11-22 16:47 UTC, commit 67e022b; E6: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E7: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E8: modo completo, 2026-11-22 17:13 UTC, commit 67e022b
@@ -159,4 +159,4 @@ Ninguna contradicción con las diapositivas ni con el guion. Notas:
 ## 5. Pendientes
 
 - Demos · correr `make bench-demo` en el portátil del autor (P-001) y ensayar las dos demos allí: antes de ensayar.
-- Repositorio remoto · crearlo, para la CI y el enlace de la diapositiva 21: antes de la presentación.
+- Diapositiva 21 · poner el enlace del repositorio, https://github.com/Cartosn/enigma-lab (público; la CI corre en cada push): antes de la presentación.
