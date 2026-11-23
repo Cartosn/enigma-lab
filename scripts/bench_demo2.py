@@ -144,7 +144,7 @@ def summarize(config: DemoConfig, cases: list[dict[str, Any]]) -> dict[str, Any]
 
 
 def machine() -> dict[str, Any]:
-    """El equipo donde se midió (P-001: la demo se hará en el portátil del autor)."""
+    """El equipo donde se midió (D-072: la exposición se hace en este mismo equipo)."""
     return {
         "nodo": platform.node(),
         "procesador": platform.processor() or platform.machine(),

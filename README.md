@@ -172,12 +172,11 @@ El detalle está en [`docs/VALIDACION.md`](docs/VALIDACION.md); las cifras, en
   letra (un doble paso del central justo en el borde del mensaje; ver `docs/VALIDACION.md`).
 - **El modo Bletchley pierde la parada** cuando el rotor central se mueve dentro del crib (cerca
   de la mitad de las claves con WETTERBERICHT); el modo robusto la recupera, a cambio de tiempo.
-- **Los tiempos son de un escritorio:** la demo 2 se midió en un i5 de 6 núcleos; hay que medirla
-  en el portátil de la presentación con `make bench-demo`.
+- **Los tiempos son de este escritorio** (un i5 de 6 núcleos), el mismo de la exposición; en otro
+  equipo, `make bench-demo` vuelve a medir la demo 2.
 - **py-enigma admite hasta 10 cables**, así que esa comparación usa de 0 a 10; las pruebas de
   propiedades cubren de 0 a 13.
 - **La imagen de Docker pesa unos 2,8 GB** por la pila científica (llvmlite, pyarrow, SciPy).
-- **La CI no ha corrido todavía:** el repositorio aún no tiene remoto.
 
 ## Fuentes
 

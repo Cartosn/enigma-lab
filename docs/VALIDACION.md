@@ -173,8 +173,8 @@ minutos).** Medido en este equipo (i5-9400F, 6 núcleos), sin otros procesos pes
   (p50) y 7,3 s (p95).
 
 `test_performance_one_order_and_sixty` lo comprueba en cada `make test`. Con la máquina
-ocupada en otras tareas, los tiempos llegaron a triplicarse; el portátil del autor puede
-dar otros (P-001).
+ocupada en otras tareas, los tiempos llegaron a triplicarse. La exposición se hace en este
+mismo equipo (D-072).
 
 ## 6.5 · Casos de las diapositivas 10 y 11
 

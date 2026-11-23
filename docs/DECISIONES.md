@@ -757,11 +757,13 @@ datos en `r5_rejewski.csv` y `r6_ataque.csv`.
   el mismo error que en Docker. `test_saved_results_download_the_saved_figure` comprueba que la
   descarga es el archivo guardado y que no se dibuja nada.
 
+### D-072 · La exposición se hace en este equipo (resuelve P-001)
+El autor expone con este escritorio (i5-9400F, 6 núcleos, 16 GB), el mismo donde se midieron
+todos los tiempos: el banco de la demo 2 (`results/bench_demo2.json`, con la configuración
+recomendada en p95 9,8 s frente al presupuesto de 30 s) y las demos en el navegador y en
+Docker. No hace falta repetir las mediciones en otro equipo, y «Cifrado del compañero» sigue la
+configuración de ese banco (D-050).
+
 ## Pendientes de decidir
 
-### P-001 · Equipo de las mediciones de la demo 2
-Este equipo es un escritorio (i5-9400F, 6 núcleos, 16 GB). El presupuesto de 30 s de la
-demo 2 es del portátil del autor. `make bench-demo` ya existe; `RESUMEN.md` dice en qué
-equipo se midió cada tiempo, y el botón «Cifrado del compañero» sigue la configuración que
-recomiende el banco del equipo donde corre (D-050). Falta que el autor lo corra en el
-portátil y ensaye allí las dos demos.
+Ninguno.

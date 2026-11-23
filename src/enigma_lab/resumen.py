@@ -39,11 +39,6 @@ from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 
 PHASES_LEFT = [
     (
-        "Demos · correr `make bench-demo` en el portátil del autor (P-001) y ensayar las dos "
-        "demos allí",
-        "antes de ensayar",
-    ),
-    (
         "Diapositiva 21 · poner el enlace del repositorio, https://github.com/Cartosn/enigma-lab "
         "(público; la CI corre en cada push)",
         "antes de la presentación",
@@ -551,7 +546,7 @@ def _demo_2(bench: dict[str, Any]) -> list[str]:
     if not bench:
         return [
             "- **Demo 2 (diapositiva 12):** sin mediciones; corre `make bench-demo` en el "
-            "portátil del autor."
+            "equipo de la exposición."
         ]
     team = bench["equipo"]
     where = f"{team['procesador']}, {team['nucleos_logicos']} núcleos lógicos, {team['sistema']}"
@@ -599,9 +594,8 @@ def _demo_2(bench: dict[str, Any]) -> list[str]:
             f"{fmt_pct(chosen['exito'])}, p95 {fmt_dec(chosen['p95'], 1)} s."
         )
     lines.append(
-        "- Estos tiempos son del equipo indicado. Este equipo es un escritorio; el presupuesto "
-        "de 30 s es del portátil del autor (P-001): corre `make bench-demo` allí antes de "
-        "ensayar y usa la configuración que recomiende."
+        "- Estos tiempos son del equipo indicado, un escritorio que es también el de la "
+        "exposición (D-072): no hace falta medirlos en otro equipo."
     )
     return lines
 
@@ -924,8 +918,7 @@ def build_markdown(
         f"- **Demo 1 (diapositiva 4):** el cálculo es instantáneo. La traza de «Vector "
         f"BDZGO» tarda {fmt_dec(timing['vector_bdzgo'], 1)} ms y la de «Portada» "
         f"{fmt_dec(timing['portada'], 1)} ms en el equipo donde corrió `make resumen` "
-        f"({cpu}). Los 45 s del guion los pone la interacción. Falta cronometrar el "
-        "recorrido completo en el portátil del autor.",
+        f"({cpu}). Los 45 s del guion los pone la interacción.",
         "- **La app en clase:** abre `http://localhost:8501/maquina?demo=1` (el modo demo queda "
         "en la URL y sobrevive a una recarga) y, en otra pestaña, "
         "`http://localhost:8501/bombe?demo=1`; pliega la barra lateral para ganar ancho. En "

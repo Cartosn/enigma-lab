@@ -2,7 +2,7 @@
 
 Última actualización: 22-11-2026 · fase 5 cerrada: E7 (Rejewski) y E8 (ataque moderno). Docker
 probado después de la fase 5; Experimentos ya funciona sin el corpus completo (D-071). Repositorio
-remoto creado, con la CI en verde.
+remoto creado, con la CI en verde. La exposición será en este equipo (P-001 resuelto, D-072).
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
@@ -72,6 +72,9 @@ Windows, con la instalación. El enlace ya está en el encabezado del informe (s
 en el inicio rápido del README y en el pendiente de la diapositiva 21 de `RESUMEN.md`
 (`resumen.py`).
 
+**La exposición** será en este escritorio, el mismo de todas las mediciones de este documento
+(P-001 resuelto, D-072): no hay que repetir el banco de la demo 2 ni las demos en otro equipo.
+
 **Qué quedó:**
 - **`rejewski/`:**
   - `characteristic.py`: las seis permutaciones del indicador con la máquina real, AD, BE y CF, su
@@ -137,15 +140,13 @@ en el inicio rápido del README y en el pendiente de la diapositiva 21 de `RESUM
 - actualizar con `results/presentacion/` la diapositiva 9 (la diferencia con Kuhl
   está en «Discrepancias»), la respuesta a «¿Hoy se rompería por fuerza bruta?» (E8) y el enlace
   del repositorio en la diapositiva 21;
-- reescribir con su voz el párrafo nuevo del informe (`% REVISAR`, «Rejewski y ataque moderno»);
-- lo que ya estaba pendiente: `make bench-demo` y el ensayo en el portátil (P-001).
+- reescribir con su voz el párrafo nuevo del informe (`% REVISAR`, «Rejewski y ataque moderno»).
 
 ## Fase 6 · Pulido y entrega
 
 **Criterio de aceptación:** se cumple en este equipo. La sección 10 está completa (README,
 informe, datos para las diapositivas y prueba final desde un clon limpio) y las dos demos del
-guion corren dentro de su tiempo. Falta repetir el banco y el ensayo en el portátil del autor
-(P-001).
+guion corren dentro de su tiempo en este equipo, que es el de la exposición (D-072).
 
 | Criterio | Resultado |
 | --- | --- |
