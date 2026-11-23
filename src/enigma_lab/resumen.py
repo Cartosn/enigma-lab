@@ -39,9 +39,9 @@ from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 
 PHASES_LEFT = [
     (
-        "Diapositiva 21 · poner el enlace del repositorio, https://github.com/Cartosn/enigma-lab "
-        "(público; la CI corre en cada push)",
-        "antes de la presentación",
+        "Guion (versión 2) · corregir los pasos de la demo 2 y quitar el pendiente del banco "
+        "de la demo, con las notas de «Con las diapositivas y el guion» (Discrepancias)",
+        "antes del primer ensayo",
     ),
 ]
 R2_COLUMNS = ["L", "texto", "n", "sobreviven", "p", "ic_bajo", "ic_alto", "teorico"]
@@ -202,8 +202,8 @@ def _slide_14(e1: dict[str, Any]) -> list[str]:
         f"{fmt_int(e1['lotes_igual_escalar'])}.",
         f"- Vectores de 6.1: {e1['vectores_ok']} de {e1['vectores_total']} coinciden "
         "(tabla en `r1_validacion.csv`). CyberChef coincide en 6 de 6 casos comprobados a mano.",
-        "- Nuevo para la diapositiva 14, si cabe: el simulador descifra letra por letra un "
-        "mensaje real, el del U-264 (Enigma M4, 25-11-1942, roto por el M4 Project en 2006).",
+        "- Mensaje real: el simulador descifra letra por letra el del U-264 (Enigma M4, "
+        "25-11-1942, roto por el M4 Project en 2006).",
     ]
 
 
@@ -269,6 +269,15 @@ def _cell(table: pd.DataFrame, letters: int, loops: int, diagonal: str, mode: st
         & (table["modo"] == mode)
     ]
     return None if match.empty else match.iloc[0]
+
+
+def _bletchley_same_menus(e5: dict[str, Any]) -> float:
+    """Segundos por orden del modo Bletchley en los menús donde se midió el robusto.
+
+    ``robusto_tiempo_relativo`` compara los mismos menús: es el tiempo del robusto dividido
+    por el del Bletchley en ellos, así que ese tiempo es el del robusto entre el cociente.
+    """
+    return float(e5["s_por_orden_robusto"] / e5["robusto_tiempo_relativo"])
 
 
 def _slide_16(e5: dict[str, Any], table: pd.DataFrame | None) -> list[str]:
@@ -345,15 +354,20 @@ def _slide_16(e5: dict[str, Any], table: pd.DataFrame | None) -> list[str]:
             f"{fmt_dec(e5['robusto_tiempo_relativo'], 1)} veces el tiempo y "
             f"{fmt_dec(e5['robusto_paradas_relativas'], 1)} veces las paradas del modo Bletchley."
         )
-    lines.append(
+    timing = (
         f"- **Tiempo por orden** (17.576 posiciones, en el equipo de `make reproduce`): "
         f"{fmt_dec(e5['s_por_orden_bletchley'], 3)} s en modo Bletchley"
-        + (
-            f" y {fmt_dec(e5['s_por_orden_robusto'], 3)} s en modo robusto."
-            if e5.get("s_por_orden_robusto")
-            else "."
-        )
     )
+    if e5.get("s_por_orden_robusto"):
+        letters = e5.get("letras", [])
+        timing += (
+            f", en promedio con todos los menús ({min(letters)} a {max(letters)} letras), y "
+            f"{fmt_dec(e5['s_por_orden_robusto'], 3)} s en modo robusto, con los de "
+            f"{_and(e5.get('letras_robusto', [12]))} letras. En esos mismos menús el modo "
+            f"Bletchley tarda {fmt_dec(_bletchley_same_menus(e5), 3)} s: de ahí las "
+            f"{fmt_dec(e5['robusto_tiempo_relativo'], 1)} veces."
+        )
+    lines.append(timing + ("" if timing.endswith(".") else "."))
     factors = [c["paradas_media"] / c["turing"] for c in on if c["turing"] > 0]
     lines.append(
         "- **«Letras» son vértices** (P-002, D-031): las letras distintas del menú. Con esa "
@@ -528,9 +542,9 @@ def _e6_notes(e6: dict[str, Any]) -> list[str]:
         f"{fmt_int(round(wald['azar']))} letras son la aproximación de Wald, que ignora el "
         "sobrepaso de los umbrales. Con las mismas tasas, el valor exacto es "
         f"{fmt_dec(exact['profundidad']['letras'], 1)} y {fmt_dec(exact['azar']['letras'], 1)}, y "
-        "la simulación lo confirma. Las cifras de la diapositiva siguen bien si se presentan como "
-        "«según Wald».",
-        "- Diapositiva 13 y guion («las letras se repiten 1 de cada 17 veces»): es la tasa del "
+        "la simulación lo confirma. Las dos diapositivas las presentan como de Wald, y así "
+        "siguen bien.",
+        "- Diapositiva 13 y guion («en el tráfico naval … 1 de cada 17»): es la tasa del "
         "tráfico naval que da Wikipedia. Nuestro corpus literario repite "
         f"{_one_in(rates['corpus_x'])} con la X como separador y {_one_in(rates['corpus_letras'])} "
         f"solo con letras. Con él, la profundidad se confirma en unas {fmt_int(round(turing))} "
@@ -576,10 +590,13 @@ def _demo_2(bench: dict[str, Any]) -> list[str]:
         )
     else:
         how = {
-            "60_robusto": "el compañero usa «Clave aleatoria» sin restricciones y empieza su "
-            "mensaje por WETTERBERICHT (con X entre palabras). En la demo, el botón «Cifrado "
-            "del compañero» de La Bombe deja el crib en la posición 0, «Rotores I a V (60 "
-            "órdenes)» y el modo robusto; se pega el cifrado y se pulsa Ctrl+Enter.",
+            "60_robusto": "el compañero usa «Clave aleatoria» sin restricciones, con el modelo "
+            "Enigma I que trae Máquina, y empieza su mensaje por WETTERBERICHT (con X entre "
+            "palabras). En la demo, el botón «Cifrado del compañero» de La Bombe deja el crib "
+            "en la posición 0, «Rotores I a V (60 órdenes)» y el modo robusto. Se pega el "
+            "cifrado y se pulsa Ctrl+Enter: aparecen el menú y sus lazos. El barrido empieza "
+            "con «Correr la Bombe», y al terminar, «Verificar» revisa todas las paradas "
+            "consistentes y muestra el texto en grande.",
             "6_robusto": "antes de cifrar, el compañero marca los rotores I, II y III en "
             "«Rotores permitidos en «Clave aleatoria»» (página Máquina), pulsa «Clave "
             "aleatoria» y empieza su mensaje por WETTERBERICHT (con X entre palabras). En la "
@@ -722,10 +739,8 @@ def _kuhl_notes(e7: dict[str, Any]) -> list[str]:
         "ninguna de las 33 variantes de los supuestos que probamos reproduce sus cifras "
         "(`scripts/kuhl_variantes.py`, VALIDACION). Su artículo tiene además erratas: escribe "
         "105.465 configuraciones, da 11.466 como el 54,40 % (es el 54,01 %) y dice que 20.433 "
-        f"tienen 10 o menos cuando su tabla 2 suma {fmt_int(cat['kuhl_hasta_10_tabla'])}. "
-        "Sugerencia: la diapositiva puede seguir citando a Kuhl («Kuhl calculó…») y agregar, si "
-        f"cabe, «nuestro catálogo: {fmt_int(k['caracteristicas_distintas']['e7'])} y "
-        f"{fmt_int(k['caracteristicas_unicas']['e7'])}».",
+        f"tienen 10 o menos cuando su tabla 2 suma {fmt_int(cat['kuhl_hasta_10_tabla'])}. La "
+        "diapositiva da las dos cifras, las nuestras y las de Kuhl.",
     ]
 
 
@@ -768,15 +783,107 @@ def _other_results(e2: dict[str, Any], e3: dict[str, Any]) -> list[str]:
     return lines or ["Sin resultados de E2 ni E3."]
 
 
+def _guion_notes(summary: dict[str, Any], bench: dict[str, Any]) -> list[str]:
+    """Lo que la versión 2 de las diapositivas y del guion dice distinto de la app o de los
+    resultados, o que se presta a confusión, con su corrección (para «Discrepancias»)."""
+    lines = [
+        "**Con las diapositivas y el guion (versión 2, 22-11-2026).** Ninguna cifra contradice "
+        "los resultados. Estas frases sí contradicen la app o se prestan a confusión; cada una "
+        "trae su corrección:",
+        "",
+        "- Guion, diapositiva 12 (demo 2), pasos 2 y 3: el menú aparece solo después de "
+        "Ctrl+Enter, y Ctrl+Enter no corre la Bombe. En la app: «Cifrado del compañero», pegar "
+        "el cifrado, Ctrl+Enter (aparecen el menú y sus lazos), «Correr la Bombe» y, al "
+        "terminar, «Verificar», que revisa todas las paradas consistentes sin que haya que "
+        "elegir una y muestra el texto en grande. Mientras corre hay una sola barra, que avanza "
+        "un orden de rotores a la vez («Orden 1 de 60», «Orden 2 de 60»…), un contador de "
+        "paradas con el cronómetro y una columna de tambores por arista del menú. Corrección "
+        "del paso 3: «la barra avanza un orden de rotores a la vez; el contador son las "
+        "paradas».",
+    ]
+    chosen = next(
+        (c for c in bench.get("configuraciones", []) if c["id"] == bench.get("recomendada")), None
+    )
+    if chosen is not None:
+        lines.append(
+            "- Guion, «Pendiente» y «Antes de exponer · Computador»: el computador de la "
+            "exposición es este escritorio (D-072), y `make bench-demo` ya corrió en él "
+            f"({bench['fecha']}): {chosen['nombre']}, {chosen['exitos']} de {chosen['n']}, p50 "
+            f"{fmt_dec(chosen['p50'], 1)} s y p95 {fmt_dec(chosen['p95'], 1)} s. El pendiente "
+            "está cumplido: no hay que medir en otro equipo."
+        )
+    lines += [
+        "- Guion, diapositiva 4 (demo 1), paso 2: «Vector BDZGO» ya deja AAAAA escrito y "
+        "BDZGO en la salida. Si se escribe AAAAA otra vez, se agregan cinco letras a la entrada.",
+        "- Guion, «Antes de exponer · Compañero»: «Clave aleatoria» sortea entre los rotores "
+        "del modelo elegido en Máquina. Con Enigma I, el que trae la página, salen los rotores "
+        "I a V y el reflector B, lo que barre la Bombe; si el compañero cambia el modelo a M3 o "
+        "M4, puede salir un rotor VI a VIII y la Bombe no encontraría la clave.",
+    ]
+    e5, e6, e7, e8 = (summary.get(k, {}) for k in ("e5", "e6", "e7", "e8"))
+    if e5.get("s_por_orden_robusto"):
+        same = _bletchley_same_menus(e5)
+        lines.append(
+            f"- Diapositiva 16, «a {fmt_int(round(e5['robusto_tiempo_relativo']))} veces el "
+            f"tiempo: {fmt_dec(e5['s_por_orden_robusto'], 2)} s por orden, frente a "
+            f"{fmt_dec(e5['s_por_orden_bletchley'], 3)} s»: las "
+            f"{fmt_dec(e5['robusto_tiempo_relativo'], 1)} veces comparan los mismos menús "
+            f"({_and(e5['letras_robusto'])} letras), donde el modo Bletchley tarda "
+            f"{fmt_dec(same, 3)} s por orden. Los {fmt_dec(e5['s_por_orden_bletchley'], 3)} s son "
+            "su promedio con todos los menús, y con ellos el cociente daría "
+            f"{fmt_dec(e5['s_por_orden_robusto'] / e5['s_por_orden_bletchley'], 0)}. "
+            f"Corrección: «frente a {fmt_dec(same, 3)} s»."
+        )
+    if e6:
+        simulated = e6["simulacion"]["tasa_1_17/letras_1_17"]["profundidad"]
+        gap, wald = e6["brecha_wald"]["profundidad"], e6["wald"]["profundidad"]
+        low, high = simulated["ic"]
+        lines.append(
+            "- Guion, pregunta «¿Por qué la simulación da más letras que Wald?»: las "
+            f"{fmt_dec(gap['total'], 1)} letras son la diferencia entre el cálculo exacto "
+            f"({fmt_dec(e6['exacto']['profundidad']['letras'], 1)}) y Wald ({fmt_dec(wald, 1)}), "
+            f"y el sobrepaso explica {fmt_dec(gap['sobrepaso_arriba'], 1)}. La simulación da "
+            f"{fmt_int(round(simulated['letras']))}, "
+            f"{fmt_int(round(simulated['letras'] - wald))} más que Wald; el resto es azar de la "
+            "simulación, porque el valor exacto cae dentro de su IC 95 % "
+            f"({fmt_int(round(low))}–{fmt_int(round(high))}). Corrección: «el cálculo exacto da "
+            f"{fmt_dec(gap['total'], 1)} letras más que Wald, y "
+            f"{fmt_dec(gap['sobrepaso_arriba'], 1)} son el sobrepaso; la simulación coincide con "
+            "el exacto dentro de su IC»."
+        )
+    if e7:
+        k = e7["catalogo"]["kuhl"]
+        lines.append(
+            "- Guion, pregunta «¿Por qué su catálogo no da lo mismo que Kuhl?» («la diferencia "
+            "es menor del 1 %»): vale para las dos cifras de la diapositiva 9 "
+            f"({fmt_pct(k['caracteristicas_distintas']['relativa'], 2)} y "
+            f"{fmt_pct(k['caracteristicas_unicas']['relativa'], 2)}), no para la clase más "
+            f"frecuente: {fmt_int(k['mayor_clase']['e7'])} frente a "
+            f"{fmt_int(k['mayor_clase']['kuhl'])} ({fmt_pct(k['mayor_clase']['relativa'], 1)})."
+        )
+    if e8:
+        longest = max(e8["longitudes"])
+        cell = e8["celdas"].get(f"10/{longest}")
+        ten = e8["por_cables"]["10"]["exito"]
+        if cell is not None:
+            lines.append(
+                "- Guion, pregunta «¿Hoy se rompería por fuerza bruta?» («con 10 cables casi "
+                f"nunca ({fmt_pct(ten)})»): el {fmt_pct(ten)} es el promedio de todas las "
+                f"longitudes, de {fmt_int(min(e8['longitudes']))} a {fmt_int(longest)} letras. "
+                f"Con {fmt_int(longest)} letras se lee el {fmt_pct(cell['exito'], 0)} de los "
+                "mensajes con 10 cables."
+            )
+    return lines
+
+
 def _discrepancies(
     e4: dict[str, Any],
     table: pd.DataFrame | None,
     e5_table: pd.DataFrame | None = None,
-    bench: dict[str, Any] | None = None,
     e6: dict[str, Any] | None = None,
 ) -> list[str]:
     lines = [
-        "Ninguna contradicción con las diapositivas ni con el guion. Notas:",
+        "**Notas sobre los resultados y las fuentes.**",
         "",
         *_e6_notes(e6 or {}),
     ]
@@ -792,13 +899,6 @@ def _discrepancies(
                 "1,2 · 0,04 de Turing. Si «letras» fueran aristas (letras del crib), no "
                 "coincidirían (ver D-031)."
             )
-            lines.append(
-                "- Guion, diapositiva 16: «en los 60 órdenes quedan unas 2 paradas falsas en "
-                "total; con dos lazos serían unas 72» son cifras de Turing (0,04 y 1,2 por 60). "
-                f"Nuestra Bombe da {_stops(60 * on[3]['paradas_media'])} y "
-                f"{_stops(60 * on[2]['paradas_media'])}. El mensaje del guion se sostiene "
-                "(con 3 lazos, unas pocas paradas en los 60 órdenes; con 2, decenas)."
-            )
     lines.append(
         "- Verificador (spec 6.4, «siempre»): recupera una clave equivalente en 200 de 200 de "
         "los casos de la prueba, que se usaron para ajustar su diseño, y en 198 de 200 casos "
@@ -806,11 +906,6 @@ def _discrepancies(
         "segunda o la última del mensaje: un doble paso del central justo en el borde que el "
         "texto no alcanza a decidir. La parada verdadera aparece siempre (400 de 400)."
     )
-    if bench and bench.get("recomendada"):
-        lines.append(
-            "- Diapositiva 12 y guion: la configuración de la demo 2 es la recomendada en "
-            "«Demos»; el guion la tiene pendiente."
-        )
     if e4 and table is not None:
         g = _row(table, "aleman", 13)
         if g is not None:
@@ -819,7 +914,7 @@ def _discrepancies(
                 f"{fmt_pct(g['p'])}, por encima de (25/26)^13 y fuera de su IC. No es un error "
                 "del filtro: es el efecto del IC del idioma, y la corrección "
                 f"(1 − (1 − κ)/25)^13 = {fmt_pct(g['teorico_kappa'])} lo explica. La "
-                "diapositiva puede seguir diciendo «60 %» para la teoría y agregar el valor real."
+                "diapositiva da los dos valores: el 60 % de la teoría y el del alemán real."
             )
     lines += [
         "- py-enigma admite como máximo 10 cables: la comparación de 10.000 claves usa de 0 a "
@@ -928,12 +1023,14 @@ def build_markdown(
         "",
         "## 4. Discrepancias",
         "",
-        *_discrepancies(summary.get("e4", {}), e4_table, e5_table, bench, summary.get("e6", {})),
+        *_guion_notes(summary, bench or {}),
+        "",
+        *_discrepancies(summary.get("e4", {}), e4_table, e5_table, summary.get("e6", {})),
         *_kuhl_notes(summary.get("e7", {})),
         "",
         "## 5. Pendientes",
         "",
-        *[f"- {what}: {when}." for what, when in PHASES_LEFT],
+        *([f"- {what}: {when}." for what, when in PHASES_LEFT] or ["- Ninguno."]),
         "",
     ]
     return "\n".join(lines)

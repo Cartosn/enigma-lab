@@ -4,7 +4,9 @@ Un solo registro para dos usos: ``tests/test_presentacion.py`` comprueba cada ci
 ``make resumen`` las lista en ``RESUMEN.md``. ``expected`` es la cifra como la escribe
 el spec o la diapositiva; ``compute`` la calcula con el formato español de
 :mod:`enigma_lab.viz.numfmt`. Las que la diapositiva cita de una fuente externa (Turing
-en la 16, Kuhl en la 9) se comprueban contra lo transcrito en ``data/reference/``. Una
+en la 16, Kuhl en la 9) se comprueban contra lo transcrito en ``data/reference/``. Las
+medidas con azar (E1 y E4 a E7) salen de la corrida completa guardada en
+``results/summary.json``; sin ella no se pueden comprobar (``SinCorrida``, D-073). Una
 cifra de un módulo que aún no exista quedaría como pendiente, con la fase en que llega.
 """
 
@@ -14,6 +16,7 @@ import math
 from collections.abc import Callable
 from dataclasses import dataclass
 from functools import cache
+from typing import Any
 
 import numpy as np
 
@@ -215,6 +218,148 @@ def _turing_slide_16() -> str:
     )
 
 
+def _our_catalog() -> str:
+    """Nuestro catálogo (E7, exacto): características distintas y las de una sola configuración."""
+    from enigma_lab.rejewski.catalog import build_catalog
+
+    sizes = build_catalog().class_sizes()
+    return f"{fmt_int(len(sizes))} · {fmt_int(int((sizes == 1).sum()))}"
+
+
+def _u264_start() -> str:
+    """Las primeras letras del mensaje del U-264 descifrado (diapositiva 14: «VONVONJLOOKS…»)."""
+    return _encrypt_vector("m4_u264", "input")[:12]
+
+
+# ---------------------------------------------------------------- cifras medidas
+
+
+class SinCorrida(LookupError):
+    """Falta la corrida completa de un experimento en ``results/summary.json``."""
+
+
+def _saved(name: str) -> dict[str, Any]:
+    """Las cifras guardadas de un experimento («e1», «e4»…), si son de la corrida completa.
+
+    Las cifras medidas de las diapositivas salen de ``make reproduce`` (modo completo,
+    semilla 2026). Sin esa corrida, como en un clon sin resultados o después de
+    ``make rapido``, no hay con qué comprobarlas.
+    """
+    from enigma_lab.experiments.common import read_summary
+
+    data: dict[str, Any] = read_summary().get(name, {})
+    if data.get("corrida", {}).get("modo") != "completo":
+        raise SinCorrida(f"falta la corrida completa de {name.upper()} (make reproduce)")
+    return data
+
+
+def _catalog_finds_day() -> str:
+    """Días simulados en que el catálogo encuentra la configuración del día (E7)."""
+    traffic = _saved("e7")["trafico"]
+    return f"{_pct(traffic['catalogo']['encontrada'], 0)} de {fmt_int(traffic['dias'])} días"
+
+
+def _pyenigma() -> str:
+    """Claves y mensajes aleatorios que coinciden con py-enigma (E1)."""
+    e1 = _saved("e1")
+    return f"{fmt_int(e1['pyenigma_coincidencias'])} de {fmt_int(e1['pyenigma_casos'])}"
+
+
+def _german_survival() -> str:
+    """Alineaciones falsas que sobreviven con alemán real, con 13 y con 50 letras (E4)."""
+    by_length = _saved("e4")["aleman"]["por_L"]
+    return f"{_pct(by_length['13']['p'])} y {_pct(by_length['50']['p'])}"
+
+
+def _e4_ci_bound() -> str:
+    """Cota del semiancho de los IC 95 % de E4, en puntos porcentuales.
+
+    Es el mayor semiancho de las 20 celdas (dos textos por 10 longitudes), redondeado hacia
+    arriba a la centésima, porque la diapositiva lo da como cota: «±0,25 puntos o menos».
+    """
+    e4 = _saved("e4")
+    widest = max(
+        (high - low) / 2
+        for text in ("aleatorio", "aleman")
+        for low, high in (cell["ic"] for cell in e4[text]["por_L"].values())
+    )
+    return "±" + fmt_dec(math.ceil(widest * 10_000) / 100, 2)
+
+
+def _german_kappa() -> str:
+    """κ del alemán con la X, y en cuántas longitudes la teoría corregida cae en el IC (E4)."""
+    e4 = _saved("e4")
+    return f"κ = {fmt_dec(e4['kappa_aleman_x'], 3)}; {e4['aleman']['teoria_kappa_dentro_del_ic']}"
+
+
+def _e4_design() -> str:
+    """Mensajes por longitud en E4, y sus letras."""
+    e4 = _saved("e4")
+    return f"{fmt_int(e4['n_por_L'])} de {fmt_int(e4['letras_por_mensaje'])} letras"
+
+
+def _slide_stops(value: float) -> str:
+    """Paradas como en la diapositiva 16: enteras desde 10 (678, 26), con dos decimales debajo."""
+    return fmt_int(round(value)) if value >= 10 else fmt_dec(value, 2)
+
+
+def _our_stops() -> str:
+    """Nuestra Bombe, 12 letras y diagonal board: paradas falsas por orden con 0 a 3 lazos (E5)."""
+    twelve = _saved("e5")["doce_letras"]
+    return " · ".join(_slide_stops(twelve[str(loops)]["paradas"]) for loops in range(4))
+
+
+def _per_loop() -> str:
+    """Por cuánto divide cada lazo las paradas falsas, medido (E5, 12 letras).
+
+    Es la media geométrica de 0 a 2 lazos, √(paradas con 0 / paradas con 2). Con 3 lazos
+    quedan tan pocas paradas que ese último cociente es impreciso, y no entra.
+    """
+    twelve = _saved("e5")["doce_letras"]
+    return fmt_int(round(math.sqrt(twelve["0"]["paradas"] / twelve["2"]["paradas"])))
+
+
+def _bombe_success() -> str:
+    """Parada verdadera en modo Bletchley, menús con giro del central y parada en robusto (E5)."""
+    e5 = _saved("e5")
+    return " · ".join(_pct(e5[k], 0) for k in ("exito_bletchley", "vuelta_frac", "exito_robusto"))
+
+
+def _robust_cost() -> str:
+    """Lo que cuesta el modo robusto (E5): veces el tiempo y segundos por orden de cada modo."""
+    e5 = _saved("e5")
+    return (
+        f"{fmt_int(round(e5['robusto_tiempo_relativo']))} veces; "
+        f"{fmt_dec(e5['s_por_orden_robusto'], 2)}{NBSP}s frente a "
+        f"{fmt_dec(e5['s_por_orden_bletchley'], 3)}{NBSP}s"
+    )
+
+
+def _e5_menus() -> str:
+    """Menús por celda en E5."""
+    return fmt_int(_saved("e5")["n_por_celda"])
+
+
+def _sprt_simulated() -> str:
+    """El SPRT simulado (tasa 1/17, letras sueltas): letras para confirmar y descartar (E6)."""
+    cell = _saved("e6")["simulacion"]["tasa_1_17/letras_1_17"]
+    return " · ".join(fmt_int(round(cell[h]["letras"])) for h in ("profundidad", "azar"))
+
+
+def _sprt_german() -> str:
+    """Alemán real: letras para confirmar con bigramas y trigramas, y con los pesos de Turing."""
+    simulation = _saved("e6")["simulacion"]
+    return " · ".join(
+        fmt_int(round(simulation[combo]["profundidad"]["letras"]))
+        for combo in ("aleman/trigramas", "aleman/letras_1_17")
+    )
+
+
+def _e6_pairs() -> str:
+    """Pares de mensajes por hipótesis en E6."""
+    return fmt_int(_saved("e6")["n_pares"])
+
+
 # ---------------------------------------------------------------- registro
 
 CIFRAS: tuple[Cifra, ...] = (
@@ -304,6 +449,8 @@ CIFRAS: tuple[Cifra, ...] = (
             vector("py_enigma")["input"],
         ),
     ),
+    Cifra("14", "mensaje real del U-264 (M4, 1942), descifrado", "VONVONJLOOKS", _u264_start),
+    Cifra("14", "claves aleatorias iguales a py-enigma (E1)", "10.000 de 10.000", _pyenigma),
     # Diapositiva 6 · stats/inference.py y E1
     Cifra(
         "6",
@@ -339,6 +486,20 @@ CIFRAS: tuple[Cifra, ...] = (
         f"14,1{NBSP}%",
         lambda: _pct(no_fixed_point_probability(50)),
     ),
+    Cifra(
+        "15",
+        "sobreviven con alemán real, con 13 y con 50 letras (E4)",
+        f"61,6{NBSP}% y 15,4{NBSP}%",
+        _german_survival,
+    ),
+    Cifra("15", "cota del semiancho de los IC 95 % de E4, en puntos", "±0,25", _e4_ci_bound),
+    Cifra(
+        "15",
+        "κ del alemán; longitudes con la teoría corregida dentro del IC (E4)",
+        "κ = 0,080; 10 de 10",
+        _german_kappa,
+    ),
+    Cifra("15, 23", "E4: mensajes por longitud", "1.000 de 250 letras", _e4_design),
     # Diapositivas 10 y 11 · cribs/ (casos deterministas de 6.5)
     Cifra("10", "alineaciones de WETTERBERICHT sobre BBGCCKITCTTEZZZLCZ", "6", _slide10_count),
     Cifra("10", "alineaciones sin conflictos", "0, 1, 2, 3", _slide10_valid),
@@ -373,9 +534,21 @@ CIFRAS: tuple[Cifra, ...] = (
     ),
     Cifra(
         "9",
-        "Kuhl (2007): características distintas y únicas (E7 da 21.225 y 11.578: Discrepancias)",
+        "nuestro catálogo: características distintas y únicas (E7, exacto)",
+        "21.225 · 11.578",
+        _our_catalog,
+    ),
+    Cifra(
+        "9",
+        "Kuhl (2007): características distintas y únicas, junto a las nuestras",
         "21.230 · 11.466",
         _kuhl_figures,
+    ),
+    Cifra(
+        "9",
+        "días en que el catálogo encuentra la configuración del día (E7)",
+        f"75{NBSP}% de 4.000 días",
+        _catalog_finds_day,
     ),
     # Diapositivas 13 y 17 · banburismus/ (tasas 1/17 y 1/26 de Wikipedia, «Banburismus»)
     Cifra(
@@ -409,22 +582,67 @@ CIFRAS: tuple[Cifra, ...] = (
         "929 y 1.062",
         _wald_letters,
     ),
-    # Diapositiva 16 · data/reference/turing_stops.csv (las cifras medidas van en RESUMEN.md)
+    Cifra(
+        "17",
+        "SPRT simulado, tasa 1/17: letras para confirmar y para descartar la profundidad (E6)",
+        "983 · 1.090",
+        _sprt_simulated,
+    ),
+    Cifra(
+        "17",
+        "alemán real: letras para confirmar, con bigramas y trigramas y con pesos de Turing (E6)",
+        "254 · 332",
+        _sprt_german,
+    ),
+    Cifra("17, 23", "E6: pares por hipótesis", "2.000", _e6_pairs),
+    # Diapositivas 16 y 20 · data/reference/turing_stops.csv (Turing) y E5 (nuestra Bombe)
     Cifra(
         "16",
         "Turing, 12 letras: paradas por orden con 0, 1, 2 y 3 lazos; en 60 órdenes con 2 y 3",
         "820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60",
         _turing_slide_16,
     ),
+    Cifra(
+        "16",
+        "nuestra Bombe, 12 letras, con diagonal board: paradas por orden con 0 a 3 lazos (E5)",
+        "678 · 26 · 0,99 · 0,11",
+        _our_stops,
+    ),
+    Cifra(
+        "16",
+        "parada verdadera en modo Bletchley · menús en que gira el central · modo robusto (E5)",
+        f"55{NBSP}% · 45{NBSP}% · 98{NBSP}%",
+        _bombe_success,
+    ),
+    Cifra(
+        "16",
+        "modo robusto: veces el tiempo; segundos por orden frente al modo Bletchley (E5)",
+        f"12 veces; 0,11{NBSP}s frente a 0,008{NBSP}s",
+        _robust_cost,
+    ),
+    Cifra("16, 23", "E5: menús de 12 letras distintas por celda", "100", _e5_menus),
+    Cifra(
+        "20",
+        "cada lazo divide las paradas falsas por (E5, media geométrica de 0 a 2 lazos)",
+        "26",
+        _per_loop,
+    ),
 )
 """Todas las cifras de la tabla 11.3, en el orden de las diapositivas."""
 
 
 def evaluate() -> list[dict[str, object]]:
-    """Calcula todas las cifras: lo esperado, lo obtenido y si coinciden."""
+    """Calcula todas las cifras: lo esperado, lo obtenido y si coinciden.
+
+    Una cifra medida sin la corrida completa guardada queda sin calcular, con el motivo.
+    """
     rows: list[dict[str, object]] = []
     for c in CIFRAS:
-        obtained = c.compute() if c.compute else None
+        pending = c.pending
+        try:
+            obtained = c.compute() if c.compute else None
+        except SinCorrida as missing:
+            obtained, pending = None, str(missing)
         rows.append(
             {
                 "diapositivas": c.slides,
@@ -432,7 +650,7 @@ def evaluate() -> list[dict[str, object]]:
                 "esperado": c.expected,
                 "obtenido": obtained,
                 "coincide": None if obtained is None else obtained == c.expected,
-                "pendiente": c.pending,
+                "pendiente": pending,
             }
         )
     return rows

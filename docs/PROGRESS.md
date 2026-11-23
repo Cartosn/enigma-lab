@@ -3,6 +3,7 @@
 Última actualización: 22-11-2026 · fase 5 cerrada: E7 (Rejewski) y E8 (ataque moderno). Docker
 probado después de la fase 5; Experimentos ya funciona sin el corpus completo (D-071). Repositorio
 remoto creado, con la CI en verde. La exposición será en este equipo (P-001 resuelto, D-072).
+Diapositivas y guion en su versión 2: sus 61 cifras coinciden con el código (D-073).
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
@@ -75,6 +76,28 @@ en el inicio rápido del README y en el pendiente de la diapositiva 21 de `RESUM
 **La exposición** será en este escritorio, el mismo de todas las mediciones de este documento
 (P-001 resuelto, D-072): no hay que repetir el banco de la demo 2 ni las demos en otro equipo.
 
+**Presentación, versión 2** (22-11-2026, D-073). El autor reemplazó el PDF y el guion de
+`docs/presentacion/` por su versión 2, hecha con `RESUMEN.md`. Se compararon las 24
+diapositivas con la versión anterior (texto) y se revisaron a ojo los gráficos de la 15, la 16
+y la 17 frente a los CSV:
+- **Cifras:** las 16 nuevas (E7 en la 9; el U-264 y E1 en la 14; el alemán real en la 15; E5
+  en la 16 y la 20; E6 en la 17; los N de la 23) quedaron en `cifras.py`, y las 61 coinciden.
+  Las medidas salen de la corrida completa guardada; sin ella, sus pruebas se saltan.
+- **Lo que no coincide**, en «Discrepancias» de `RESUMEN.md`, con su corrección:
+  - demo 2: Ctrl+Enter muestra el menú, pero el barrido empieza con «Correr la Bombe», y hay
+    una sola barra, que avanza un orden a la vez;
+  - demo 1: «Vector BDZGO» ya deja AAAAA escrito;
+  - el guion pide correr `make bench-demo` en el computador de la exposición, pero ya se midió
+    aquí (D-072);
+  - la diapositiva 16 compara 0,11 s con 0,008 s, pero en los mismos menús el modo Bletchley
+    tarda 0,009 s;
+  - tres respuestas de «Preguntas probables»: la diferencia con Wald, la de Kuhl y el 3,5 % de
+    E8.
+- **Guía de estudio:** las 15 preguntas empiezan por las 10 del guion v2, y el modo robusto
+  cuesta unas 12 veces el tiempo (antes decía «13 a 14», de una corrida anterior).
+
+`make test`: 353 pruebas en 2 min 5 s, con las lentas incluidas; `make lint`, sin errores.
+
 **Qué quedó:**
 - **`rejewski/`:**
   - `characteristic.py`: las seis permutaciones del indicador con la máquina real, AD, BE y CF, su
@@ -137,10 +160,12 @@ en el inicio rápido del README y en el pendiente de la diapositiva 21 de `RESUM
 **Qué falta:** nada del código.
 
 **Pendiente del autor:**
-- actualizar con `results/presentacion/` la diapositiva 9 (la diferencia con Kuhl
-  está en «Discrepancias»), la respuesta a «¿Hoy se rompería por fuerza bruta?» (E8) y el enlace
-  del repositorio en la diapositiva 21;
-- reescribir con su voz el párrafo nuevo del informe (`% REVISAR`, «Rejewski y ataque moderno»).
+- corregir el guion (la demo 2 antes que nada) y la diapositiva 16 con «Discrepancias» de
+  `results/presentacion/RESUMEN.md`;
+- reescribir con su voz los 6 párrafos `% REVISAR` del informe, entre ellos el nuevo de
+  «Rejewski y ataque moderno»;
+- ensayar dos veces con cronómetro, las dos demos incluidas, y preguntarle al profesor si las
+  preguntas cuentan dentro de los 25 minutos (guion).
 
 ## Fase 6 · Pulido y entrega
 

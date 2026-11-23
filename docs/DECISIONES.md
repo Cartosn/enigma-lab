@@ -764,6 +764,33 @@ recomendada en p95 9,8 s frente al presupuesto de 30 s) y las demos en el navega
 Docker. No hace falta repetir las mediciones en otro equipo, y «Cifrado del compañero» sigue la
 configuración de ese banco (D-050).
 
+### D-073 · Presentación, versión 2: sus cifras en el registro y lo que no coincide
+- **Qué llegó.** El autor reemplazó las diapositivas y el guion de `docs/presentacion/` por la
+  versión 2 (22-11-2026), hecha con `RESUMEN.md`: E7 en la diapositiva 9, el U-264 y E1 en la
+  14, el alemán real en la 15, E5 en la 16, E6 en la 17 y el enlace del repositorio en la 21.
+- **Las cifras medidas entran al registro.** `cifras.py` tenía solo cifras exactas o citadas, y
+  las medidas iban solo en el resumen. Ahora están todas las de las diapositivas: 16 nuevas, 61
+  en total. Las medidas (E1 y E4 a E7) salen de la corrida completa guardada en
+  `results/summary.json`, la misma del resumen y del informe, sin volver a correr nada. Sin esa
+  corrida (un clon sin resultados, o después de `make rapido`, que escribe en el mismo lugar),
+  `SinCorrida` salta la prueba y el resumen muestra la cifra sin calcular, con el motivo: un
+  `make rapido` no debe romper `make test`.
+- **Cifras que la diapositiva redondea o da como cota.** «IC 95 % de ±0,25 puntos o menos» (E4)
+  se comprueba como el mayor semiancho de los 20 IC, redondeado hacia arriba a la centésima. El
+  «÷ 26» de la diapositiva 20 es la media geométrica de 0 a 2 lazos, √(paradas con 0 / paradas
+  con 2); de 2 a 3 lazos quedan tan pocas paradas que el cociente es impreciso.
+- **Lo que no coincide va a «Discrepancias»** (`resumen._guion_notes`), sin editar el guion: los
+  pasos de la demo 2 (Ctrl+Enter muestra el menú pero no corre la Bombe; hay una sola barra),
+  «Vector BDZGO» ya escribe AAAAA, el pendiente del banco ya cumplido (D-072), la comparación de
+  tiempos de la diapositiva 16 y tres respuestas de «Preguntas probables». Las notas que la
+  versión 2 dejó resueltas se quitaron, y el texto de la demo 2 en «Demos» nombra ahora «Correr
+  la Bombe»: su versión anterior («se pega el cifrado y se pulsa Ctrl+Enter») originó el error
+  del guion.
+- **Guía de estudio.** El guion tiene ahora 10 preguntas probables; las 15 de la guía empiezan
+  por ellas, en su orden. Para seguir en 15, las de los anillos y del rotor central se unieron, y
+  la del alemán real frente a (25/26)^L queda entre las del tema 3, donde ya estaba. El modo
+  robusto cuesta «unas 12 veces el tiempo», como en la corrida actual, y no «13 a 14».
+
 ## Pendientes de decidir
 
 Ninguno.

@@ -592,8 +592,9 @@ texto que parece alemán.
 
 ## Las 15 preguntas más probables
 
-Las seis primeras son las «Preguntas probables» del guion. Cada respuesta dice dónde está en
-el código.
+Las diez primeras son las «Preguntas probables» del guion (versión 2), en su orden. Cada
+respuesta dice dónde está en el código. La de por qué con alemán real sobreviven más
+alineaciones que (25/26)^L está entre las preguntas del tema 3.
 
 1. *¿Y la máquina de Turing?* Es el modelo teórico de computación de 1936. La Bombe es una
    máquina electromecánica de 1940, hecha para una búsqueda concreta: probar hipótesis de
@@ -615,54 +616,66 @@ el código.
    de solo texto cifrado no prueban claves: buscan los rotores con el índice de coincidencia y el
    plugboard por hill climbing (Gillogly 1995; Ostwald y Weierud 2017). E8 implementa el de
    Gillogly (`attacks/gillogly.py`): con 6 cables lee la mitad de los mensajes desde unas
-   314 letras, en 1,7 s por mensaje; con 10 cables casi no lee nada, porque su fase 1 supone los
-   anillos (tema 6.4).
+   314 letras, en 1,7 s por mensaje; con 10 cables casi no lee nada (el 3,5 % de los mensajes
+   de 25 a 1.500 letras; con 1.500 letras, el 25 %), porque su fase 1 supone los anillos
+   (tema 6.4).
 6. *¿Qué es un decibán?* 10·log₁₀ del factor de Bayes, P(datos | profundidad) /
    P(datos | azar). La evidencia de observaciones independientes se suma, porque el
    logaritmo convierte el producto en una suma. Una repetición suma +1,845 dB a favor de la
    profundidad y una no repetición, −0,093 (`banburismus/scoring.py` · `decibans`).
-7. *¿Cómo saben que el simulador es correcto?* Por cuatro vías independientes (E1): los 9
-   vectores publicados, py-enigma en 10.000 claves y mensajes aleatorios (10.000 de 10.000),
-   CyberChef a mano en 6 casos y pruebas de propiedades con hypothesis
-   (`core/vectors.py` · `check_all`; `experiments/e1_validation.py`;
-   `tests/test_pyenigma.py`, `tests/test_properties.py`).
-8. *¿Por qué ninguna letra se cifra a sí misma?* El cifrado es E = S⁻¹·P⁻¹·U·P·S: el
-   reflector U es una involución sin puntos fijos y todo lo demás lo conjuga. Una
-   conjugación conserva los puntos fijos, así que E tampoco tiene: si E(x) = x, entonces
-   U(y) = y para y = P(S(x)). Por eso cifrar dos veces devuelve el texto (E es una
-   involución) y E1 encontró 0 puntos fijos en 200.000 letras (`tests/test_properties.py`).
-9. *¿Qué es el doble paso y por qué el periodo es 16.900?* Cuando el central llega a su
-   muesca, en la pulsación siguiente avanza otra vez y arrastra al izquierdo: avanza dos veces
-   seguidas. Así el central se salta una posición por vuelta del izquierdo y el ciclo tiene
-   26 · 25 · 26 = 16.900 posiciones; 676 quedan fuera de él (`core/stepping.py` · `step`,
-   `cycle_structure`).
-10. *¿Por qué la Bombe supone anillos AAA, y cómo salen los anillos?* Un anillo corrido es
-    equivalente a una posición corrida mientras ningún rotor arrastra a otro, así que la
-    Bombe busca la posición del núcleo con anillos AAA. El verificador prueba luego los 676
-    pares (central, derecho) y se queda con la clave cuyo descifrado parece alemán; el
-    anillo izquierdo se fija en A (`bombe/checker.py` · `ring_settings`).
-11. *¿Qué pasa si el rotor central se mueve dentro del crib?* El modo Bletchley, que supone
-    que solo gira el derecho, pierde la parada verdadera: en E5 eso pasó en el 45 % de los
-    menús, y el éxito cayó al 55 %. El modo robusto prueba además una vuelta del central en
-    cada letra del crib y encuentra la parada en el 98 %, con 13 a 14 veces el tiempo
-    (`bombe/sweep.py` · `BombeSettings`, `true_stop`). La demo 2 usa el modo robusto.
-12. *¿Por qué con alemán real sobreviven más alineaciones que (25/26)^L?* Porque el alemán
-    no es uniforme. En una alineación falsa, la letra del crib choca con la cifrada si es
-    distinta de la letra plana de esa posición (probabilidad 1 − κ, con κ el índice de
-    coincidencia) y además es justo la que salió (1/25): (1 − κ)/25, menos que 1/26 cuando
-    κ > 1/26. La teoría corregida (1 − (1 − κ)/25)^L, con κ = 0,0802 medido en el corpus,
-    queda dentro del IC en las 10 longitudes (`cribs/dragging.py` · `survival_probability`;
-    `experiments/e4_cribs.py`).
-13. *¿Por qué con 3 lazos miden 0,11 paradas por orden y Turing 0,04?* Con tan pocas paradas
-    (11 en 100 menús) la estimación es imprecisa, pero su IC no incluye 0,04, así que lo
-    reportamos como diferencia y no ajustamos nada. Turing daba estimaciones redondas para
-    menús típicos de su tráfico; nuestros menús salen de cribs alemanes con clave aleatoria.
-    En 15 de las 17 celdas de su tabla, lo medido queda entre la mitad y el doble (E5).
-14. *¿Cuántas letras necesita el Banburismus, y por qué no 929?* 929 es la aproximación de
-    Wald, que supone que la prueba se detiene justo en el umbral. En realidad lo pasa: el
-    cálculo exacto da 959,7 y la simulación 983 (IC 954–1.012). Con alemán real basta con
-    332 letras, porque el texto literario repite 1 de cada 12,5 letras y no 1 de cada 17
-    (`banburismus/sprt.py` · `exact_letters`, `wald_gap`; E6).
+7. *¿Por qué con tres lazos da 0,11 y no 0,04?* Con tan pocas paradas (11 en 100 menús; IC
+   95 %: 0,05 a 0,17) la estimación es imprecisa, pero su IC no incluye 0,04, así que lo
+   reportamos como diferencia y no ajustamos nada. Turing daba estimaciones redondas para
+   menús típicos de su tráfico; nuestros menús salen de cribs alemanes con clave aleatoria.
+   En 15 de las 17 celdas de su tabla, lo medido queda entre la mitad y el doble
+   (`experiments/e5_bombe.py`, E5).
+8. *¿Por qué su catálogo no da lo mismo que Kuhl?* En las cifras de la diapositiva 9 la
+   diferencia es pequeña: 21.225 características distintas frente a 21.230 (−0,02 %) y 11.578
+   únicas frente a 11.466 (+0,98 %). La clase más frecuente difiere más: 1.728 frente a 1.771
+   (−2,4 %). Kuhl no dice qué supone del rotor central durante el indicador ni de los anillos;
+   probamos 33 variantes de esos supuestos y ninguna da sus cifras
+   (`scripts/kuhl_variantes.py`), y su artículo tiene erratas. La forma coincide: 14 de las 15
+   características de su tabla 1 están entre nuestras 15 más frecuentes
+   (`rejewski/catalog.py` · `build_catalog`; E7, tema 6.2).
+9. *¿Por qué 1/17 y no el índice de coincidencia del alemán?* 1/17 es la tasa de repetición
+   del tráfico naval que da Wikipedia («Banburismus»), la que usaba Turing
+   (`banburismus/scoring.py` · `TURING`). Nuestro corpus es literario: con la X como
+   separador repite 1 de cada 12,5 letras alineadas (κ = 0,0802), más que 1/17. Con ese texto
+   y los pesos de Turing, la profundidad se confirma en unas 332 letras, no en 929; con pesos
+   medidos en el corpus, en 262 con letras sueltas y en 254 con bigramas y trigramas
+   (`corpus_model`; E6). El mismo κ explica por qué con alemán real sobreviven más
+   alineaciones falsas que (25/26)^L (tema 3).
+10. *¿Por qué la simulación da más letras que Wald?* Wald supone que el puntaje se detiene
+    justo en el umbral de +19,96 dB, y así da 928,8 letras para confirmar la profundidad. En
+    realidad lo pasa: una repetición suma +1,845 dB de golpe, y el puntaje cruza el umbral
+    por 0,65 dB en promedio. El cálculo exacto da 959,7 letras, 30,9 más que Wald, y 30,7 de
+    ellas son ese sobrepaso. La simulación da 983 (IC 95 % 954–1.012), que contiene al
+    exacto: el resto es azar (`banburismus/sprt.py` · `exact_letters`, `wald_gap`; E6).
+11. *¿Cómo saben que el simulador es correcto?* Por cuatro vías independientes (E1): los 9
+    vectores publicados, py-enigma en 10.000 claves y mensajes aleatorios (10.000 de
+    10.000), CyberChef a mano en 6 casos y pruebas de propiedades con hypothesis
+    (`core/vectors.py` · `check_all`; `experiments/e1_validation.py`;
+    `tests/test_pyenigma.py`, `tests/test_properties.py`).
+12. *¿Por qué ninguna letra se cifra a sí misma?* El cifrado es E = S⁻¹·P⁻¹·U·P·S: el
+    reflector U es una involución sin puntos fijos y todo lo demás lo conjuga. Una
+    conjugación conserva los puntos fijos, así que E tampoco tiene: si E(x) = x, entonces
+    U(y) = y para y = P(S(x)). Por eso cifrar dos veces devuelve el texto (E es una
+    involución) y E1 encontró 0 puntos fijos en 200.000 letras (`tests/test_properties.py`).
+13. *¿Qué es el doble paso y por qué el periodo es 16.900?* Cuando el central llega a su
+    muesca, en la pulsación siguiente avanza otra vez y arrastra al izquierdo: avanza dos
+    veces seguidas. Así el central se salta una posición por vuelta del izquierdo y el ciclo
+    tiene 26 · 25 · 26 = 16.900 posiciones; 676 quedan fuera de él (`core/stepping.py` ·
+    `step`, `cycle_structure`).
+14. *¿Qué supone la Bombe sobre los anillos y el rotor central?* Dos cosas. Anillos AAA: un
+    anillo corrido equivale a una posición corrida mientras ningún rotor arrastra a otro, así
+    que la Bombe busca la posición del núcleo; el verificador prueba luego los 676 pares
+    (central, derecho), se queda con la clave cuyo descifrado parece alemán y fija el
+    izquierdo en A (`bombe/checker.py` · `ring_settings`). Y, en modo Bletchley, que dentro
+    del crib solo gira el derecho: si el central se mueve, pierde la parada verdadera. En E5
+    eso pasó en el 45 % de los menús, y el éxito cayó al 55 %. El modo robusto prueba además
+    una vuelta del central en cada letra del crib y encuentra la parada en el 98 %, con unas
+    12 veces el tiempo (`bombe/sweep.py` · `BombeSettings`, `true_stop`). La demo 2 usa el
+    modo robusto.
 15. *Si el plugboard aporta 47 de los 67 bits, ¿por qué no protege?* Porque la Bombe no lo
     busca: supone la pareja de la letra de prueba, la propaga por el menú y descarta la
     posición si aparece una contradicción. Así recorre solo 60 órdenes × 17.576 posiciones =
