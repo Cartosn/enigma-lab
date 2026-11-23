@@ -42,7 +42,7 @@ line-length = 100
 target-version = "py312"
 # app/ui se importa como «ui» (Streamlit pone app/ en sys.path).
 src = ["src", "app", "tests"]
-# El piloto se conserva tal como lo escribió el autor (referencia histórica).
+# El piloto se conserva tal como se escribió (referencia histórica).
 extend-exclude = ["scripts/piloto_enigma.py"]
 
 [tool.ruff.lint]
@@ -55,7 +55,11 @@ known-first-party = ["enigma_lab"]
 
 [tool.mypy]
 python_version = "3.12"
-files = ["src"]
+# El paquete, la app (sus páginas importan «ui» desde app/) y los scripts, sin el piloto.
+files = ["src", "app", "scripts"]
+mypy_path = ["src", "app"]
+explicit_package_bases = true
+exclude = ["scripts/piloto_enigma\\.py"]
 ignore_missing_imports = true
 warn_unused_ignores = true
 

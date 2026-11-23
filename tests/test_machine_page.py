@@ -52,7 +52,7 @@ def test_historical_preset_decrypts_u264() -> None:
 
 
 def test_payload_is_the_python_trace() -> None:
-    """La animación recibe exactamente la traza de Enigma.trace (spec, fase 1)."""
+    """La animación recibe exactamente la traza de Enigma.trace."""
     config = EnigmaConfig.from_strings("I II III", positions="ADU")
     traces = Enigma(config).trace("AAAA")
     payload = machine_payload(config, traces)
@@ -73,7 +73,7 @@ def test_long_texts_are_truncated_for_the_animation() -> None:
 
 
 def test_component_does_not_reimplement_enigma() -> None:
-    """Regla clave (spec 3): el JavaScript no trae cableados; solo anima la traza."""
+    """Regla clave: el JavaScript no trae cableados; solo anima la traza."""
     template = COMPONENT.read_text(encoding="utf-8")
     for spec in ROTORS.values():
         assert spec.wiring not in template

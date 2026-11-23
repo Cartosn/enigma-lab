@@ -1,4 +1,4 @@
-"""La Bombe de referencia, en Python puro y lenta: solo para las pruebas (spec 5.5 y 6.3).
+"""La Bombe de referencia, en Python puro y lenta: solo para las pruebas.
 
 Es independiente de la versión rápida en todo lo que importa:
 

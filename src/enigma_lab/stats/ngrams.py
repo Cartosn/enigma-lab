@@ -1,4 +1,4 @@
-"""Log-probabilidades de n-gramas para puntuar descifrados (spec 5.3).
+"""Log-probabilidades de n-gramas para puntuar descifrados.
 
 Un modelo de n-gramas guarda, para cada grupo de n letras, log₁₀ de su frecuencia en
 el corpus. La puntuación de un texto es la suma de las log-probabilidades de todos sus
@@ -88,7 +88,9 @@ def interpolated_log_probs(
     probabilidad de que siga a las tres anteriores, y un cuadrigrama que no apareció en
     el corpus hereda la probabilidad de los trigramas, bigramas y letras. Así el modelo
     distingue mejor textos que difieren en una sola letra (lo usa el verificador de la
-    Bombe; ver D-036). Devuelve un arreglo (26⁴,) float32 indexado como
+    Bombe; ver D-036). Una letra que no aparece en el corpus (la muestra española no
+    tiene K ni W) cuenta como ``FLOOR_COUNT`` apariciones, el mismo piso de los n-gramas,
+    para que ningún texto puntúe −∞. Devuelve un arreglo (26⁴,) float32 indexado como
     :func:`ngram_index`.
     """
     counts = [
@@ -104,7 +106,7 @@ def interpolated_log_probs(
     p4 = ratio(c4, c3[a * 676 + b * 26 + c])
     p3 = ratio(c3[b * 676 + c * 26 + d], c2[b * 26 + c])
     p2 = ratio(c2[c * 26 + d], c1[c])
-    p1 = c1[d] / c1.sum()
+    p1 = np.maximum(c1, FLOOR_COUNT)[d] / c1.sum()
     l4, l3, l2, l1 = weights
     return np.log10(l4 * p4 + l3 * p3 + l2 * p2 + l1 * p1).astype(np.float32)
 
@@ -129,7 +131,7 @@ def interpolated_head(codes: np.ndarray, weights: tuple[float, ...] = INTERPOLAT
     def ratio(num: np.ndarray, den: np.ndarray) -> np.ndarray:
         return np.divide(num, den, out=np.zeros_like(num), where=den > 0)
 
-    p1 = c1 / c1.sum()
+    p1 = np.maximum(c1, FLOOR_COUNT) / c1.sum()
     p_b = (l2 * ratio(c2[a * 26 + b], c1[a]) + l1 * p1[b]) / (l2 + l1)
     p_c = (l3 * ratio(c3, c2[a * 26 + b]) + l2 * ratio(c2[b * 26 + c], c1[b]) + l1 * p1[c]) / (
         l3 + l2 + l1
@@ -147,8 +149,18 @@ def interpolated(
 
 
 def chain_score(text: np.ndarray, head: np.ndarray, log_probs: np.ndarray) -> np.ndarray | float:
-    """log₁₀ P(texto) con la regla de la cadena del modelo interpolado (un texto o (N, L))."""
+    """log₁₀ P(texto) con la regla de la cadena del modelo interpolado (un texto o (N, L)).
+
+    Como ``bombe/checker._text_score``: con menos de 3 letras el puntaje es 0, y con 3
+    solo cuenta la tabla de las tres primeras.
+    """
     codes = np.asarray(text, dtype=np.int64)
-    first = codes[..., 0] * 676 + codes[..., 1] * 26 + codes[..., 2]
-    scores = head[first] + log_probs[ngram_index(codes, 4)].sum(axis=-1, dtype=np.float64)
+    length = codes.shape[-1]
+    if length < 3:
+        scores = np.zeros(codes.shape[:-1])
+    else:
+        first = codes[..., 0] * 676 + codes[..., 1] * 26 + codes[..., 2]
+        scores = head[first].astype(np.float64)
+        if length > 3:
+            scores = scores + log_probs[ngram_index(codes, 4)].sum(axis=-1, dtype=np.float64)
     return float(scores) if np.ndim(scores) == 0 else scores

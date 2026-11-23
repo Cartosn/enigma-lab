@@ -1,10 +1,10 @@
-"""Cada cifra de la presentación, comprobada contra el código (spec, sección 11.3).
+"""Cada cifra de la presentación, comprobada contra el código.
 
 El registro de cifras está en ``enigma_lab/cifras.py``: la misma lista alimenta la tabla
 «Cifras de la presentación» de ``RESUMEN.md``. Las cifras de módulos que aún no
 existen quedan como pendientes, con la fase en que llegan (``pytest -ra`` las lista).
 Las medidas se comprueban contra la corrida completa guardada en ``results/``; sin ella
-(un clon sin resultados, o después de ``make rapido``) esas pruebas se saltan (D-073).
+(un clon sin resultados) esas pruebas se saltan (D-073).
 """
 
 from __future__ import annotations

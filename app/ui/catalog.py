@@ -1,4 +1,4 @@
-"""Catálogo de los módulos de Enigma Lab (spec, sección 8.2).
+"""Catálogo de los módulos de Enigma Lab.
 
 Lo usan la navegación (``Inicio.py``) y las tarjetas de la página Inicio, para que
 las dos digan lo mismo. ``page`` vale ``None`` si el módulo no tiene página.

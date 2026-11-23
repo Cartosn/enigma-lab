@@ -1,4 +1,4 @@
-"""El tráfico de un día y la reconstrucción de AD, BE y CF (spec 5.7).
+"""El tráfico de un día y la reconstrucción de AD, BE y CF.
 
 **El día.** Una clave diaria de 1932: rotores I–III en algún orden, reflector A, anillos al
 azar, 6 cables (Kuhl 2007) y una posición del día (Grundstellung) al azar. Cada mensaje trae

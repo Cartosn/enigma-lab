@@ -1,4 +1,4 @@
-"""El aleatorizador: Enigma sin plugboard, precalculado por orden de rotores (spec 5.5).
+"""El aleatorizador: Enigma sin plugboard, precalculado por orden de rotores.
 
 La Bombe aparta el plugboard. Lo que queda de la máquina en cada pulsación es el
 **aleatorizador**

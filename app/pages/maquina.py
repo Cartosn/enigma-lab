@@ -1,4 +1,4 @@
-"""Página Máquina: configurar Enigma, cifrar y ver el camino de cada letra (spec 8.2, punto 2).
+"""Página Máquina: configurar Enigma, cifrar y ver el camino de cada letra.
 
 Demo 1 del guion (diapositiva 4): el preajuste «Vector BDZGO» y luego «Portada», que
 descifra en un clic el mensaje de la diapositiva 1.

@@ -1,4 +1,4 @@
-"""El ataque moderno solo con texto cifrado (spec 5.8): Gillogly y el hill climbing."""
+"""El ataque moderno solo con texto cifrado: Gillogly y el hill climbing."""
 
 from __future__ import annotations
 

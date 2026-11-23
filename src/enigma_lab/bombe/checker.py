@@ -1,4 +1,4 @@
-"""El verificador: de una parada a la clave completa (spec 5.5).
+"""El verificador: de una parada a la clave completa.
 
 Emula el trabajo que seguía a cada parada en Bletchley Park, en dos etapas.
 

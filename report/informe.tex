@@ -1,12 +1,10 @@
-% Enigma Lab · informe final (spec, sección 10): 3 páginas como máximo, 11 pt, una columna.
+% Enigma Lab · informe final: 3 páginas como máximo, 11 pt, una columna.
 %
 % Compilar:  make report   (latexmk o Tectonic; si no hay LaTeX, sube report/ a Overleaf
 % con informe.tex, numbers.tex y la carpeta figuras/).
 %
 % Todas las cifras entran por numbers.tex (macros \EL…), que make report genera a partir de
 % results/summary.json: no escribas números de resultados a mano.
-%
-% Los párrafos marcados  % REVISAR  son borradores de análisis: reescríbelos con tu voz.
 \documentclass[11pt]{article}
 
 \usepackage{iftex}
@@ -63,7 +61,6 @@ comparando cada resultado con las cifras de Turing y de la literatura.
 
 \section{Contexto en el curso}
 
-% REVISAR
 Enigma reúne los temas del curso: el cableado se conocía desde 1932, así que solo la clave era
 secreta (Kerckhoffs); es un cifrado de flujo de permutaciones cuyo odómetro se repite cada
 \ELperiodo{} letras; los cribs son texto plano conocido; que ninguna letra se cifre a sí misma
@@ -120,7 +117,7 @@ Semilla \ELsemilla; intervalos de Wilson para proporciones y normales para media
     Vectores publicados (BDZGO, EWTYX, py-enigma, U-264 y los de las diapositivas) &
       \ELvectoresOk{} de \ELvectoresTotal \\
     py-enigma con claves y mensajes aleatorios (\ELpyenigmaLetras{} letras, 0 a 10 cables) &
-      \ELpyenigmaCoinciden{} de \ELpyenigmaCasos{} (IC 95~\%: \ELpyenigmaICbajo--100~\%) \\
+      \ELpyenigmaCoinciden{} de \ELpyenigmaCasos{} (IC 95~\%: \ELpyenigmaICbajo--\ELpyenigmaICalto) \\
     Puntos fijos en \ELpropiedadesLetras{} letras · cifrar dos veces devuelve el texto &
       \ELpuntosFijos{} · \ELinvolucion{} de \ELpropiedadesClaves{} claves \\
     Periodo del odómetro I-II-III (posiciones fuera del ciclo) & \ELperiodo{} (\ELfueraCiclo) \\
@@ -179,7 +176,6 @@ cálculo exacto, \ELexactoProfundidad{} y \ELexactoAzar. Con alemán real y los 
 Turing bastan \ELalemanLetrasProfundidad{} letras, y \ELalemanTrigramasProfundidad{} puntuando
 bigramas y trigramas.
 
-% REVISAR
 \textbf{Rejewski y ataque moderno.} El catálogo tiene \ELrejCaracteristicas{} características,
 \ELrejUnicas{} de una sola configuración y \ELrejMayor{} en la más frecuente (Kuhl:
 \ELkuhlCaracteristicas, \ELkuhlUnicas{} y \ELkuhlMayor). Ver las 26 letras de AD, BE y CF pide
@@ -199,12 +195,10 @@ la fase 1, que supone los anillos.
 
 \section{Análisis y lecciones}
 
-% REVISAR
 \textbf{Divide y vencerás.} El experimento confirma la hipótesis: la Bombe no necesita los
 \ELbitsPlugboard{} bits del plugboard porque prueba hipótesis sobre un solo stecker y deja que
 el menú propague las consecuencias; recorre \ELbitsBarrido{} bits y no \ELbitsSinAnillos.
 
-% REVISAR
 \textbf{Cribs y menús.} El filtro del crib es barato pero débil: con 13 letras deja pasar el
 \ELsobreviveTrece{} de las posiciones falsas; con alemán real, algo más, por su índice de
 coincidencia. La fuerza está en los lazos: hasta 2, cada uno divide las paradas por unas 26,
@@ -213,14 +207,12 @@ porque la letra supuesta debe ser un punto fijo de la permutación del lazo. Con
 su valor y lo reportamos como diferencia. Sin diagonal board, un menú sin lazos no descarta casi
 nada.
 
-% REVISAR
 \textbf{Wald y el sobrepaso.} La aproximación de Wald supone que la prueba se detiene justo en el
 umbral; en realidad lo pasa (en promedio \ELsobrepasoArriba~dB arriba), y eso explica
 \ELbrechaSobrepaso{} de las \ELbrechaTotal{} letras de diferencia en profundidad. Con texto real
 la profundidad se confirma en un tercio de las letras porque el alemán literario repite 1 de cada
 \ELtasaCorpusInversa{} letras, más que el 1 de cada 17 del tráfico naval.
 
-% REVISAR
 \textbf{Lecciones y límites.} El tamaño de la clave no es la seguridad: cuenta el mejor ataque;
 cualquier sesgo es un distinguidor y reutilizar un nonce deja dos mensajes en profundidad. E7 no
 reproduce del todo a Kuhl; E8 usa \ELataqueN{} mensajes por celda. El corpus es literario, no

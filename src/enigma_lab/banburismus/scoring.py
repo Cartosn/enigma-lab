@@ -1,4 +1,4 @@
-"""El peso de la evidencia en decibanes, con letras sueltas o con multigramas (spec 5.6).
+"""El peso de la evidencia en decibanes, con letras sueltas o con multigramas.
 
 **Decibanes.** Turing medía la evidencia a favor de una hipótesis con el logaritmo del
 factor de Bayes. Un ban es un factor 10, y un decibán, su décima parte:

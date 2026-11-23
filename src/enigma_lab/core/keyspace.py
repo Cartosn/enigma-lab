@@ -16,7 +16,7 @@ que el número total de claves es el producto de sus opciones:
 La información de cada componente se mide en bits, log₂(opciones). Como las opciones
 se multiplican, los bits se suman: 5,91 + 14,10 + 47,10 = 67,11 bits sin anillos.
 
-La Bombe aparta el plugboard (sección 5.5 del spec) y solo recorre órdenes ×
+La Bombe aparta el plugboard y solo recorre órdenes ×
 posiciones: 60 × 17.576 = 1.054.560 configuraciones, unos 20 bits.
 """
 
@@ -55,7 +55,7 @@ ENIGMA_I = Model("Enigma I", n_rotors=5)
 M3 = Model("Enigma M3 (naval)", n_rotors=8)
 
 DEFAULT_CABLES = 10
-"""Cables del procedimiento habitual de la Wehrmacht desde 1939 (spec 2 y 5.2)."""
+"""Cables del procedimiento habitual de la Wehrmacht desde 1939."""
 
 
 def rotor_orders(n_rotors: int, slots: int = SLOTS) -> int:

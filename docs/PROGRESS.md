@@ -4,6 +4,7 @@
 probado después de la fase 5; Experimentos ya funciona sin el corpus completo (D-071). Repositorio
 remoto creado, con la CI en verde. La exposición será en este equipo (P-001 resuelto, D-072).
 Diapositivas y guion en su versión 3: sus 61 cifras coinciden con el código (D-073, D-074).
+Revisión final de la entrega el mismo día (D-075 a D-077).
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
@@ -15,14 +16,48 @@ Diapositivas y guion en su versión 3: sus 61 cifras coinciden con el código (D
 | 5 · Extensiones P2 | Cerrada (22-11-2026), después de la fase 6 | 3 |
 | 6 · Pulido y entrega | Cerrada (22-11-2026) | Fin de la 3 |
 
+## Revisión final (23-11-2026)
+
+Una revisión de todo el repositorio (D-075 a D-077). Errores corregidos:
+- «Verificar» fallaba con cifrados de menos de 4 letras: el puntaje de la cadena no aceptaba
+  textos tan cortos;
+- `make rapido` escribía encima de la corrida completa; ahora guarda en `results/rapido/`;
+- los núcleos paralelos del ataque moderno corrían sin el candado de la Bombe;
+- la página Estadística decía «filas oscuras» donde el mapa de calor pinta más claras las letras
+  frecuentes;
+- en La Bombe, la columna «Verdadera» marcaba todas las variantes de la posición verdadera, y la
+  tabla de paradas podía marcar como no consistente una parada que sí lo era;
+- la normalización con X recortaba las X del principio y del final del texto;
+- `EnigmaConfig` aceptaba un plugboard sin ordenar, y las claves al azar, un número imposible de
+  cables;
+- las figuras que se bajan después de «Correr ahora» salían a 1x.
+
+Además: textos más claros en el código, los documentos y la app (por ejemplo, «vectores de
+prueba» en lugar de un número de sección); VALIDACION numera sus secciones de 1 a 8; la guía de
+estudio cierra con preguntas frecuentes; la imagen de Docker copia solo lo que usa la app; el
+banco de la demo 2 ya no guarda el nombre del equipo; mypy revisa también `app/` y `scripts/`;
+el informe toma de los resultados el extremo superior del IC de py-enigma; la captura de Inicio
+del README muestra todas las páginas, y en la figura de E1 la columna «Esperado» ya no se monta
+sobre la de «Resultado».
+
+**Ninguna cifra cambia.** El corpus normalizado y los modelos de n-gramas del alemán dan
+exactamente lo mismo que antes (12 de 12 huellas SHA-256 iguales); solo se redibujó la figura de
+E1 y se recompiló el informe, que sigue en 3 páginas.
+
+`make test`: 363 pruebas (10 nuevas) en 2 min 43 s, con las lentas incluidas; `make lint`, sin
+errores, ahora con mypy en 83 archivos. Docker: `docker compose build` tarda 2 min 33 s, con Numba
+compilado en 18,9 s dentro de la imagen, y la app responde a `/_stcore/health` 2 s después de
+`docker compose up -d`. La imagen trae solo `src/`, `app/`, `data/`, `results/`, `.streamlit/`,
+`docs/FUENTES.md`, `README.md`, `pyproject.toml` y `uv.lock`. En el navegador, contra el
+contenedor, el caso de respaldo se descifra letra por letra.
+
 ## Fase 5 · Extensiones P2
 
 Se hizo después de cerrar la fase 6, sobre la entrega ya armada: lo que la fase 6 marcó como
 «no se hizo» quedó actualizado (README, informe, `cifras.py`, la página Experimentos y este
 documento).
 
-**Criterio de aceptación** (spec, sección 9: «E7 comparado con Kuhl; E8 con su curva de éxito»):
-se cumple.
+**Criterio de aceptación** («E7 comparado con Kuhl; E8 con su curva de éxito»): se cumple.
 
 | Criterio | Resultado |
 | --- | --- |
@@ -37,13 +72,13 @@ E6, 49 s; E7, 21 s. La primera corrida, sobre `103df6c`, guardó todos los datos
 dibujar la figura de E8 (un bigote de Wilson negativo por redondeo, con 0 éxitos de 24); se
 corrigió en `67e022b` y se repitió entera, con cifras idénticas (D-067). `make rapido`, con los
 ocho experimentos en modo rápido, tarda 1 min 19 s (E8, 26 s). `make report`: 9 s; el informe
-queda en 3 páginas justas, con poco margen para reescribir los párrafos `% REVISAR`.
+queda en 3 páginas justas, con poco margen para cambios de redacción.
 
 **Docker después de la fase 5** (22-11-2026). La imagen que había era de antes de la fase 5 (el
 Dockerfile cambió en `103df6c`). Desde un clon limpio de `9e55377`, `docker compose build
 --no-cache` tarda 2 min 21 s: las dependencias, 26 s; Numba de la Bombe y de Gillogly, 18,6 s
 dentro de la imagen; exportar la imagen, de 2,8 GB, 87 s. La app responde a `/_stcore/health`
-3,1 s después de `docker compose up -d`. En el navegador integrado, contra el contenedor:
+3,1 s después de `docker compose up -d`. En el navegador, contra el contenedor:
 - Inicio, con 9 de 9 vectores, a lo sumo 6,3 s después de abrirla por primera vez.
 - Rejewski carga en 3,3 s: el tráfico del día, los ciclos, el catálogo (3 candidatas, entre ellas
   la verdadera) y la comparación con Kuhl.
@@ -76,8 +111,8 @@ en el inicio rápido del README y en el pendiente de la diapositiva 21 de `RESUM
 **La exposición** será en este escritorio, el mismo de todas las mediciones de este documento
 (P-001 resuelto, D-072): no hay que repetir el banco de la demo 2 ni las demos en otro equipo.
 
-**Presentación, versión 2** (22-11-2026, D-073). El autor reemplazó el PDF y el guion de
-`docs/presentacion/` por su versión 2, hecha con `RESUMEN.md`. Se compararon las 24
+**Presentación, versión 2** (22-11-2026, D-073). El PDF y el guion de
+`docs/presentacion/` pasaron a la versión 2, hecha con `RESUMEN.md`. Se compararon las 24
 diapositivas con la versión anterior (texto) y se revisaron a ojo los gráficos de la 15, la 16
 y la 17 frente a los CSV:
 - **Cifras:** las 16 nuevas (E7 en la 9; el U-264 y E1 en la 14; el alemán real en la 15; E5
@@ -136,8 +171,8 @@ y las 24 páginas se revisaron renderizadas.
 - **Integración:** la sección de la diapositiva 9 en `RESUMEN.md`, E8 en «Otros resultados» (para
   «¿Hoy se rompería por fuerza bruta?»), la diferencia con Kuhl en «Discrepancias»,
   `r5_rejewski.csv` y `r6_ataque.csv`; dos cifras de la diapositiva 9 en `cifras.py` (D-063); el
-  respaldo 16:9 de E7 y E8; las macros `\ELrej…`, `\ELkuhl…` y `\ELataque…` del informe, con el
-  párrafo nuevo marcado `% REVISAR`.
+  respaldo 16:9 de E7 y E8; las macros `\ELrej…`, `\ELkuhl…` y `\ELataque…` del informe, con su
+  párrafo de análisis.
 - **Documentos:** DECISIONES D-062 a D-070, VALIDACION, FUENTES (Kuhl y Ostwald y Weierud, leídos
   el 22-11-2026), ARQUITECTURA, el tema 6 de la guía de estudio, README (dos capturas nuevas).
 
@@ -174,13 +209,13 @@ y las 24 páginas se revisaron renderizadas.
 
 **Qué falta:** nada del código.
 
-**Pendiente del autor:**
-- si quiere, pasar al guion y a la diapositiva 15 las tres notas de «Discrepancias» de
+**Pendiente:**
+- pasar al guion y a la diapositiva 15 las tres notas de «Discrepancias» de
   `results/presentacion/RESUMEN.md` (ninguna cambia una cifra);
-- reescribir con su voz los 6 párrafos `% REVISAR` del informe, entre ellos el nuevo de
-  «Rejewski y ataque moderno»;
-- ensayar dos veces con cronómetro, las dos demos incluidas, y preguntarle al profesor si las
-  preguntas cuentan dentro de los 25 minutos (guion).
+- pulir la redacción del análisis del informe, también la del párrafo «Rejewski y ataque
+  moderno»;
+- ensayar dos veces con cronómetro, las dos demos incluidas, y preguntar al profesor si las
+  preguntas cuentan dentro de los 25 minutos.
 
 ## Fase 6 · Pulido y entrega
 
@@ -190,8 +225,8 @@ guion corren dentro de su tiempo en este equipo, que es el de la exposición (D-
 
 | Criterio | Resultado |
 | --- | --- |
-| README (spec 10) | En español, con 5 capturas y el GIF de la demo 2 (`docs/img/`), inicio rápido con Docker y en local, `make reproduce`, estructura, validación, limitaciones (la fase 5 entre ellas) y fuentes |
-| Informe | `report/informe.pdf`: 3 páginas a 11 pt, una columna, con 3 figuras (E4, E5 y E6) y 1 tabla (E1 y E2); todas las cifras entran por `report/numbers.tex` (108 macros generadas desde los resultados); los párrafos de análisis van marcados `% REVISAR` |
+| README | En español, con 5 capturas y el GIF de la demo 2 (`docs/img/`), inicio rápido con Docker y en local, `make reproduce`, estructura, validación, limitaciones (la fase 5 entre ellas) y fuentes |
+| Informe | `report/informe.pdf`: 3 páginas a 11 pt, una columna, con 3 figuras (E4, E5 y E6) y 1 tabla (E1 y E2); todas las cifras entran por `report/numbers.tex` (108 macros generadas desde los resultados) |
 | Datos para las diapositivas | `results/presentacion/` (RESUMEN.md, cifras.json y los CSV) y el respaldo 16:9 oscuro de E2 a E6 en `results/figures/slides/` |
 | Modo demo sin internet | Ninguna petición sale de localhost (revisado en el navegador, también con la app en Docker); Numba se precalienta al abrir la app |
 | Demo 1 (diapositiva 4, 45 s) | «Vector BDZGO» y «Portada» responden en 0,18 s del clic al texto; el resto lo pone la exposición |
@@ -236,11 +271,11 @@ porque Tectonic baja sus paquetes).
   `figuras.py` (figuras del informe y respaldo de las diapositivas); `make report` y
   `make figuras`. Tectonic 0.17.0 instalado en la carpeta de usuario.
 - **Documentos:**
-  - README final, con capturas tomadas en el navegador integrado y un GIF de la demo 2 (D-061);
+  - README final, con capturas de la app y un GIF de la demo 2 (D-061);
   - guía de estudio: índice de dónde está cada algoritmo, el tema 6 (Rejewski y el ataque
-    moderno, solo teoría) y las 15 preguntas más probables, con las 6 del guion;
+    moderno, solo teoría) y 15 preguntas frecuentes, con las 6 del guion;
   - ARQUITECTURA con el diagrama al día y la imagen de Docker;
-  - DECISIONES D-049 a D-061; el banco de la demo 2 de 60 casos, a pedido del autor (D-060).
+  - DECISIONES D-049 a D-061; el banco de la demo 2 de 60 casos (D-060).
 
 **Tiempos medidos en este equipo** (escritorio i5-9400F, 6 núcleos, 16 GB; navegador
 integrado):
@@ -270,11 +305,11 @@ corrida final las reprodujo. Las del informe están en `report/numbers.tex`:
 **Qué falta:** nada del código. La fase 5 (Rejewski y el ataque moderno) no se hizo en esta fase;
 se hizo después (ver «Fase 5»).
 
-**Pendiente del autor:**
+**Pendiente:**
 - correr `make bench-demo` en el portátil y ensayar allí las dos demos (P-001);
 - actualizar con `results/presentacion/` la configuración de la demo 2 y los
   ajustes del guion;
-- reescribir con su voz los párrafos `% REVISAR` del informe;
+- pulir la redacción del análisis del informe;
 - crear el repositorio remoto, para la CI y el enlace de la diapositiva 21 (y ponerlo en el
   encabezado del informe).
 
@@ -364,7 +399,7 @@ tarda 4 min 20 s en este equipo; E6, 46 s.
 **Qué falta (fase 5, P2, solo si alcanza el tiempo):** Rejewski (E7) y el ataque moderno
 (E8). Después, la fase 6: modo demo completo, Docker, informe y entrega.
 
-**Pendiente del autor:**
+**Pendiente:**
 - actualizar con `results/presentacion/` las diapositivas 13 y 17;
 - correr `make bench-demo` en el portátil y confirmar la configuración de la demo 2
   (P-001);
@@ -376,14 +411,15 @@ tarda 4 min 20 s en este equipo; E6, 46 s.
 
 | Criterio | Resultado |
 | --- | --- |
-| Pruebas de 6.4 (200 casos) | Parada verdadera 200 de 200; clave equivalente 200 de 200 |
+| La Bombe en 200 casos aleatorios | Parada verdadera 200 de 200; clave equivalente 200 de 200 |
 | Un orden en menos de 3 s | 0,006 s en modo Bletchley y 0,10 s en robusto (E5, solo el barrido) |
 | Los 60 órdenes en menos de 2 min | 1,9 s en modo Bletchley (página La Bombe, caso de respaldo); en robusto con WETTERBERICHT, p50 5,6 s y p95 7,3 s (banco de la demo 2) |
 | Paradas comparadas con la tabla de Turing | E5: con 12 letras, 678 · 26,3 · 0,99 · 0,11 por orden (Turing: 820 · 31 · 1,2 · 0,04); 15 de 17 celdas entre la mitad y el doble |
 
 Además:
-- **6.3:** la Bombe en Numba coincide con la de referencia en 24 casos.
-- **Caso de respaldo (6.5):** en modo Bletchley para en II-III-I y el verificador
+- **Numba frente a la referencia:** la Bombe en Numba coincide con la de Python puro en 24
+  casos.
+- **Caso de respaldo:** en modo Bletchley para en II-III-I y el verificador
   descifra las 78 letras.
 - **CyberChef (P-003):** da las mismas paradas en 3 de 3 casos; en el más largo, 84 con su
   stecker. Su máquina de verificación deja las mismas paradas, con los mismos steckers,
@@ -419,7 +455,7 @@ con las lentas incluidas. `make lint` pasa sin errores. `make reproduce` complet
 - **Demo 2:** `scripts/bench_demo2.py` y `make bench-demo`.
 - **Documentos:**
   - guía de estudio (tema 4 y respuestas del guion);
-  - VALIDACION (6.2 a 6.5 de la Bombe);
+  - VALIDACION (la Bombe);
   - DECISIONES (D-031 a D-041);
   - ARQUITECTURA y FUENTES.
 
@@ -461,7 +497,7 @@ commit `5b34896`, con el mismo código de la Bombe):
 - la página Banburismus;
 - E6, con la simulación del SPRT frente a la aproximación de Wald (929 y 1.062 letras).
 
-**Pendiente del autor:**
+**Pendiente:**
 - correr `make bench-demo` en el portátil y confirmar la configuración de la demo 2
   (P-001);
 - crear el repositorio remoto.
@@ -475,7 +511,7 @@ commit `5b34896`, con el mismo código de la Bombe):
 | Cifras de 5.2 exactas | Todas (desde la fase 0; E2 las reúne) |
 | E4 coincide con (25/26)^L dentro del IC | Texto aleatorio: dentro del IC 95 % en 10 de 10 longitudes |
 
-Además, los casos de 6.5 (diapositivas 10 y 11 y caso de respaldo) pasan exactos.
+Además, los casos de las diapositivas 10 y 11 y el caso de respaldo pasan exactos.
 `make test` da 189 pruebas que pasan y 3 cifras pendientes (fases 3 a 5), en unos 40 s.
 `make lint` pasa sin errores. `make reproduce` completo (corpus y E1 a E4) tarda 39 s en
 este equipo.
@@ -486,7 +522,8 @@ este equipo.
   - español: Cervantes, 1.620.450 letras;
   - se descarga de un espejo de Gutenberg con SHA-256 verificado;
   - el repo trae muestras de unos 200 KB por idioma.
-- **`stats/`:** normalización según el spec, frecuencias, IC, χ², la antifrecuencia del
+- **`stats/`:** normalización (Ä → AE, sin tildes, X como separador), frecuencias, IC, χ², la
+  antifrecuencia del
   cifrado y su potencia teórica, matriz plano × cifrado, cuadrigramas e intervalos.
 - **`cribs/`:** arrastre del crib, escalar y vectorizado, y menú con lazos, aristas en
   lazos y letra de prueba.
@@ -497,7 +534,7 @@ este equipo.
   - dos componentes nuevos, el arrastre del crib y el grafo del menú, que solo dibujan
     datos de Python;
   - todo revisado en el navegador.
-- **Documentos:** guía de estudio (tema 3), VALIDACION (6.5), DECISIONES (D-024 a
+- **Documentos:** guía de estudio (tema 3), VALIDACION (casos de las diapositivas), DECISIONES (D-024 a
   D-030), FUENTES (corpus) y ARQUITECTURA.
 
 **Cifras obtenidas** (modo completo, semilla 2026, commit `6bd632e`):
@@ -526,10 +563,10 @@ este equipo.
 - `make bench-demo` para la demo 2;
 - CyberChef para la Bombe.
 
-**Pendiente del autor:**
+**Pendiente:**
 - confirmar el equipo de la demo 2 (P-001);
 - crear el repositorio remoto;
-- encender Docker Desktop si quiere la validación automática con CyberChef (P-003).
+- encender Docker Desktop para la validación automática con CyberChef (P-003).
 
 ## Fase 1 · Núcleo Enigma
 
@@ -537,7 +574,7 @@ este equipo.
 
 | Criterio | Resultado |
 | --- | --- |
-| Vectores de 6.1 | 9 de 9, con un mensaje real del U-264 (1942) |
+| Vectores de prueba | 9 de 9, con un mensaje real del U-264 (1942) |
 | 100 % frente a py-enigma en 10.000 claves | 10.000 de 10.000 (IC 95 % de Wilson 99,96 %–100 %) |
 | Propiedades | Involución, sin puntos fijos y lotes = escalar, con hypothesis |
 | Periodo 16.900 y 676 fuera del ciclo | Un solo ciclo de 16.900; 676 fuera |
@@ -556,7 +593,7 @@ este equipo.
     - `Enigma` con `encrypt` y `trace`, para Enigma I, M3 y M4.
   - `batch.py`: cifrado por lotes con tablas precalculadas.
   - `random_keys.py`: claves aleatorias con semilla.
-  - `vectors.py`: los vectores de 6.1.
+  - `vectors.py`: los vectores de prueba.
 - **Validación:**
   - py-enigma en 10.000 claves (E1 y `tests/test_pyenigma.py`);
   - CyberChef a mano en 6 casos, todos iguales;
@@ -590,19 +627,19 @@ este equipo.
 **Qué falta (fase 2):**
 - `keyspace` completo y la página «Espacio de claves» (E2);
 - el corpus alemán y español, y `stats/` (E3);
-- `cribs/` con los casos de 6.5 (E4);
+- `cribs/` con los casos de las diapositivas 10 y 11 (E4);
 - las páginas 3 a 5 y la página Experimentos.
 
-**Pendiente del autor:**
+**Pendiente:**
 - confirmar en qué equipo se hará la demo 2 (P-001);
 - crear el repositorio remoto, para la CI y el enlace de la diapositiva 21;
-- encender Docker Desktop cuando quiera la validación automática con CyberChef (P-003).
+- encender Docker Desktop para la validación automática con CyberChef (P-003).
 
 ## Fase 0 · Andamiaje
 
 **Criterio de aceptación:** `make test` y `make app` funcionan. Se cumple. `make test`
 da 59 pruebas que pasan y 8 pendientes en unos 11 s en este equipo. `make app` sirve la
-app en http://localhost:8501; se revisó en el navegador integrado, con las fuentes
+app en http://localhost:8501; se revisó en el navegador, con las fuentes
 cargadas desde la app y sin peticiones externas.
 
 **Qué quedó:**
@@ -615,7 +652,7 @@ cargadas desde la app y sin peticiones externas.
 - `Makefile`: `help`, `install`, `test`, `test-rapido`, `lint`, `format`, `app` y
   `requirements`. Scripts de instalación `install.ps1` e `install.sh`.
 - Tema «Bletchley nocturno»:
-  - colores del spec, en `.streamlit/config.toml` y en `viz/theme.py`;
+  - los colores del tema, en `.streamlit/config.toml` y en `viz/theme.py`;
   - paleta Okabe-Ito en un orden validado;
   - rampa ámbar;
   - plantillas Plotly `enigma_dark` y `enigma_dark_demo`, y estilos Matplotlib
@@ -639,7 +676,7 @@ cargadas desde la app y sin peticiones externas.
 - Barrido de la Bombe: 1.054.560 configuraciones (20,01 bits).
 - Fuerza bruta a 10⁹ claves por segundo: 5.037 años.
 
-**Exploración previa al plan** (no es un resultado del proyecto; la fase 3 la repite
+**Exploración inicial** (no es un resultado del proyecto; la fase 3 la repite
 con `enigma_lab`). `scripts/exploracion_demo2.py` usa el piloto con 5.000 claves y
 semilla 2026:
 - Con WETTERBERICHT, el rotor central se mueve dentro de las 13 letras en el 46,7 % de
@@ -650,9 +687,9 @@ semilla 2026:
   paradas.
 
 **Qué falta (fase 1):** `core/` con Enigma I y M3, el doble paso, la traza y la versión
-por lotes; los vectores de 6.1 y un mensaje histórico; py-enigma en 10.000 claves;
+por lotes; los vectores de prueba y un mensaje histórico; py-enigma en 10.000 claves;
 hypothesis; CyberChef (P-003); la página Máquina con la animación y los preajustes
 «Vector BDZGO» y «Portada»; `make resumen`.
 
-**Pendiente del autor:** confirmar en qué equipo se hará la demo 2 (P-001) y crear el
+**Pendiente:** confirmar en qué equipo se hará la demo 2 (P-001) y crear el
 repositorio remoto, para que corra la CI y para el enlace de la diapositiva 21.

@@ -1,24 +1,24 @@
 # Validación
 
-Cómo se comprueba que el simulador y los ataques son correctos (spec, sección 6). La
+Cómo se comprueba que el simulador y los ataques son correctos. La
 validación es P0 y bloquea las demás fases: las pruebas de este documento corren con
 `make test`, y E1 (`make reproduce`) guarda sus cifras en `results/summary.json`.
 
 | Sección | Qué se valida | Estado |
 | --- | --- | --- |
-| 6.1 | Vectores de prueba y un mensaje histórico real | **Hecho** (9 de 9) |
-| 6.2 | py-enigma en 10.000 claves y mensajes aleatorios | **Hecho** (100 %) |
-| 6.2 | CyberChef: 5 casos de Enigma a mano en la web | **Hecho** (6 de 6) |
-| 6.2 | CyberChef: 3 casos de la Bombe | **Hecho** (3 de 3, paradas y verificación) |
-| 6.3 | Propiedades con hypothesis | **Hecho** |
-| 6.3 | La Bombe en Numba coincide con la de referencia | **Hecho** (24 casos) |
-| 6.4 | Bombe en 200 casos aleatorios | **Hecho** (parada 200 de 200; clave 200 de 200) |
-| 6.5 | Casos deterministas de las diapositivas 10 y 11 | **Hecho** |
-| 6.5 | Caso de respaldo en la Bombe | **Hecho** (para en II-III-I; descifra las 78 letras) |
-| Fase 3 | Un orden en menos de 3 s; los 60 en menos de 2 min | **Hecho** |
-| Fase 4 | SPRT simulado frente a la aproximación de Wald (929 y 1.062 letras) | **Hecho** (983 y 1.090; exacto 959,7 y 1.067,4) |
+| 1 | Vectores de prueba y un mensaje histórico real | **Hecho** (9 de 9) |
+| 2 | py-enigma en 10.000 claves y mensajes aleatorios | **Hecho** (100 %) |
+| 2 | CyberChef: 5 casos de Enigma a mano en la web | **Hecho** (6 de 6) |
+| 2 | CyberChef: 3 casos de la Bombe | **Hecho** (3 de 3, paradas y verificación) |
+| 3 | Propiedades con hypothesis | **Hecho** |
+| 3 | La Bombe en Numba coincide con la de referencia | **Hecho** (24 casos) |
+| 4 | Bombe en 200 casos aleatorios | **Hecho** (parada 200 de 200; clave 200 de 200) |
+| 4 | Un orden en menos de 3 s; los 60 en menos de 2 min | **Hecho** |
+| 5 | Casos deterministas de las diapositivas 10 y 11 | **Hecho** |
+| 5 | Caso de respaldo en la Bombe | **Hecho** (para en II-III-I; descifra las 78 letras) |
+| 6 | SPRT simulado frente a la aproximación de Wald (929 y 1.062 letras) | **Hecho** (983 y 1.090; exacto 959,7 y 1.067,4) |
 
-## 6.1 · Vectores de prueba
+## 1 · Vectores de prueba
 
 Están en `data/reference/test_vectors.json` y los comprueba `enigma_lab.core.vectors`.
 Esa comprobación la usan tres sitios: `tests/test_vectors.py`, el experimento E1 y la
@@ -43,7 +43,7 @@ roto por el M4 Project de Stefan Krah en 2006, con la clave, el cifrado y el tex
 publicados por D. Rijmenants (ver `docs/FUENTES.md`). Por eso el simulador incluye
 también la Enigma M4. Su descifrado coincide letra por letra con el texto publicado.
 
-## 6.2 · Implementaciones independientes
+## 2 · Implementaciones independientes
 
 ### py-enigma 1.0.2
 
@@ -65,7 +65,7 @@ marcada como `lento`).
 ### CyberChef (GCHQ)
 
 Node.js no está instalado, y Docker Desktop estaba apagado cuando se validó. Por eso se
-validó a mano en la web, como prevé el spec. `scripts/cyberchef_urls.py` arma para cada
+validó a mano en la web. `scripts/cyberchef_urls.py` arma para cada
 caso la URL de CyberChef con la receta «Enigma» y el texto ya puestos; cualquiera puede
 abrirlas y repetir la comparación. Se hizo el 20-11-2026 en https://gchq.github.io/CyberChef/.
 
@@ -109,7 +109,7 @@ dos implementaciones dan exactamente el mismo conjunto de posiciones y de stecke
 máquina de verificación de CyberChef deja las mismas 5 paradas que nuestra etapa 1
 (`checker.consistent_stops`), con los mismos steckers deducidos.
 
-## 6.3 · Propiedades con hypothesis
+## 3 · Propiedades con hypothesis
 
 `tests/test_properties.py` genera claves de cualquier modelo (Enigma I, M3 y M4), con
 cualquier reflector y de 0 a 13 cables. Hypothesis corre en modo determinista.
@@ -136,7 +136,7 @@ cualquier reflector y de 0 a 13 cables. Hypothesis corre en modo determinista.
 - **Las paradas no dependen del hilo que se energiza:** con los hilos A y Q, mismas
   paradas y mismos hilos aislados.
 
-## 6.4 · La Bombe en 200 casos aleatorios
+## 4 · La Bombe en 200 casos aleatorios
 
 `tests/test_bombe.py::test_section_64_two_hundred_cases`, marcada `lento` (unos 80 s);
 otros 20 casos corren en cada `make test`.
@@ -176,15 +176,14 @@ minutos).** Medido en este equipo (i5-9400F, 6 núcleos), sin otros procesos pes
 ocupada en otras tareas, los tiempos llegaron a triplicarse. La exposición se hace en este
 mismo equipo (D-072).
 
-## 6.5 · Casos de las diapositivas 10 y 11
+## 5 · Casos de las diapositivas 10 y 11
 
 `tests/test_cribs.py` los comprueba, y `enigma_lab/cifras.py` los lleva a `RESUMEN.md`.
 
 - **Arrastre (diapositiva 10):** cifrado `BBGCCKITCTTEZZZLCZ`, crib `WETTERBERICHT`.
   - Hay 6 alineaciones, de la 0 a la 5. La 0, la 1, la 2 y la 3 no tienen conflictos.
   - En la 4 y la 5, una T del crib cae sobre la T de la posición 7.
-  - La 4 además choca en la posición 11 (E sobre E); el spec no lo menciona, pero no lo
-    contradice.
+  - La 4 además choca en la posición 11 (E sobre E).
 - **Menú (diapositiva 11), alineación 0:**
   - 11 letras, 13 aristas, 1 componente y 3 lazos; la letra de prueba es T, de grado 6.
   - Las aristas en lazos son exactamente las del texto: E–B (1), B–I (6), I–T (9),
@@ -200,7 +199,7 @@ mismo equipo (D-072).
 - **Versión vectorizada del arrastre:** hypothesis comprueba que da lo mismo que la
   escalar.
 
-## Fase 4 · Banburismus
+## 6 · Banburismus
 
 `tests/test_banburismus.py`, `tests/test_experiments.py::test_e6_banburismus_small` y la
 página (`tests/test_pages.py`).
@@ -247,7 +246,7 @@ y tasa 1/17, el SPRT pide 983 letras en profundidad (IC 95 % 954–1.012) y 1.09
 - *El cálculo exacto* da 959,7 y 1.067,4, dentro de los dos IC.
 - *La identidad de Wald* con el puntaje final medido da 963 y 1.072 letras.
 
-## Fase 5 · Rejewski (E7)
+## 7 · Rejewski (E7)
 
 **La característica no depende del plugboard** (`tests/test_rejewski.py`, con hypothesis): en
 claves al azar de Enigma I, M3 y M4, con 0 a 13 cables, la estructura de AD, BE y CF con la
@@ -288,7 +287,7 @@ derecho.
 en parejas coincide con la fuerza bruta (todas las formas de cerrar las cadenas) en 150 de 150
 productos con 1 a 5 letras desconocidas.
 
-## Fase 5 · Ataque moderno (E8)
+## 8 · Ataque moderno (E8)
 
 - **La tabla de sucesores** del paso (`gillogly.step_table`) coincide con `core/stepping.step` en
   600 ventanas al azar de tres órdenes.

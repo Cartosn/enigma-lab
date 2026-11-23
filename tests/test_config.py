@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import numpy as np
 import pytest
 
+from enigma_lab import SEED
 from enigma_lab.core.machine import EnigmaConfig, clean, groups_of_five, parse_settings
+from enigma_lab.core.random_keys import random_plugboard
 
 
 def test_ring_notations_are_equivalent() -> None:
@@ -57,3 +60,21 @@ def test_clean_and_groups() -> None:
     with pytest.raises(ValueError):
         clean("Ñandú", strict=True)
     assert groups_of_five("LGNEVYPYZQDVKES") == "LGNEV YPYZQ DVKES"
+
+
+def test_plugboard_is_canonical_when_built_directly() -> None:
+    """Escrita a mano y en cualquier orden, la misma clave es la misma EnigmaConfig."""
+    direct = EnigmaConfig(plugboard=(("V", "A"), ("B", "S")), rings=[0, 0, 0])  # type: ignore[arg-type]
+    assert direct == EnigmaConfig.from_strings("I II III", plugboard="AV BS")
+    assert direct.rings == (0, 0, 0)
+    assert hash(direct) == hash(EnigmaConfig.from_strings("I II III", plugboard="SB AV"))
+    with pytest.raises(ValueError):
+        EnigmaConfig(plugboard=(("A",),))  # type: ignore[arg-type]
+
+
+def test_random_plugboard_rejects_impossible_cable_counts() -> None:
+    rng = np.random.default_rng(SEED)
+    for cables in (-1, 14):
+        with pytest.raises(ValueError):
+            random_plugboard(rng, cables)
+    assert len(random_plugboard(rng, 13)) == 13

@@ -1,4 +1,4 @@
-"""Cableados de rotores y reflectores, muescas y modelos de Enigma (spec 5.1).
+"""Cableados de rotores y reflectores, muescas y modelos de Enigma.
 
 Fuente: Wikipedia, «Enigma rotor details», revisión 1275803743 (15-02-2025),
 consultada el 20-11-2026. Los cableados coinciden con los del piloto (rotores I–V y

@@ -1,18 +1,17 @@
 # Guía de estudio
 
-Para defender el proyecto frente al profesor (spec, sección 8.4). Cada tema explica la
-idea en lenguaje claro, da la fórmula y dice en qué archivo y función está. Las rutas son
-relativas a `src/enigma_lab/` salvo que digan otra cosa.
+Cada tema explica una parte del proyecto en lenguaje claro, da la fórmula y dice en qué archivo
+y función está. Las rutas son relativas a `src/enigma_lab/` salvo que digan otra cosa.
 
 **Temas:**
 0. [Dónde está cada algoritmo](#0-dónde-está-cada-algoritmo) (índice del código)
-1. [El espacio de claves](#1-el-espacio-de-claves) (fase 0)
-2. [La máquina y el doble paso](#2-la-máquina-y-el-doble-paso) (fase 1)
-3. [Estadística del idioma, cribs y menús](#3-estadística-del-idioma-cribs-y-menús) (fase 2)
-4. [La Bombe, el diagonal board y el verificador](#4-la-bombe-el-diagonal-board-y-el-verificador) (fase 3)
-5. [Banburismus, decibanes y la prueba secuencial](#5-banburismus-decibanes-y-la-prueba-secuencial) (fase 4)
-6. [Rejewski y el ataque moderno](#6-rejewski-y-el-ataque-moderno) (fase 5)
-7. [Las 15 preguntas más probables](#las-15-preguntas-más-probables)
+1. [El espacio de claves](#1-el-espacio-de-claves)
+2. [La máquina y el doble paso](#2-la-máquina-y-el-doble-paso)
+3. [Estadística del idioma, cribs y menús](#3-estadística-del-idioma-cribs-y-menús)
+4. [La Bombe, el diagonal board y el verificador](#4-la-bombe-el-diagonal-board-y-el-verificador)
+5. [Banburismus, decibanes y la prueba secuencial](#5-banburismus-decibanes-y-la-prueba-secuencial)
+6. [Rejewski y el ataque moderno](#6-rejewski-y-el-ataque-moderno)
+7. [Preguntas frecuentes](#preguntas-frecuentes)
 
 ## 0. Dónde está cada algoritmo
 
@@ -86,7 +85,7 @@ en menos de 2 minutos. (`KeySpace.bombe_sweep` y `brute_force_years`)
   suficientes letras libres para formar parejas nuevas. Con 11 cables quedan 4 letras
   libres; con 13 no queda ninguna, y N(13) = 7.905.853.580.625 < N(11) =
   205.552.193.096.250. (`best_cable_count`; prueba `test_plugboard_maximum_is_eleven_cables`)
-- *¿Cómo se comprueba la fórmula de N(k)?* Además de los valores exactos del spec, una
+- *¿Cómo se comprueba la fórmula de N(k)?* Además de los valores exactos (N(6), N(10) y N(11)), una
   prueba con hypothesis verifica para todo k la recurrencia
   N(k) · k = N(k − 1) · C(26 − 2(k − 1), 2): cada plugboard de k cables sale de uno de
   k − 1 cables agregando una pareja, de k maneras. (`tests/test_keyspace.py`)
@@ -236,7 +235,7 @@ porque la misma pareja puede repetirse en dos pasos (`cribs/menu.py`).
   experimento E4 lo mide.
 - *¿Qué es un lazo y por qué importa?* Es un ciclo del menú: una cadena de hipótesis de
   plugboard que debe volver a cerrar en la letra de partida. Con una hipótesis falsa
-  casi nunca cierra, y cada lazo divide las paradas falsas por unas 26 (fase 3).
+  casi nunca cierra, y cada lazo divide las paradas falsas por unas 26 (E5).
 
 ## 4. La Bombe, el diagonal board y el verificador
 
@@ -336,7 +335,7 @@ P(u) = a. El diagonal board une el hilo u del cable a con el hilo a del cable u.
   - Una versión de referencia, que propaga la corriente hilo por hilo, da lo mismo en
     24 casos.
   - CyberChef da exactamente las mismas paradas en 3 casos: 84 en el más largo.
-  - La clave verdadera da parada en 200 de 200 casos (6.4).
+  - La clave verdadera da parada en 200 de 200 casos aleatorios (VALIDACION, sección 4).
   - E5 reproduce la tabla de Turing.
 
   (`tests/test_bombe.py`; `docs/VALIDACION.md`)
@@ -590,10 +589,9 @@ texto que parece alemán.
   central y el izquierdo giran en otra letra y corren parte del texto, y con 10 cables la señal
   del IC es débil. Con la ubicación dada, el hill climbing sí lee esos mensajes (6.4, E8).
 
-## Las 15 preguntas más probables
+## Preguntas frecuentes
 
-Las diez primeras son las «Preguntas probables» del guion (versión 3), en su orden. Cada
-respuesta dice dónde está en el código. La de por qué con alemán real sobreviven más
+Cada respuesta dice dónde está en el código. La de por qué con alemán real sobreviven más
 alineaciones que (25/26)^L está entre las preguntas del tema 3.
 
 1. *¿Y la máquina de Turing?* Es el modelo teórico de computación de 1936. La Bombe es una

@@ -1,4 +1,4 @@
-"""E7 · ¿Qué tan única es una característica de Rejewski? (spec 7 y 5.7)
+"""E7 · ¿Qué tan única es una característica de Rejewski?
 
 **El catálogo** (exacto, sin azar; ``rejewski/catalog.py``). La característica (la estructura
 de ciclos de AD, BE y CF) de las 6 × 17.576 = 105.456 configuraciones de los rotores I–III con
@@ -28,7 +28,14 @@ import numpy as np
 import pandas as pd
 
 from enigma_lab import SEED, paths
-from enigma_lab.experiments.common import Mode, RunInfo, save_figure, save_table, update_summary
+from enigma_lab.experiments.common import (
+    Mode,
+    RunInfo,
+    output_dir,
+    save_figure,
+    save_table,
+    update_summary,
+)
 from enigma_lab.rejewski.catalog import CATALOG_REFLECTOR, CATALOG_ROTORS, Catalog, build_catalog
 from enigma_lab.rejewski.characteristic import (
     N_TYPES,
@@ -429,21 +436,22 @@ def figure(df: pd.DataFrame, theme: str = "enigma_print", days: pd.DataFrame | N
 
 def main(mode: Mode = "completo", seed: int = SEED) -> dict[str, Any]:
     """Corre E7 (el catálogo es exacto; el tráfico, Monte Carlo) y guarda sus resultados."""
+    folder = output_dir(mode)
     started = time.perf_counter()
     params = PARAMS[mode]
     df = run(params, seed)
     days = run_traffic(params, seed)
     figures = summary(df, days, params) | {"segundos": round(time.perf_counter() - started, 1)}
     catalog = build_catalog()
-    save_table(df, "e7_rejewski")
-    save_table(top_table(catalog), "e7_rejewski_top")
-    save_table(kuhl_top_table(catalog), "e7_rejewski_kuhl_tabla1")
-    save_table(days, "e7_rejewski_trafico")
-    update_summary("e7", figures, RunInfo("e7", mode, seed))
+    save_table(df, "e7_rejewski", folder)
+    save_table(top_table(catalog), "e7_rejewski_top", folder)
+    save_table(kuhl_top_table(catalog), "e7_rejewski_kuhl_tabla1", folder)
+    save_table(days, "e7_rejewski_trafico", folder)
+    update_summary("e7", figures, RunInfo("e7", mode, seed), folder)
 
     import matplotlib.pyplot as plt
 
     fig = figure(df, days=days)
-    save_figure(fig, "e7_rejewski")
+    save_figure(fig, "e7_rejewski", folder)
     plt.close(fig)
     return figures

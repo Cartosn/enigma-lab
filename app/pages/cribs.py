@@ -1,4 +1,4 @@
-"""Página Cribs y menús: el arrastre del crib y el menú de la Bombe (spec 8.2, punto 5)."""
+"""Página Cribs y menús: el arrastre del crib y el menú de la Bombe."""
 
 from __future__ import annotations
 
@@ -151,7 +151,7 @@ if not demo:
 if stats.loops < 3:
     st.warning(
         f"Este menú tiene {stats.loops} lazo{'s' if stats.loops != 1 else ''}. Con menos de 3, "
-        "la Bombe dará muchas paradas falsas (página La Bombe, fase 3).",
+        "la Bombe dará muchas paradas falsas (página La Bombe).",
         icon=":material/warning:",
     )
 st.session_state["bombe_input"] = {"cipher": cipher, "crib": crib, "position": position}

@@ -1,4 +1,4 @@
-"""La Bombe completa: ajustes, barrido por órdenes y lista de paradas (spec 5.5).
+"""La Bombe completa: ajustes, barrido por órdenes y lista de paradas.
 
 Uso:
 

@@ -1,31 +1,32 @@
 # Decisiones
 
-Registro de las decisiones tomadas ante ambigüedades o limitaciones (spec, sección 0,
-punto 5): se elige la opción más simple coherente con el spec y se anota aquí.
+Registro de las decisiones tomadas ante ambigüedades o limitaciones: se elige la opción más
+simple coherente con los objetivos del proyecto y se anota aquí.
 
 ## Fase 0 · Andamiaje (20-11-2026)
 
 ### D-001 · Herramientas en Windows
-- El equipo no tenía uv, GNU Make ni Python 3.12. Con la aprobación del autor se
-  instalaron con winget, a nivel usuario: uv 0.13.9 (`astral-sh.uv`) y GNU Make 4.4.1
+- El equipo no tenía uv, GNU Make ni Python 3.12. Se instalaron
+  con winget, a nivel usuario: uv 0.13.9 (`astral-sh.uv`) y GNU Make 4.4.1
   (`ezwinports.make`). uv descargó CPython 3.12.16 sin tocar el Python 3.14 del sistema.
 - El Makefile exporta `PYTHONUTF8=1`, porque la consola de Windows (cp1252) falla al
   imprimir tildes, y sus recetas solo usan `uv` y `python`, porque en Windows corren en
   `cmd.exe` o en `sh` según la terminal.
 
 ### D-002 · Nombre del PDF de la presentación
-El spec lo llama `docs/presentacion/presentacion.pdf`; el archivo real es
-`docs/presentacion/Romper Enigma presentación final.pdf`. No se renombra porque
-`docs/presentacion/` no se edita, y ningún código depende de ese nombre.
+La presentación conserva el nombre con que se exportó, `docs/presentacion/Romper Enigma
+presentación final.pdf`, en lugar de uno corto como `presentacion.pdf`: ningún código
+depende de él.
 
-### D-003 · La especificación
-La especificación del proyecto la guarda el autor fuera del repositorio. Cuando el código o
-estos documentos citan «el spec» o «spec, sección N», se refieren a sus secciones.
+### D-003 · Documentos que se explican solos
+Cada cifra de referencia está en `data/reference/` o en `docs/FUENTES.md`, y cada criterio de
+aceptación, en `docs/PROGRESS.md`: el código y estos documentos no remiten a archivos que no
+estén en el repositorio.
 
 ### D-004 · El piloto
 `piloto_enigma.py` pasó a `scripts/piloto_enigma.py`, sin cambios y excluido de ruff. Es
 una referencia (las diapositivas 6 y 15 citan sus cifras), no parte de la arquitectura.
-`scripts/exploracion_demo2.py` lo usa para la medición exploratoria del plan.
+`scripts/exploracion_demo2.py` lo usa para una medición exploratoria inicial.
 
 ### D-005 · `core/keyspace.py` se adelantó a la fase 0
 La página Inicio muestra «67 → 20 bits» y ninguna cifra se escribe a mano, así que los
@@ -33,8 +34,8 @@ conteos exactos del espacio de claves, con sus pruebas, llegaron en la fase 0. E
 fase 2 se completan la página «Espacio de claves» y el experimento E2.
 
 ### D-006 · Años de 365,25 días
-El estimador de fuerza bruta divide por segundos de un año juliano. Así reproduce las
-«unos 5.037 años» del spec; con años de 365 días daría 5.041.
+El estimador de fuerza bruta divide por segundos de un año juliano. Así da los «unos 5.037
+años» de la diapositiva 7; con años de 365 días daría 5.041.
 
 ### D-007 · Navegación de la app
 - `app/Inicio.py` es el punto de entrada: arma la navegación con `st.navigation`,
@@ -48,14 +49,15 @@ El estimador de fuerza bruta divide por segundos de un año juliano. Así reprod
   ejecución.
 
 ### D-008 · Fuentes empaquetadas
-Para que la app funcione sin internet (spec 8.2, punto 11), Inter 4.1 (variable, WOFF2) y
+Para que la app funcione sin internet, Inter 4.1 (variable, WOFF2) y
 JetBrains Mono 2.304 (WOFF2) están en `app/static/fonts/`, servidas por Streamlit
 (`enableStaticServing`). Matplotlib no lee WOFF2: usa copias TTF en
 `src/enigma_lab/viz/fonts/`. Ambas fuentes tienen licencia SIL OFL 1.1, que va junto a
 los archivos. Origen y SHA-256: `docs/FUENTES.md`.
 
 ### D-009 · Orden de la paleta Okabe-Ito
-El spec pide Okabe-Ito. El negro se excluye porque es invisible sobre el fondo oscuro.
+Las series usan la paleta Okabe-Ito, apta para daltonismo. El negro se excluye porque es
+invisible sobre el fondo oscuro.
 Las siete restantes se ordenaron con el validador de paletas de una guía de visualización
 (OKLab ΔE ×100, daltonismo simulado con Machado, Oliveira y
 Fernandes, 2009). Se enumeraron los órdenes y se eligió el que maximiza la peor
@@ -117,9 +119,8 @@ precalentado.
 No se encontró una fuente verificable del mensaje de Barbarossa (1941). Se revisaron
 Wikipedia en alemán e inglés, Crypto Museum y las páginas de D. Rijmenants. La única
 fuente con un mensaje real y su clave completa fue el M4 Project: el mensaje del U-264,
-de 1942. Para descifrarlo, el núcleo incluye la Enigma M4, que el spec marca como
-opcional: un rotor griego fijo a la izquierda y un reflector delgado. El cifrado por
-lotes sigue siendo solo para tres rotores.
+de 1942. Para descifrarlo, el núcleo incluye también la Enigma M4: un rotor griego fijo a la
+izquierda y un reflector delgado. El cifrado por lotes sigue siendo solo para tres rotores.
 
 ### D-016 · py-enigma como dependencia normal
 E1 forma parte de `make reproduce` y compara con py-enigma. Por eso py-enigma pasó de
@@ -132,14 +133,14 @@ C (B y C delgados en la M4). Las pruebas con hypothesis cubren de 0 a 13 cables 
 reflector A.
 
 ### D-018 · CyberChef a mano en la web (resuelve P-003 para la máquina)
-Docker Desktop estaba apagado y Node.js no está instalado, así que se aplicó el respaldo
-del spec: 6 casos validados a mano en la web de CyberChef. `scripts/cyberchef_urls.py`
+Docker Desktop estaba apagado y Node.js no está instalado, así que la validación se hizo
+a mano: 6 casos en la web de CyberChef. `scripts/cyberchef_urls.py`
 genera las URL con la receta incluida, para poder repetir la validación. Los 3 casos de
 la Bombe quedan para la fase 3, con Docker si está disponible.
 
 ### D-019 · E1 y `make resumen` llegan en la fase 1
 El criterio de la fase 1 («100 % frente a py-enigma en 10.000 claves») es la medida de
-E1, y el spec pide `make resumen` al cerrar la fase 1. Por eso en esta fase ya existen:
+E1, y `make resumen` se corre al cerrar la fase 1. Por eso en esta fase ya existen:
 - el marco de experimentos: `experiments/common.py` y `__main__.py`;
 - E1, con su Parquet, su figura y su entrada en `summary.json`;
 - `make reproduce`, `make rapido`, `make experimento` y `make resumen`.
@@ -191,8 +192,8 @@ un commit propio, justo después del commit del código.
   completo (`make corpus`, que `make reproduce` corre primero).
 
 ### D-025 · Normalización
-Sigue el spec (5.3): en alemán Ä → AE, Ö → OE, Ü → UE, ß → SS; en español se quitan las
-tildes y Ñ → N. Las demás marcas diacríticas se quitan. En el modo «X como separador»,
+En alemán Ä → AE, Ö → OE, Ü → UE y ß → SS, como escribían los operadores; en español se
+quitan las tildes y Ñ → N. Las demás marcas diacríticas se quitan. En el modo «X como separador»,
 cada tramo de caracteres que no son letras (espacios, signos y también dígitos) se
 vuelve una sola X.
 
@@ -241,8 +242,8 @@ en el criptoanálisis con n-gramas.
 ### D-031 · «Letras del menú» son vértices (resuelve P-002)
 - **La fuente.** La tabla de Wikipedia «Bombe» (revisión 1385546242) se titula por el
   «Number of letters on the menu», y el artículo llama menú al grafo de las letras del crib
-  y del cifrado: sus letras son los nodos. Es la misma convención de 6.5 (11 letras, 13
-  aristas). Otra frase del artículo usa «letras» para las letras del crib («con 12 letras
+  y del cifrado: sus letras son los nodos. Es la misma convención de la diapositiva 11 (11
+  letras, 13 aristas). Otra frase del artículo usa «letras» para las letras del crib («con 12 letras
   o menos caben tres órdenes en una Bombe», una pila de tambores por letra), pero esa no
   es la de la tabla.
 - **La comprobación.** E5 mide las dos lecturas sin proponérselo. Con vértices, la
@@ -310,7 +311,7 @@ en el criptoanálisis con n-gramas.
 - **Plausible.** Si el log₁₀ P por letra supera −1,5. El alemán da cerca de −0,67 y las
   letras al azar, −2,66.
 - **Cómo se eligió.** Primero se probó la suma de cuadrigramas, sin interpolar y sin el
-  término de las claves. Fallaba en 1 o 2 de los 200 casos de la prueba 6.4, siempre con
+  término de las claves. Fallaba en 1 o 2 de los 200 casos de la prueba, siempre con
   el plugboard exacto y 1 o 2 letras distintas, por un anillo mal elegido. El diseño final
   se ajustó con esos 200 casos (200 de 200) y se comprobó con 200 casos nuevos (198 de 200;
   ver VALIDACION).
@@ -351,7 +352,8 @@ en el criptoanálisis con n-gramas.
   1. 60 órdenes en modo robusto;
   2. rotores I, II y III en modo robusto;
   3. el crib acordado WETTERBERICHTXFUER (18 letras: «Wetterbericht für») con 60 órdenes.
-- **Criterio.** El spec: éxito de al menos 95 % y p95 del tiempo total de 30 s o menos.
+- **Criterio.** Éxito de al menos 95 % y p95 del tiempo total de 30 s o menos (el
+  presupuesto de la demo 2).
 - **Rotores permitidos.** «Clave aleatoria» de la página Máquina ahora admite rotores
   permitidos, para la configuración 2.
 
@@ -366,18 +368,18 @@ en el criptoanálisis con n-gramas.
 - **Verificar.** Reutiliza las hipótesis de la etapa 1, calculadas al terminar el barrido.
 
 ### D-041 · CyberChef para la Bombe, a mano en la web (resuelve P-003)
-Docker Desktop seguía apagado. Se aplicó el respaldo del spec:
+Docker Desktop seguía apagado, así que también se validó a mano en la web:
 - `scripts/cyberchef_urls.py` arma las URL con la receta «Bombe», sin y con máquina de
   verificación.
 - Hay tres casos con menú conexo: el de respaldo (3 lazos), uno de 2 lazos y uno de 1
   lazo con el crib en la posición 3.
-- Resultado en VALIDACION (6.2).
+- Resultado en VALIDACION, sección 2.
 
 ## Fase 4 · Banburismus (21-11-2026)
 
 ### D-042 · La profundidad dura todo el solapamiento
-- **El spec (5.6)** dice que los dos mensajes quedan en profundidad «hasta que se mueve el
-  rotor central».
+- **La descripción habitual** dice que los dos mensajes quedan en profundidad «hasta que se
+  mueve el rotor central».
 - **Con la máquina real** no es así. Si las claves de mensaje coinciden en el rotor
   izquierdo y en el central, las dos máquinas recorren la misma sucesión de estados del
   odómetro, una adelantada respecto de la otra. Desde el primer estado en que coinciden,
@@ -409,11 +411,11 @@ Docker Desktop seguía apagado. Se aplicó el respaldo del spec:
 
 ### D-044 · Puntuaciones y modelo de multigramas
 - **Cuatro puntuaciones:**
-  - letras sueltas con 1/17 (Turing; los pesos del spec);
+  - letras sueltas con 1/17 (los pesos de Turing);
   - letras sueltas con la tasa medida en el corpus;
   - bigramas y trigramas;
   - hasta tetragramas.
-- **Multigramas.** El spec pide puntuarlos, pero no da sus tasas. Turing usaba tablas del
+- **Multigramas.** Se puntúan como hacía Turing, pero sin sus tablas: él usaba las del
   tráfico naval, que no tenemos. Se usa la regla de la cadena: la probabilidad de repetir
   depende de la racha de columnas que acaban de repetir, h_r, y se calcula con ρₙ, la
   probabilidad de que dos n-gramas del corpus coincidan (`scoring.run_probabilities`). Así
@@ -446,7 +448,7 @@ Docker Desktop seguía apagado. Se aplicó el respaldo del spec:
   el cálculo exacto (D-048).
 
 ### D-046 · CSV extra para la diapositiva 17
-`r4_banburismus.csv` lleva primero las columnas del spec y después las extras: fuente,
+`r4_banburismus.csv` lleva primero ocho columnas fijas y después las extras: fuente,
 hipótesis, α, `identifica`, `wald`, `exacto` y otras. Las trayectorias y la curva ROC no
 caben en esa tabla, así que van aparte:
 - `r4_trayectorias.csv`: 10 pares por hipótesis, un punto cada 20 letras, con la tasa 1/17
@@ -455,8 +457,8 @@ caben en esa tabla, así que van aparte:
 
 ### D-047 · PNG a 2x
 `save_figure` guardaba fuera del bloque `with` del estilo, donde no rigen `savefig.dpi` ni
-`savefig.bbox`. Por eso los PNG de E1 a E5 salían a 1x (630 × 360 px) y no a 2x, como pide
-el spec (sección 7). Ahora la función fija 200 puntos por pulgada y el recorte ajustado. Los
+`savefig.bbox`. Por eso los PNG de E1 a E5 salían a 1x (630 × 360 px) y no a 2x.
+Ahora la función fija 200 puntos por pulgada y el recorte ajustado. Los
 PNG de E1 a E5 cambian en la siguiente corrida; los SVG y PDF conservan su contenido.
 
 ### D-048 · El cálculo exacto del SPRT
@@ -504,7 +506,7 @@ PNG de E1 a E5 cambian en la siguiente corrida; los SVG y PDF conservan su conte
   y Streamlit borra el estado de esos controles. Ahora los botones guardan sus ajustes aparte
   (`bombe_pending`) y cada control los toma justo antes de dibujarse (`_apply_pending`).
 
-### D-051 · Exportar los gráficos (spec 8.3)
+### D-051 · Exportar los gráficos
 - **La figura:** la barra de cada gráfico de Plotly la baja en PNG a 2x.
 - **Los datos:** cada gráfico de las páginas lleva «Datos (CSV)», con las series de la propia
   figura (`viz/plotly_figs.py` · `figure_table`) o la tabla que lo origina. En Experimentos, cada
@@ -524,15 +526,15 @@ PNG de E1 a E5 cambian en la siguiente corrida; los SVG y PDF conservan su conte
   («67 → 20 bits») y la confianza en el simulador.
 - **Formato.** Figuras compactas propias del informe (`figuras.py`, estilo `enigma_print` con
   letra de 8 pt), no las de los experimentos, que están pensadas para una página. Papel carta,
-  márgenes de 1,8 cm y 11 pt: entra en 3 páginas con unas 7 líneas de margen para la reescritura
-  del autor.
+  márgenes de 1,8 cm y 11 pt: entra en 3 páginas con unas 7 líneas de margen para pulir la
+  redacción.
 - **Las cifras** entran por `report/numbers.tex`, que `informe.py` genera desde
   `results/summary.json`, `results/e5_bombe.parquet` (las celdas de Turing) y
   `results/bench_demo2.json`. El periodo del odómetro sale del código (`core/stepping.py`). Una
   prueba comprueba que toda macro `\EL…` del informe exista.
 
 ### D-053 · LaTeX con Tectonic
-El equipo no tenía LaTeX. Con la aprobación del autor se instaló Tectonic 0.17.0 (el zip oficial
+El equipo no tenía LaTeX. Se instaló Tectonic 0.17.0 (el zip oficial
 para Windows de GitHub, SHA-256 verificado) en `%LOCALAPPDATA%\Programs\tectonic`, sin tocar el
 PATH. `informe.py` busca latexmk en el PATH y Tectonic en el PATH, en la variable `TECTONIC` y en
 esa carpeta. La primera compilación baja los paquetes de LaTeX (necesita internet esa vez).
@@ -559,9 +561,9 @@ consulta externa y la dirección impresa es la que se usa.
 ### D-056 · `st.iframe` en lugar de `components.html`
 Streamlit 1.67 marca `st.components.v1.html` como obsoleto («se quita después del
 01-06-2026»). Los cuatro componentes pasan a `st.iframe` con el mismo HTML; siguen siendo solo
-dibujo (la regla clave del spec 3 no cambia).
+dibujo: la lógica de Enigma sigue estando solo en Python.
 
-### D-057 · Ninguna espera sin indicador (spec 8.3)
+### D-057 · Ninguna espera sin indicador
 - **Al arrancar** (`Inicio.py` · `_setup_once`, con el indicador «Preparando Enigma Lab…»):
   precalienta Numba y precarga los módulos pesados (SciPy, pandas, networkx, los experimentos).
   Así ninguna página queda en blanco al abrirla.
@@ -582,14 +584,14 @@ letra, también en modo demo.
 
 ### D-060 · Banco de la demo 2: el de 60 casos
 `results/bench_demo2.json` tenía sin commit una corrida de 30 casos (21-11-2026, 21:27 UTC,
-commit `2cfa34b`) que el `RESUMEN.md` comprometido citaba. A pedido del autor se restauró la de
+commit `2cfa34b`) que el `RESUMEN.md` comprometido citaba. Se restauró la de
 60 casos (18:25 UTC, commit `5b34896`), con el mismo código de la Bombe, y el resumen final la
 cita.
 
 ### D-061 · Capturas del README
-Se tomaron con el navegador integrado de la app de escritorio, con la ventana emulada a
-1024 × 640; el navegador las guarda a 800 px de ancho (el tamaño del panel). El GIF de la demo 2
-son seis de esas capturas, armadas con Pillow.
+Se tomaron en el navegador con la ventana a 1024 × 640 y se guardaron a 800 px de ancho. El GIF
+de la demo 2 son seis de esas capturas, armadas con Pillow. La de Inicio se repitió el
+23-11-2026, con todas las páginas en la barra lateral.
 
 ## Fase 5 · Extensiones P2 (22-11-2026)
 
@@ -758,28 +760,28 @@ datos en `r5_rejewski.csv` y `r6_ataque.csv`.
   descarga es el archivo guardado y que no se dibuja nada.
 
 ### D-072 · La exposición se hace en este equipo (resuelve P-001)
-El autor expone con este escritorio (i5-9400F, 6 núcleos, 16 GB), el mismo donde se midieron
+La exposición se hace con este escritorio (i5-9400F, 6 núcleos, 16 GB), el mismo donde se midieron
 todos los tiempos: el banco de la demo 2 (`results/bench_demo2.json`, con la configuración
 recomendada en p95 9,8 s frente al presupuesto de 30 s) y las demos en el navegador y en
 Docker. No hace falta repetir las mediciones en otro equipo, y «Cifrado del compañero» sigue la
 configuración de ese banco (D-050).
 
 ### D-073 · Presentación, versión 2: sus cifras en el registro y lo que no coincide
-- **Qué llegó.** El autor reemplazó las diapositivas y el guion de `docs/presentacion/` por la
-  versión 2 (22-11-2026), hecha con `RESUMEN.md`: E7 en la diapositiva 9, el U-264 y E1 en la
+- **Qué cambió.** Las diapositivas y el guion pasaron a la versión 2 (22-11-2026), hecha con
+  `RESUMEN.md`: E7 en la diapositiva 9, el U-264 y E1 en la
   14, el alemán real en la 15, E5 en la 16, E6 en la 17 y el enlace del repositorio en la 21.
 - **Las cifras medidas entran al registro.** `cifras.py` tenía solo cifras exactas o citadas, y
   las medidas iban solo en el resumen. Ahora están todas las de las diapositivas: 16 nuevas, 61
   en total. Las medidas (E1 y E4 a E7) salen de la corrida completa guardada en
   `results/summary.json`, la misma del resumen y del informe, sin volver a correr nada. Sin esa
-  corrida (un clon sin resultados, o después de `make rapido`, que escribe en el mismo lugar),
+  corrida (un clon sin resultados, o, hasta D-075, después de `make rapido`),
   `SinCorrida` salta la prueba y el resumen muestra la cifra sin calcular, con el motivo: un
   `make rapido` no debe romper `make test`.
 - **Cifras que la diapositiva redondea o da como cota.** «IC 95 % de ±0,25 puntos o menos» (E4)
   se comprueba como el mayor semiancho de los 20 IC, redondeado hacia arriba a la centésima. El
   «÷ 26» de la diapositiva 20 es la media geométrica de 0 a 2 lazos, √(paradas con 0 / paradas
   con 2); de 2 a 3 lazos quedan tan pocas paradas que el cociente es impreciso.
-- **Lo que no coincide va a «Discrepancias»** (`resumen._guion_notes`), sin editar el guion: los
+- **Lo que no coincide va a «Discrepancias»** (`resumen._guion_notes`): los
   pasos de la demo 2 (Ctrl+Enter muestra el menú pero no corre la Bombe; hay una sola barra),
   «Vector BDZGO» ya escribe AAAAA, el pendiente del banco ya cumplido (D-072), la comparación de
   tiempos de la diapositiva 16 y tres respuestas de «Preguntas probables». Las notas que la
@@ -792,8 +794,8 @@ configuración de ese banco (D-050).
   robusto cuesta «unas 12 veces el tiempo», como en la corrida actual, y no «13 a 14».
 
 ### D-074 · Presentación, versión 3: el tiempo de la diapositiva 16 y las notas que quedan
-- **Qué llegó.** El autor reemplazó las diapositivas y el guion por la versión 3 (23-11-2026),
-  hecha con «Discrepancias» de `RESUMEN.md`. El guion corrige las ocho notas de la versión 2 y
+- **Qué cambió.** Las diapositivas y el guion pasaron a la versión 3 (23-11-2026), hecha con
+  «Discrepancias» de `RESUMEN.md`. El guion corrige las ocho notas de la versión 2 y
   nada más. El PDF es el mismo mazo en vectores (texto y gráficos) en vez de una imagen por
   página: 184 KB en lugar de 5,6 MB, con el mismo texto salvo «frente a 0,009 s» en la 16. Se
   guarda con el nombre de siempre, `Romper Enigma presentación final.pdf`.
@@ -808,6 +810,39 @@ configuración de ese banco (D-050).
   alemán» a κ = 0,080, el del alemán con X entre palabras, y la 23 da 0,076, el de solo letras.
   «Demos» muestra ahora el máximo del banco y el largo del mensaje: de su «p95» salió el «peor
   5 %».
+
+## Revisión final (23-11-2026)
+
+### D-075 · El modo rápido guarda aparte
+`make rapido` y `make experimento MODO=rapido` escribían en `results/`, encima de la corrida
+completa que leen la app, el resumen y el informe. Ahora cada modo tiene su carpeta
+(`experiments/common.output_dir`): el completo, `results/`, y el rápido, `results/rapido/`, que
+no se versiona. «Correr ahora», en la página Experimentos, sigue corriendo en memoria.
+
+### D-076 · Un solo candado para los núcleos paralelos
+Los núcleos paralelos del ataque moderno (`attacks/gillogly.py`: las fases 1 y 2 y el reajuste)
+corrían sin el candado de la Bombe (`bombe/sweep._LOCK`, D-037). Con la capa de hilos OpenMP de
+este equipo no pasa nada, pero con la «workqueue» de Numba dos lanzamientos simultáneos, desde dos
+pestañas, pueden detener el proceso. Ahora toman el mismo candado.
+
+### D-077 · Ajustes de la revisión
+- **Claves.** `EnigmaConfig` guarda el plugboard en orden alfabético también si se construye a
+  mano (antes `(("B", "A"),)` y `(("A", "B"),)` daban claves distintas), y las claves al azar
+  rechazan un número de cables fuera de 0 a 13.
+- **Idioma.** La normalización con X une las palabras sin recortar las X propias de la primera y
+  de la última (antes «Fax» quedaba «FA»); el corpus normalizado no cambia. El modelo interpolado
+  da a una letra ausente el piso de 0,01 apariciones (la muestra española no tiene K ni W), y el
+  puntaje de la cadena acepta textos de menos de 4 letras: «Verificar» ya no falla con cifrados
+  tan cortos.
+- **La Bombe.** La columna «Verdadera» compara también la vuelta del central, y la tabla marca
+  como consistente toda parada con alguna hipótesis consistente, no solo las de las primeras 300.
+- **La app.** Las figuras que se bajan después de «Correr ahora» salen a 2x, como las guardadas
+  (D-047). Un error inesperado muestra solo su tipo (`showErrorDetails = "type"`); el detalle
+  queda en la consola.
+- **Docker.** La imagen copia solo lo que usa la app: `src/`, `app/`, `data/`, `results/`,
+  `.streamlit/` y `docs/FUENTES.md`.
+- **Banco de la demo 2.** Ya no guarda el nombre del equipo; sí el procesador y los núcleos.
+- **Tipos.** `make lint` pasa mypy también por `app/` y `scripts/`.
 
 ## Pendientes de decidir
 

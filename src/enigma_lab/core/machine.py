@@ -1,4 +1,4 @@
-"""La máquina Enigma: clave inmutable, cifrado y traza letra por letra (spec 5.1).
+"""La máquina Enigma: clave inmutable, cifrado y traza letra por letra.
 
 El camino de una letra, con el plugboard P, los rotores derecho R, central M e
 izquierdo L, y el reflector U:
@@ -73,6 +73,17 @@ def parse_plugboard(text: str) -> tuple[tuple[str, str], ...]:
     return tuple(sorted(pairs))
 
 
+def _sorted_pairs(pairs: tuple[tuple[str, str], ...]) -> tuple[tuple[str, str], ...]:
+    """Cada cable y la lista de cables en orden alfabético: (("B", "A"),) → (("A", "B"),)."""
+    out = []
+    for pair in pairs:
+        if len(pair) != 2:
+            raise ValueError(f"cada cable une dos letras: {pair!r}")
+        a, b = sorted(str(letter).upper() for letter in pair)
+        out.append((a, b))
+    return tuple(sorted(out))
+
+
 @dataclass(frozen=True)
 class EnigmaConfig:
     """Una clave completa de Enigma, inmutable.
@@ -95,6 +106,12 @@ class EnigmaConfig:
     model: str = "I"
 
     def __post_init__(self) -> None:
+        # Dos maneras de escribir la misma clave dan la misma EnigmaConfig: tuplas de
+        # enteros, y cada cable y la lista de cables en orden alfabético.
+        object.__setattr__(self, "rotors", tuple(self.rotors))
+        object.__setattr__(self, "rings", tuple(int(v) for v in self.rings))
+        object.__setattr__(self, "positions", tuple(int(v) for v in self.positions))
+        object.__setattr__(self, "plugboard", _sorted_pairs(self.plugboard))
         self._validate()
 
     def _validate(self) -> None:

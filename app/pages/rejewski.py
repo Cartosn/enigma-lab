@@ -1,4 +1,4 @@
-"""Página Rejewski: el indicador doble, los ciclos de AD, BE y CF y el catálogo (spec 8.2, punto 9).
+"""Página Rejewski: el indicador doble, los ciclos de AD, BE y CF y el catálogo.
 
 Un día de tráfico de 1932 (rotores I–III, reflector A, 6 cables), cifrado con la máquina real.
 Con los mensajes interceptados se reconstruyen AD, BE y CF, se dibujan como ciclos y, cuando
@@ -257,7 +257,7 @@ st.caption(
     f"{fmt_int(catalog.n_configurations)} "
     f"configuraciones y {fmt_int(len(sizes))} características distintas; "
     f"{fmt_int(int((sizes == 1).sum()))} señalan una sola y la más frecuente, "
-    f"(13 13)(13 13)(13 13), {fmt_int(int(sizes.max()))}. Kuhl (2007) da "
+    f"{catalog.top(1)['caracteristica'].iloc[0]}, {fmt_int(int(sizes.max()))}. Kuhl (2007) da "
     f"{fmt_int(reference['caracteristicas_distintas'])}, "
     f"{fmt_int(reference['caracteristicas_unicas'])} y {fmt_int(largest['configuraciones'])}: "
     "la forma coincide, las cifras no del todo (Experimentos › E7)."

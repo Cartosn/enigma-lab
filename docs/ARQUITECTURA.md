@@ -1,6 +1,6 @@
 # Arquitectura
 
-Regla central (spec, sección 3): **la lógica de Enigma existe una sola vez, en Python**,
+Regla central: **la lógica de Enigma existe una sola vez, en Python**,
 dentro de `src/enigma_lab/`. La app de Streamlit solo la llama y la muestra; los
 componentes JavaScript de `app/components/` animan una «traza» en JSON que calcula Python
 y nunca reimplementan la máquina.
@@ -88,7 +88,7 @@ completo, que no está en Docker ni en un clon sin `make corpus` (D-071).
 | `app/` | Punto de entrada, navegación, modo demo, Inicio y Máquina | 0 y 1 |
 | `core/wiring.py`, `stepping.py`, `machine.py` | Cableados, paso con doble paso, Enigma I, M3 y M4 con traza | 1 |
 | `core/batch.py`, `random_keys.py` | Cifrado por lotes en NumPy y claves aleatorias con semilla | 1 |
-| `core/vectors.py` | Vectores de 6.1 (`data/reference/test_vectors.json`) | 1 |
+| `core/vectors.py` | Vectores de prueba (`data/reference/test_vectors.json`) | 1 |
 | `experiments/` | Marco común y E1 (validación) | 1 |
 | `cifras.py`, `resumen.py` | Cifras de la presentación y `make resumen` | 1 |
 | `app/components/enigma_machine.html` | Animación SVG que reproduce la traza | 1 |
@@ -229,7 +229,7 @@ sequenceDiagram
 ```mermaid
 flowchart TB
     base["python:3.12-slim + uv 0.13.9"] --> deps["uv sync --frozen --no-dev --no-install-project<br/>(capa de dependencias, de uv.lock)"]
-    deps --> code["COPY . (sin lo que excluye .dockerignore)<br/>uv sync --frozen --no-dev"]
+    deps --> code["COPY de src/, app/, data/, results/, .streamlit/ y docs/FUENTES.md<br/>uv sync --frozen --no-dev"]
     code --> user["usuario «enigma» sin privilegios<br/>NUMBA_CACHE_DIR y MPLCONFIGDIR con escritura"]
     user --> warm["warm_up(): núcleos de Numba de la Bombe y del ataque,<br/>compilados en la imagen"]
     warm --> run["streamlit run app/Inicio.py<br/>headless, 0.0.0.0:8501, sin vigilar archivos"]

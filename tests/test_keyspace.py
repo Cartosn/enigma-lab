@@ -1,4 +1,4 @@
-"""Espacio de claves: las cifras exactas de la sección 5.2 del spec."""
+"""Espacio de claves: las cifras exactas."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from hypothesis import strategies as st
 from enigma_lab.core import keyspace as ks
 
 
-def test_plugboard_counts_from_spec() -> None:
+def test_plugboard_exact_counts() -> None:
     assert ks.plugboard_settings(0) == 1
     assert ks.plugboard_settings(1) == 325  # C(26, 2)
     assert ks.plugboard_settings(6) == 100_391_791_500

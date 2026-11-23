@@ -1,4 +1,4 @@
-"""Página Espacio de claves: cuántos bits aporta cada componente (spec 8.2, punto 3)."""
+"""Página Espacio de claves: cuántos bits aporta cada componente."""
 
 from __future__ import annotations
 

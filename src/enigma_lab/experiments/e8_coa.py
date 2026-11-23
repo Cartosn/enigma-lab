@@ -1,4 +1,4 @@
-"""E8 · ¿Cuánto texto necesita el ataque moderno solo con texto cifrado? (spec 7 y 5.8)
+"""E8 · ¿Cuánto texto necesita el ataque moderno solo con texto cifrado?
 
 **Mensajes.** Fragmentos alemanes del corpus (X como separador) de L letras, cifrados con
 claves aleatorias de Enigma I (rotores I–V, reflector B, anillos y posiciones al azar) con k
@@ -24,7 +24,7 @@ para cada número de cables, con su IC por el método delta. Tiempo por mensaje.
 cables o menos, y un solo éxito con 10 cables, con 1.463 letras. Distancia de unicidad: unas 23
 letras. Los mensajes reales no pasaban de 250 letras.
 
-**Presupuesto** (spec 7: menos de 40 min). D-067 explica N y los órdenes de cada modo.
+**Presupuesto:** menos de 40 min. D-067 explica N y los órdenes de cada modo.
 """
 
 from __future__ import annotations
@@ -44,7 +44,14 @@ from enigma_lab.bombe.scrambler import rotor_orders
 from enigma_lab.core.machine import encrypt
 from enigma_lab.core.random_keys import random_config
 from enigma_lab.core.wiring import ALPHABET
-from enigma_lab.experiments.common import Mode, RunInfo, save_figure, save_table, update_summary
+from enigma_lab.experiments.common import (
+    Mode,
+    RunInfo,
+    output_dir,
+    save_figure,
+    save_table,
+    update_summary,
+)
 from enigma_lab.stats.corpus import Source, random_excerpts
 from enigma_lab.stats.inference import wilson_interval
 
@@ -449,17 +456,18 @@ def figure(df: pd.DataFrame, theme: str = "enigma_print") -> Any:
 
 def main(mode: Mode = "completo", seed: int = SEED) -> dict[str, Any]:
     """Corre E8 y guarda sus resultados."""
+    folder = output_dir(mode)
     started = time.perf_counter()
     params = PARAMS[mode]
     df = run(params, seed, progress=True)
     figures = summary(df, params) | {"segundos": round(time.perf_counter() - started, 1)}
-    save_table(df, "e8_coa_mensajes")
-    save_table(aggregate(df), "e8_coa")
-    update_summary("e8", figures, RunInfo("e8", mode, seed))
+    save_table(df, "e8_coa_mensajes", folder)
+    save_table(aggregate(df), "e8_coa", folder)
+    update_summary("e8", figures, RunInfo("e8", mode, seed), folder)
 
     import matplotlib.pyplot as plt
 
     fig = figure(df)
-    save_figure(fig, "e8_coa")
+    save_figure(fig, "e8_coa", folder)
     plt.close(fig)
     return figures

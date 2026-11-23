@@ -1,4 +1,4 @@
-"""E6 · ¿Cuánto solapamiento necesita el Banburismus? (spec 7)
+"""E6 · ¿Cuánto solapamiento necesita el Banburismus?
 
 **Pares.** Dos mensajes cifrados con la máquina real, con la misma clave diaria (Enigma I,
 rotores I–V, 10 cables) y claves de mensaje que solo difieren en el rotor derecho
@@ -79,7 +79,14 @@ from enigma_lab.banburismus.sprt import (
     wald_gap,
     wald_letters,
 )
-from enigma_lab.experiments.common import Mode, RunInfo, save_figure, save_table, update_summary
+from enigma_lab.experiments.common import (
+    Mode,
+    RunInfo,
+    output_dir,
+    save_figure,
+    save_table,
+    update_summary,
+)
 from enigma_lab.stats.corpus import Mode as TextMode
 from enigma_lab.stats.corpus import Source
 from enigma_lab.stats.inference import mean_ci, wilson_interval
@@ -384,7 +391,7 @@ R4_COLUMNS = [
 def aggregate(df: pd.DataFrame, corpus: Source = "completo") -> pd.DataFrame:
     """Tabla de la diapositiva 17 (``r4_banburismus.csv``).
 
-    Una fila por fuente, puntuación, solapamiento, α e hipótesis, con las columnas del spec
+    Una fila por fuente, puntuación, solapamiento, α e hipótesis, con las ocho columnas fijas
     primero. ``wald``, ``exacto``, los sobrepasos y ``wald_identidad`` (E[S_N] / deriva por
     letra) solo se llenan en el solapamiento máximo, el de la prueba sin truncar.
     """
@@ -743,19 +750,20 @@ def figure(
 
 def main(mode: Mode = "completo", seed: int = SEED) -> dict[str, Any]:
     """Corre E6 y guarda sus resultados."""
+    folder = output_dir(mode)
     started = time.perf_counter()
     params = PARAMS[mode]
     df, paths = run_with_trajectories(params, seed)
     figures = summary(df, params) | {"segundos": round(time.perf_counter() - started, 1)}
-    save_table(df, "e6_banburismus_pruebas")
-    save_table(aggregate(df, params["corpus"]), "e6_banburismus")
-    save_table(roc_table(df), "e6_banburismus_roc")
-    save_table(paths, "e6_banburismus_trayectorias")
-    update_summary("e6", figures, RunInfo("e6", mode, seed))
+    save_table(df, "e6_banburismus_pruebas", folder)
+    save_table(aggregate(df, params["corpus"]), "e6_banburismus", folder)
+    save_table(roc_table(df), "e6_banburismus_roc", folder)
+    save_table(paths, "e6_banburismus_trayectorias", folder)
+    update_summary("e6", figures, RunInfo("e6", mode, seed), folder)
 
     import matplotlib.pyplot as plt
 
     fig = figure(df, trajectories=paths, corpus=params["corpus"])
-    save_figure(fig, "e6_banburismus")
+    save_figure(fig, "e6_banburismus", folder)
     plt.close(fig)
     return figures

@@ -1,5 +1,5 @@
 {
-  "description": "Caso de respaldo de la Bombe (spec 6.1 y 6.5): el botón «Caso de respaldo» de la página La Bombe lo carga si falla la demo 2.",
+  "description": "Caso de respaldo de la Bombe: el botón «Caso de respaldo» de la página La Bombe lo carga si falla la demo 2.",
   "key": {"model": "I", "rotors": "II III I", "reflector": "B", "rings": "DVW", "positions": "KZY", "plugboard": "EJ LI QT DX KH AG RV MF NC UY"},
   "plaintext": "WETTERBERICHTXFUERXDIEXNACHTXBEWOELKTXWINDXAUSXNORDWESTXSTAERKEXDREIXSICHTXGUT",
   "ciphertext": "ICGWNXTXINRGBWMLPFTAXFNLHILVEGCVKTJUIUPSDEWXVHFEVWUXPYROMOWJFSMVXXMAUTRNYSWLMP",

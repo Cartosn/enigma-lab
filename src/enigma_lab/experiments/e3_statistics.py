@@ -1,4 +1,4 @@
-"""E3 · ¿Qué estadística se filtra y cuál no? (spec 7)
+"""E3 · ¿Qué estadística se filtra y cuál no?
 
 Para cada idioma (alemán, español) y longitud L se cifran N fragmentos reales del
 corpus, cada uno con su propia clave aleatoria de Enigma I (10 cables). Por mensaje se
@@ -26,7 +26,14 @@ import pandas as pd
 
 from enigma_lab import SEED
 from enigma_lab.core.batch import encrypt_batch, random_key_batch
-from enigma_lab.experiments.common import Mode, RunInfo, save_figure, save_table, update_summary
+from enigma_lab.experiments.common import (
+    Mode,
+    RunInfo,
+    output_dir,
+    save_figure,
+    save_table,
+    update_summary,
+)
 from enigma_lab.stats.corpus import (
     ALL_LANGUAGES,
     LANGUAGES,
@@ -244,18 +251,19 @@ def figure(df: pd.DataFrame, theme: str = "enigma_print", pairs: np.ndarray | No
 
 def main(mode: Mode = "completo", seed: int = SEED) -> dict[str, Any]:
     """Corre E3 y guarda sus resultados."""
+    folder = output_dir(mode)
     started = time.perf_counter()
     params = PARAMS[mode]
     df, pairs = run_with_pairs(params, seed)
     figures = summary(df, params) | {"segundos": round(time.perf_counter() - started, 1)}
-    save_table(df, "e3_estadistica")
-    save_table(by_condition(df, params["source"]), "e3_condiciones")
-    save_table(pairs_table(pairs), "e3_pares")
-    update_summary("e3", figures, RunInfo("e3", mode, seed))
+    save_table(df, "e3_estadistica", folder)
+    save_table(by_condition(df, params["source"]), "e3_condiciones", folder)
+    save_table(pairs_table(pairs), "e3_pares", folder)
+    update_summary("e3", figures, RunInfo("e3", mode, seed), folder)
 
     import matplotlib.pyplot as plt
 
     fig = figure(df, pairs=pairs)
-    save_figure(fig, "e3_estadistica")
+    save_figure(fig, "e3_estadistica", folder)
     plt.close(fig)
     return figures

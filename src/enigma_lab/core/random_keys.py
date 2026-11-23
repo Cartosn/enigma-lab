@@ -1,4 +1,4 @@
-"""Claves aleatorias con ``numpy.random.Generator`` y semilla (spec 5.1).
+"""Claves aleatorias con ``numpy.random.Generator`` y semilla.
 
 Una clave aleatoria elige tres rotores distintos en orden, anillos y posiciones al azar
 y k cables. Para el plugboard se baraja el alfabeto y se emparejan las 2k primeras
@@ -17,6 +17,8 @@ from enigma_lab.core.wiring import ALPHABET, MODELS
 
 def random_plugboard(rng: np.random.Generator, cables: int) -> tuple[tuple[str, str], ...]:
     """k cables al azar, todos los plugboards de k cables igual de probables."""
+    if not 0 <= cables <= 13:
+        raise ValueError(f"un plugboard lleva de 0 a 13 cables, no {cables}")
     letters = rng.permutation(26)[: 2 * cables]
     pairs = (sorted((ALPHABET[a], ALPHABET[b])) for a, b in letters.reshape(-1, 2))
     return tuple(sorted((a, b) for a, b in pairs))

@@ -1,4 +1,4 @@
-"""El método de Rejewski: el indicador doble, la característica y el catálogo (spec 5.7).
+"""El método de Rejewski: el indicador doble, la característica y el catálogo.
 
 - ``characteristic``: las permutaciones A…F del indicador, los productos AD, BE y CF y su
   estructura de ciclos, que no depende del plugboard.

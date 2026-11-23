@@ -72,7 +72,11 @@ def stops_frame(run: BombeRun, hypotheses: Hypotheses | None, limit: int = 300) 
     rows: list[dict[str, Any]] = []
     seen: set[tuple[str, int, int]] = set()
     if hypotheses is not None:
-        for k in range(min(len(hypotheses), limit)):
+        # Se recorren todas las hipótesis, no solo las primeras: así toda parada consistente
+        # sale en este primer bloque, y las de abajo son de verdad las que no pasaron.
+        for k in range(len(hypotheses)):
+            if len(rows) >= limit:
+                break
             h = hypotheses.get(k)
             key = (order_label(h.stop.order), h.stop.position, h.stop.turn)
             if key in seen:

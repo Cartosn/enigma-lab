@@ -1,4 +1,4 @@
-"""El informe (spec 10): sus cifras salen de los resultados y sus figuras se dibujan."""
+"""El informe: sus cifras salen de los resultados y sus figuras se dibujan."""
 
 from __future__ import annotations
 

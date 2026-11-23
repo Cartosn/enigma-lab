@@ -1,4 +1,4 @@
-"""Banburismus: decibanes, el SPRT de Wald y los mensajes en profundidad (spec 5.6)."""
+"""Banburismus: decibanes, el SPRT de Wald y los mensajes en profundidad."""
 
 from __future__ import annotations
 

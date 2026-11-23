@@ -1,4 +1,4 @@
-"""Página Experimentos: una pestaña por experimento (spec 8.2, punto 7).
+"""Página Experimentos: una pestaña por experimento.
 
 Por defecto muestra los resultados guardados en ``results/`` (modo completo, los mismos
 de ``RESUMEN.md``). «Correr ahora» repite el experimento en modo rápido dentro de la
@@ -6,7 +6,7 @@ sesión, sin tocar los resultados guardados.
 
 Las tablas y cifras de cada pestaña se calculan una sola vez (``st.cache_data``), y las
 figuras para descargar (PNG y SVG, estilo ``enigma_print``) solo cuando alguien pulsa el
-botón: así la página abre rápido (spec 8.3).
+botón: así la página abre rápido.
 
 Con los resultados guardados, las tablas que dependen del corpus (E3, E4 y E6) y las figuras
 para descargar se leen de ``results/`` tal como se guardaron: recalcularlas pediría el corpus
@@ -44,17 +44,17 @@ INFO: dict[str, dict[str, str]] = {
     "e1": {
         "tab": "E1 · Validación",
         "pregunta": "¿El simulador es correcto?",
-        "metodo": "Los vectores publicados de la sección 6.1, 10.000 claves y mensajes "
+        "metodo": "Los vectores de prueba publicados, 10.000 claves y mensajes "
         "aleatorios comparados con py-enigma, y 2.000 claves para las propiedades "
         "(involución, sin puntos fijos, lotes = escalar).",
-        "referencia": "Meta del spec: 100 % de coincidencia con py-enigma.",
+        "referencia": "Meta: 100 % de coincidencia con py-enigma.",
     },
     "e2": {
         "tab": "E2 · Espacio de claves",
         "pregunta": "¿Cuánto aporta cada componente de la clave?",
         "metodo": "Conteo exacto con enteros de Python: órdenes, posiciones, anillos y "
         "plugboard N(k) para 0 a 13 cables.",
-        "referencia": "Spec 5.2: 67,11 bits sin anillos; máximo de N(k) en 11 cables.",
+        "referencia": "Conteos exactos: 67,11 bits sin anillos; máximo de N(k) en 11 cables.",
     },
     "e3": {
         "tab": "E3 · Estadística",
@@ -296,7 +296,7 @@ def _show_e1(data: dict[str, Any], run_now: bool) -> None:
         delta_color="off",
         delta_arrow="off",
     )
-    cols[2].metric("Vectores de 6.1", f"{figures['vectores_ok']} de {figures['vectores_total']}")
+    cols[2].metric("Vectores de prueba", f"{figures['vectores_ok']} de {figures['vectores_total']}")
     st.dataframe(vectors, hide_index=True, width="stretch")
     _downloads("e1_vectores", vectors, lambda: e1_validation.figure(vectors), run_now)
 

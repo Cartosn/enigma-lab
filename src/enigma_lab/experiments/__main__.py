@@ -11,9 +11,9 @@ import importlib
 import json
 import sys
 
-from enigma_lab import SEED
+from enigma_lab import SEED, paths
 from enigma_lab.experiments import EXPERIMENTS
-from enigma_lab.experiments.common import MODES
+from enigma_lab.experiments.common import MODES, output_dir
 
 
 def main(argv: list[str] | None = None) -> None:
@@ -27,7 +27,11 @@ def main(argv: list[str] | None = None) -> None:
 
     chosen = list(EXPERIMENTS) if args.experimento == "todos" else [args.experimento]
     for name in chosen:
-        print(f"== {name.upper()} · modo {args.mode} · semilla {args.seed}", flush=True)
+        folder = output_dir(args.mode).relative_to(paths.ROOT).as_posix()
+        print(
+            f"== {name.upper()} · modo {args.mode} · semilla {args.seed} · guarda en {folder}/",
+            flush=True,
+        )
         module = importlib.import_module(EXPERIMENTS[name])
         figures = module.main(args.mode, args.seed)
         print(json.dumps(figures, ensure_ascii=False, indent=2), flush=True)

@@ -1,4 +1,4 @@
-"""El entorno de la sección 3 del spec: Python 3.12 y las bibliotecas obligatorias."""
+"""El entorno: Python 3.12 y las bibliotecas del proyecto."""
 
 from __future__ import annotations
 

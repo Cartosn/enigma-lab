@@ -1,4 +1,4 @@
-"""Página Inicio: la pregunta del proyecto y la cifra «67 → 20 bits» (spec 8.2, punto 1).
+"""Página Inicio: la pregunta del proyecto y la cifra «67 → 20 bits».
 
 Todas las cifras salen de ``enigma_lab.core.keyspace``; ninguna está escrita a mano.
 """
@@ -109,15 +109,13 @@ st.subheader("Estado de la validación")
 
 @st.cache_data(show_spinner=False)
 def _vector_status() -> list[tuple[str, bool]]:
-    """Los vectores de 6.1, comprobados con el simulador (una vez por sesión del servidor)."""
+    """Los vectores de prueba, comprobados con el simulador (una vez por sesión del servidor)."""
     return [(result.label, result.ok) for result in check_all()]
 
 
 status = _vector_status()
 passed = sum(ok for _, ok in status)
-st.markdown(
-    f"Vectores de prueba de la sección 6.1, comprobados en vivo: **{passed} de {len(status)}**."
-)
+st.markdown(f"Vectores de prueba, comprobados en vivo: **{passed} de {len(status)}**.")
 status_columns = st.columns(3)
 for index, (label, ok) in enumerate(status):
     mark = ":green[:material/check_circle:]" if ok else ":red[:material/cancel:]"
@@ -129,7 +127,7 @@ if e1:
         f"E1 (modo {e1['corrida']['modo']}, semilla {e1['corrida']['semilla']}): "
         f"{fmt_int(e1['pyenigma_coincidencias'])} de {fmt_int(e1['pyenigma_casos'])} claves "
         f"aleatorias coinciden con py-enigma; {fmt_int(e1['puntos_fijos'])} puntos fijos en "
-        f"{fmt_int(e1['propiedades_letras'])} letras."
+        f"{fmt_int(e1['propiedades_letras'] + e1['pyenigma_letras'])} letras."
     )
 else:
     st.caption("E1 todavía no se ha corrido en este equipo: `make reproduce`.")

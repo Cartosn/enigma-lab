@@ -1,4 +1,4 @@
-"""Experimentos E1 a E8 (spec, sección 7).
+"""Experimentos E1 a E8.
 
 Cada experimento es un módulo ``eN_*.py`` con ``run(params, seed) -> DataFrame``,
 ``summary(df) -> dict`` y ``figure(df, theme)``. Se corren con

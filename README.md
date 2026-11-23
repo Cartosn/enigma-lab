@@ -74,7 +74,7 @@ recomendó `make bench-demo` en ese equipo, y «Caso de respaldo» es el plan B.
 | Comando | Qué hace |
 | --- | --- |
 | `make reproduce` | Descarga el corpus completo (SHA-256 verificado), corre E1 a E8 en modo completo con semilla 2026, arma `results/presentacion/` y dibuja las figuras |
-| `make rapido` | Los mismos experimentos en modo rápido, con las muestras del corpus (sin internet) |
+| `make rapido` | Los mismos experimentos en modo rápido, con las muestras del corpus (sin internet); guarda en `results/rapido/` y no toca la corrida completa |
 | `make resumen` | Rehace `results/presentacion/` (RESUMEN.md, cifras.json y los CSV) sin correr nada |
 | `make figuras` | Figuras del informe (`report/figuras/`) y de respaldo para las diapositivas (`results/figures/slides/`) |
 | `make report` | Informe: `report/numbers.tex` desde los resultados, sus figuras y el PDF si hay LaTeX (latexmk o Tectonic); si no, `report/` sirve tal cual para Overleaf |
@@ -114,7 +114,7 @@ enigma-lab/
 ├── data/                vectores, tabla de Turing, Kuhl y Ostwald-Weierud (reference/), muestras del corpus (corpora/), casos de la demo (demo/)
 ├── results/             resultados generados: Parquet, summary.json, figures/ y presentacion/
 ├── report/              informe.tex, numbers.tex (generado), figuras/ e informe.pdf
-├── docs/                spec, progreso, decisiones, arquitectura, validación, guía de estudio, fuentes e img/
+├── docs/                progreso, decisiones, arquitectura, validación, guía de estudio, fuentes, capturas (img/) y la presentación
 ├── tests/               pytest + hypothesis; test_presentacion.py comprueba cada cifra de las diapositivas
 ├── scripts/             instalación, corpus, banco de la demo 2, URL de CyberChef, variantes del catálogo de Kuhl y el piloto original
 └── Dockerfile · docker-compose.yml · Makefile · pyproject.toml · uv.lock · requirements.txt
@@ -129,19 +129,19 @@ diagramas, está en [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md).
 El detalle está en [`docs/VALIDACION.md`](docs/VALIDACION.md); las cifras, en
 [`results/presentacion/RESUMEN.md`](results/presentacion/RESUMEN.md).
 
-- **Simulador (E1):** los 9 vectores de la especificación (entre ellos BDZGO, EWTYX, el ejemplo
+- **Simulador (E1):** 9 vectores de prueba (entre ellos BDZGO, EWTYX, el ejemplo
   de py-enigma, la portada, la traza de la diapositiva 4, el caso de respaldo y un mensaje real
   del U-264); 10.000 de 10.000 claves y mensajes aleatorios iguales a py-enigma, una
   implementación independiente (Enigma I, M3 y M4); 6 de 6 casos comprobados a mano en
   CyberChef; y pruebas de propiedades con hypothesis: cifrar dos veces devuelve el texto, ninguna
   letra se cifra a sí misma y el cifrado por lotes coincide con el escalar.
-- **Espacio de claves (E2):** los conteos exactos de la especificación: 158.962.555.217.826.360.000
+- **Espacio de claves (E2):** los conteos exactos: 158.962.555.217.826.360.000
   claves sin anillos (67,11 bits), el máximo del plugboard con 11 cables y el barrido de la Bombe,
   1.054.560 configuraciones (20,01 bits).
 - **Bombe (E5):** la versión en Numba coincide con una de referencia en Python puro; en 200 casos
   aleatorios la configuración verdadera siempre produce una parada y el verificador recupera una
-  clave equivalente; las paradas coinciden con CyberChef en 3 de 3 casos, y las paradas falsas
-  quedan entre la mitad y el doble de la tabla de Turing en 15 de sus 17 celdas.
+  clave equivalente; las paradas coinciden con CyberChef en 3 de 3 casos, y las hipótesis abiertas
+  por orden quedan entre la mitad y el doble de la tabla de Turing en 15 de sus 17 celdas.
 - **Banburismus (E6):** la simulación del SPRT se explica con un cálculo exacto: la diferencia con
   la aproximación de Wald es el sobrepaso de los umbrales.
 - **Rejewski (E7):** la característica no depende del plugboard (hypothesis, con 0 a 13 cables) y
@@ -190,7 +190,7 @@ Gutenberg para el corpus.
 ## Documentación
 
 - [`docs/GUIA_DE_ESTUDIO.md`](docs/GUIA_DE_ESTUDIO.md): cada algoritmo con sus fórmulas, dónde
-  está en el código y las 15 preguntas más probables.
+  está en el código y preguntas frecuentes.
 - [`docs/ARQUITECTURA.md`](docs/ARQUITECTURA.md): módulos, flujo de datos y la imagen de Docker.
 - [`docs/DECISIONES.md`](docs/DECISIONES.md): las decisiones tomadas ante ambigüedades.
 - [`docs/PROGRESS.md`](docs/PROGRESS.md): el estado por fase, con las cifras y los tiempos.

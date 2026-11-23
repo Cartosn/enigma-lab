@@ -1,6 +1,6 @@
 # Enigma Lab · configuración de Streamlit
 #
-# Tema «Bletchley nocturno» (spec 8.1). Los mismos colores están en
+# Tema «Bletchley nocturno». Los mismos colores están en
 # src/enigma_lab/viz/theme.py; si cambias uno, cambia el otro (tests/test_app.py
 # comprueba que coincidan).
 
@@ -17,7 +17,8 @@ serverAddress = "localhost"
 
 [client]
 toolbarMode = "minimal"
-showErrorDetails = "full"
+# En pantalla, solo el tipo de un error inesperado; el detalle queda en la consola.
+showErrorDetails = "type"
 
 [theme]
 base = "dark"

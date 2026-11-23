@@ -1,9 +1,9 @@
-"""Página La Bombe: el barrido de los rotores, las paradas y el verificador (spec 8.2, punto 6).
+"""Página La Bombe: el barrido de los rotores, las paradas y el verificador.
 
 Demo 2 del guion (diapositiva 12): el cifrado de un compañero con el crib WETTERBERICHT.
 «Cifrado del compañero» vacía el cifrado y deja la configuración que recomendó
 ``make bench-demo`` en este equipo (``results/bench_demo2.json``). Plan B: el botón «Caso
-de respaldo», que carga el caso de 6.1 (modo Bletchley, 3 lazos).
+de respaldo», que carga un caso conocido (modo Bletchley, 3 lazos).
 """
 
 from __future__ import annotations
@@ -180,7 +180,7 @@ buttons[1].button(
     icon=":material/support:",
     width="stretch",
     wrap=True,
-    help="El caso de 6.1: rotores II-III-I, WETTERBERICHT en la posición 0, 3 lazos.",
+    help="Un caso conocido: rotores II-III-I, WETTERBERICHT en la posición 0, 3 lazos.",
 )
 if not demo:
     buttons[2].button(
@@ -354,7 +354,6 @@ def _run_sweep() -> None:
     state[K + "run"] = run
     state[K + "hypotheses"] = hypotheses
     state[K + "signature"] = signature
-    state[K + "elapsed"] = time.perf_counter() - start
 
 
 if st.button("Correr la Bombe", type="primary", icon=":material/play_arrow:", width="stretch"):
@@ -396,13 +395,16 @@ if shown is not None:
 
 table = stops_frame(run, hypotheses)
 if known_key is not None and expected is not None and not table.empty:
-    true_order, true_pos = order_label(known_key.rotors), position_letters(expected[0])
+    true_order, true_pos = "-".join(known_key.rotors), position_letters(expected[0])
+    true_turn = f"letra {expected[1]}" if expected[1] else "—"
     table.insert(
         0,
         "Verdadera",
         [
-            "✔" if (o == true_order and p == true_pos) else ""
-            for o, p in zip(table["Orden"], table["Posición"], strict=True)
+            "✔" if (o, p, t) == (true_order, true_pos, true_turn) else ""
+            for o, p, t in zip(
+                table["Orden"], table["Posición"], table["Vuelta del central"], strict=True
+            )
         ],
     )
 if run.n_stops == 0:

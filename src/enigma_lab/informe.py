@@ -1,4 +1,4 @@
-"""El informe final (spec, sección 10): cifras, figuras y compilación del PDF.
+"""El informe final: cifras, figuras y compilación del PDF.
 
 ``make report`` corre este módulo, que:
 
@@ -102,6 +102,7 @@ def _validation_macros(e1: dict[str, Any]) -> dict[str, str]:
         "ELpyenigmaCasos": fmt_int(e1["pyenigma_casos"]),
         "ELpyenigmaCoinciden": fmt_int(e1["pyenigma_coincidencias"]),
         "ELpyenigmaICbajo": fmt_pct(e1["pyenigma_ic95"][0], 2),
+        "ELpyenigmaICalto": fmt_pct(e1["pyenigma_ic95"][1], 2).replace(",00", ""),
         "ELpyenigmaLetras": fmt_int(e1["pyenigma_letras"]),
         "ELpropiedadesClaves": fmt_int(e1["propiedades_claves"]),
         "ELpropiedadesLetras": fmt_int(e1["propiedades_letras"]),
@@ -419,7 +420,7 @@ def main() -> int:
     pages = page_count(REPORT / "informe.log")
     print(f"PDF: report/informe.pdf · {pages if pages is not None else '?'} páginas")
     if pages is not None and pages > MAX_PAGES:
-        print(f"Error: el informe pasa de {MAX_PAGES} páginas (spec, sección 10).")
+        print(f"Error: el informe pasa de {MAX_PAGES} páginas.")
         return 1
     return 0
 

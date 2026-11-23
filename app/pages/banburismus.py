@@ -1,4 +1,4 @@
-"""Página Banburismus: decibanes y la prueba secuencial de Wald (spec 8.2, punto 8).
+"""Página Banburismus: decibanes y la prueba secuencial de Wald.
 
 Dos mensajes en profundidad con un desplazamiento oculto. Se comparan en cada
 desplazamiento de −25 a +25 y se suman decibanes; la trayectoria del puntaje decide con
@@ -35,6 +35,7 @@ from enigma_lab.banburismus.sprt import thresholds, wald_letters
 from enigma_lab.core.machine import groups_of_five
 from enigma_lab.core.wiring import ALPHABET
 from enigma_lab.experiments.e6_banburismus import auc, roc_points
+from enigma_lab.stats.corpus import Source
 from enigma_lab.viz import plotly_figs
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 from enigma_lab.viz.theme import CATEGORICAL, DARK
@@ -42,7 +43,7 @@ from ui.charts import chart
 from ui.layout import is_demo, what_am_i_seeing
 
 K = "banb_"
-CORPUS = "muestra"  # la muestra del repositorio: la app funciona sin internet
+CORPUS: Source = "muestra"  # la muestra del repositorio: la app funciona sin internet
 ALPHAS = {0.05: "5 %", 0.01: "1 %", 0.001: "0,1 %"}
 ROC_PAIRS = 300
 ROC_MAX_LETTERS = 800
@@ -138,7 +139,7 @@ controls = st.columns([1.3, 2.2, 1.2])
 text = controls[0].selectbox(
     "Texto plano",
     list(TEXT_SOURCES),
-    format_func=TEXT_SOURCES.get,
+    format_func=lambda k: TEXT_SOURCES[k],
     key=K + "text",
     help="Alemán del corpus, o un texto sintético que en profundidad repite 1 de cada 17 "
     "letras exactas, el modelo de Turing.",

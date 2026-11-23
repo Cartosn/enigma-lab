@@ -1,4 +1,4 @@
-"""Página Ataque moderno: el ataque de Gillogly solo con texto cifrado (spec 8.2, punto 10).
+"""Página Ataque moderno: el ataque de Gillogly solo con texto cifrado.
 
 Un mensaje alemán cifrado con una clave al azar; el ataque no conoce nada más. La fase 1 mide el
 índice de coincidencia de cada ubicación sin plugboard, la fase 2 ajusta los anillos y la fase 3
@@ -221,7 +221,9 @@ if result is not None:
     st.caption(
         f"En la mejor ubicación: {order_label(tuple(config.rotors))}, anillos "
         f"{config.ring_letters}, posición {config.position_letters} y "
-        f"{len(config.plugboard)} cables ({config.plugboard_string or 'ninguno'})."
+        f"{len(config.plugboard)} cables ({config.plugboard_string or 'ninguno'}). La curva "
+        "repite la subida desde el plugboard vacío en esa ubicación; el ataque, además, "
+        "reajusta los anillos y prueba las posiciones vecinas (D-066)."
     )
     text = _letters(result["text"])
     big_result(

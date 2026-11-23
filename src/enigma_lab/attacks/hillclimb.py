@@ -1,4 +1,4 @@
-"""Hill climbing del plugboard (spec 5.8): Gillogly (1995) y Ostwald y Weierud (2017).
+"""Hill climbing del plugboard: Gillogly (1995) y Ostwald y Weierud (2017).
 
 **El problema.** En la ubicación correcta (orden, anillos y posiciones) se conoce el
 aleatorizador de cada letra, ``paths[j]`` = Sⱼ. Falta el plugboard P: la letra plana es

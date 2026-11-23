@@ -1,8 +1,8 @@
-"""Las cifras de la presentación (spec 11.3), cada una calculada por el código.
+"""Las cifras de la presentación, cada una calculada por el código.
 
 Un solo registro para dos usos: ``tests/test_presentacion.py`` comprueba cada cifra y
 ``make resumen`` las lista en ``RESUMEN.md``. ``expected`` es la cifra como la escribe
-el spec o la diapositiva; ``compute`` la calcula con el formato español de
+la diapositiva; ``compute`` la calcula con el formato español de
 :mod:`enigma_lab.viz.numfmt`. Las que la diapositiva cita de una fuente externa (Turing
 en la 16, Kuhl en la 9) se comprueban contra lo transcrito en ``data/reference/``. Las
 medidas con azar (E1 y E4 a E7) salen de la corrida completa guardada en
@@ -242,8 +242,8 @@ def _saved(name: str) -> dict[str, Any]:
     """Las cifras guardadas de un experimento («e1», «e4»…), si son de la corrida completa.
 
     Las cifras medidas de las diapositivas salen de ``make reproduce`` (modo completo,
-    semilla 2026). Sin esa corrida, como en un clon sin resultados o después de
-    ``make rapido``, no hay con qué comprobarlas.
+    semilla 2026). Sin esa corrida, como en un clon sin resultados, no hay con qué
+    comprobarlas (``make rapido`` guarda aparte, en ``results/rapido/``).
     """
     from enigma_lab.experiments.common import read_summary
 
@@ -503,7 +503,7 @@ CIFRAS: tuple[Cifra, ...] = (
         _german_kappa,
     ),
     Cifra("15, 23", "E4: mensajes por longitud", "1.000 de 250 letras", _e4_design),
-    # Diapositivas 10 y 11 · cribs/ (casos deterministas de 6.5)
+    # Diapositivas 10 y 11 · cribs/ (casos deterministas) y el caso de respaldo de la 12
     Cifra("10", "alineaciones de WETTERBERICHT sobre BBGCCKITCTTEZZZLCZ", "6", _slide10_count),
     Cifra("10", "alineaciones sin conflictos", "0, 1, 2, 3", _slide10_valid),
     Cifra(
@@ -520,13 +520,13 @@ CIFRAS: tuple[Cifra, ...] = (
     ),
     Cifra("11", "letra de prueba y su grado", "T, grado 6", lambda: _test_letter("slide")),
     Cifra(
-        "6.5",
+        "12",
         "menú del caso de respaldo: letras, aristas, componentes y lazos",
         "11 · 13 · 1 · 3",
         lambda: _menu_numbers("backup"),
     ),
     Cifra(
-        "6.5", "letra de prueba del caso de respaldo", "T, grado 4", lambda: _test_letter("backup")
+        "12", "letra de prueba del caso de respaldo", "T, grado 4", lambda: _test_letter("backup")
     ),
     # Diapositiva 9 · rejewski/ (el catálogo) y data/reference/kuhl_2007.json (la cita)
     Cifra(
@@ -561,7 +561,7 @@ CIFRAS: tuple[Cifra, ...] = (
         lambda: _banburismus_weight("repeticion"),
     ),
     Cifra(
-        "5.6",
+        "13",
         "decibanes por no repetición: 10·log₁₀((16/17)/(25/26))",
         f"−0,093{NBSP}dB",
         lambda: _banburismus_weight("no_repeticion"),

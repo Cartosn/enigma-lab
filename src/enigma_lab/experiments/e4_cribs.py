@@ -1,4 +1,4 @@
-"""E4 · ¿Cuántas posiciones descarta un crib? (spec 7)
+"""E4 · ¿Cuántas posiciones descarta un crib?
 
 Para cada longitud L del crib se cifran N mensajes de 250 letras con claves aleatorias
 de Enigma I (10 cables). En cada mensaje se toma como crib el tramo de L letras que
@@ -35,7 +35,14 @@ import pandas as pd
 from enigma_lab import SEED
 from enigma_lab.core.batch import encrypt_batch, random_key_batch
 from enigma_lab.cribs.dragging import survival_probability, survives
-from enigma_lab.experiments.common import Mode, RunInfo, save_figure, save_table, update_summary
+from enigma_lab.experiments.common import (
+    Mode,
+    RunInfo,
+    output_dir,
+    save_figure,
+    save_table,
+    update_summary,
+)
 from enigma_lab.stats.corpus import Source, load_codes, random_excerpts
 from enigma_lab.stats.frequencies import index_of_coincidence
 from enigma_lab.stats.inference import mean_ci
@@ -57,7 +64,7 @@ PARAMS: dict[str, dict[str, Any]] = {
 TEXTS = ("aleatorio", "aleman")
 TEXT_LABELS = {"aleatorio": "Texto aleatorio", "aleman": "Alemán real (X como separador)"}
 PILOT_L13 = 0.600
-"""Referencia del piloto (spec, tabla de E4): 60,0 % con L = 13, texto aleatorio."""
+"""Referencia del piloto: 60,0 % con L = 13, texto aleatorio."""
 
 
 def kappa(text: str, source: Source) -> float:
@@ -239,17 +246,18 @@ def figure(df: pd.DataFrame, theme: str = "enigma_print", source: Source = "comp
 
 def main(mode: Mode = "completo", seed: int = SEED) -> dict[str, Any]:
     """Corre E4 y guarda sus resultados."""
+    folder = output_dir(mode)
     started = time.perf_counter()
     params = PARAMS[mode]
     df = run(params, seed)
     figures = summary(df, params) | {"segundos": round(time.perf_counter() - started, 1)}
-    save_table(df, "e4_cribs_mensajes")
-    save_table(aggregate(df, params["source"]), "e4_cribs")
-    update_summary("e4", figures, RunInfo("e4", mode, seed))
+    save_table(df, "e4_cribs_mensajes", folder)
+    save_table(aggregate(df, params["source"]), "e4_cribs", folder)
+    update_summary("e4", figures, RunInfo("e4", mode, seed), folder)
 
     import matplotlib.pyplot as plt
 
     fig = figure(df, source=params["source"])
-    save_figure(fig, "e4_cribs")
+    save_figure(fig, "e4_cribs", folder)
     plt.close(fig)
     return figures

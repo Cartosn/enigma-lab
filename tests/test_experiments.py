@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import shutil
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -18,6 +19,7 @@ from enigma_lab.experiments import (
     e7_rejewski,
     e8_coa,
 )
+from enigma_lab.experiments.common import output_dir
 
 SMALL_E3 = {"n": 60, "lengths": [100, 300], "source": "muestra"}
 SMALL_E4 = {"n": 300, "lengths": [5, 13, 30], "message_length": 250, "source": "muestra"}
@@ -244,3 +246,14 @@ def test_resumen_builds_from_saved_results(tmp_path) -> None:  # type: ignore[no
         )
         assert (out / "r4_roc.csv").is_file() and (out / "r4_trayectorias.csv").is_file()
         assert "La diferencia con Wald es el sobrepaso" in text
+
+
+def test_rapid_mode_saves_apart(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    """El modo rápido guarda en results/rapido/ y no pisa la corrida completa (D-075)."""
+    monkeypatch.setattr(paths, "RESULTS", tmp_path)
+    assert output_dir("completo") == tmp_path
+    assert output_dir("rapido") == tmp_path / "rapido"
+    e2_keyspace.main("rapido")
+    assert (tmp_path / "rapido" / "e2_espacio_de_claves.parquet").is_file()
+    assert json.loads((tmp_path / "rapido" / "summary.json").read_text("utf-8"))["e2"]
+    assert not (tmp_path / "summary.json").exists()

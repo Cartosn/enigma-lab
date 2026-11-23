@@ -1,5 +1,5 @@
 {
-  "description": "Vectores de prueba de la sección 6.1 del spec y un mensaje histórico real. Los usan tests/test_vectors.py, el experimento E1 y la página Inicio.",
+  "description": "Vectores de prueba y un mensaje histórico real. Los usan tests/test_vectors.py, el experimento E1 y la página Inicio.",
   "vectors": [
     {
       "id": "bdzgo",
@@ -8,7 +8,7 @@
       "key": {"model": "I", "rotors": "I II III", "reflector": "B", "rings": "AAA", "positions": "AAA", "plugboard": ""},
       "input": "AAAAA",
       "output": "BDZGO",
-      "source": "Wikipedia, «Enigma rotor details»; spec 6.1"
+      "source": "Wikipedia, «Enigma rotor details»"
     },
     {
       "id": "ewtyx",
@@ -17,7 +17,7 @@
       "key": {"model": "I", "rotors": "I II III", "reflector": "B", "rings": "BBB", "positions": "AAA", "plugboard": ""},
       "input": "AAAAA",
       "output": "EWTYX",
-      "source": "Wikipedia, «Enigma rotor details»; spec 6.1"
+      "source": "Wikipedia, «Enigma rotor details»"
     },
     {
       "id": "doble_paso",
@@ -26,7 +26,7 @@
       "key": {"model": "I", "rotors": "I II III", "reflector": "B", "rings": "AAA", "positions": "ADU", "plugboard": ""},
       "presses": 4,
       "windows": ["ADU", "ADV", "AEW", "BFX", "BFY"],
-      "source": "spec 6.1; diapositiva 5"
+      "source": "diapositiva 5"
     },
     {
       "id": "py_enigma",
@@ -37,7 +37,7 @@
       "message_key": "BLA",
       "input": "NIBLFMYMLLUFWCASCSSNVHAZ",
       "output": "THEXRUSSIANSXAREXCOMINGX",
-      "source": "documentación de py-enigma (anillos en base 0: [1, 20, 11] = B-U-L); spec 6.1"
+      "source": "documentación de py-enigma (anillos en base 0: [1, 20, 11] = B-U-L)"
     },
     {
       "id": "odometro",
@@ -46,7 +46,7 @@
       "rotors": "I II III",
       "period": 16900,
       "off_cycle": 676,
-      "source": "spec 6.1; diapositivas 3, 5 y 14"
+      "source": "diapositivas 3, 5 y 14"
     },
     {
       "id": "traza_a",
@@ -56,7 +56,7 @@
       "input": "A",
       "path": "plugboard A → III C → II D → I F → reflector S → I S → II E → III B → plugboard B",
       "letters": ["A", "A", "C", "D", "F", "S", "S", "E", "B", "B", "B"],
-      "source": "spec 6.1; diapositiva 4"
+      "source": "diapositiva 4"
     },
     {
       "id": "portada",
@@ -65,7 +65,7 @@
       "key": {"model": "I", "rotors": "II V III", "reflector": "B", "rings": "ENI", "positions": "GMA", "plugboard": "BQ CR DI EJ KW MT OS PX UZ GH"},
       "input": "ROMPERXENIGMAXCRIPTOGRAFIAXUNAL",
       "output": "LGNEVYPYZQDVKESNPUYYQVWSKYNZJHE",
-      "source": "generado por el piloto para la presentación; spec 6.1"
+      "source": "generado por el piloto para la presentación"
     },
     {
       "id": "respaldo_bombe",
@@ -74,7 +74,7 @@
       "key": {"model": "I", "rotors": "II III I", "reflector": "B", "rings": "DVW", "positions": "KZY", "plugboard": "EJ LI QT DX KH AG RV MF NC UY"},
       "input": "WETTERBERICHTXFUERXDIEXNACHTXBEWOELKTXWINDXAUSXNORDWESTXSTAERKEXDREIXSICHTXGUT",
       "output": "ICGWNXTXINRGBWMLPFTAXFNLHILVEGCVKTJUIUPSDEWXVHFEVWUXPYROMOWJFSMVXXMAUTRNYSWLMP",
-      "source": "generado por el piloto para la presentación; spec 6.1"
+      "source": "generado por el piloto para la presentación"
     },
     {
       "id": "m4_u264",

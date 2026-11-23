@@ -67,7 +67,7 @@ def render_menu(payload: dict[str, Any]) -> None:
 
 
 def menu_table(graph: nx.MultiGraph) -> pd.DataFrame:
-    """Las aristas del menú como tabla: los datos del grafo, para descargarlos (spec 8.3)."""
+    """Las aristas del menú como tabla: los datos del grafo, para descargarlos."""
     return pd.DataFrame(
         {"letra_a": e.a, "letra_b": e.b, "paso": e.offset, "en_lazo": e.in_loop}
         for e in menu_edges(graph)

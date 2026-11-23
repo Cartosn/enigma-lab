@@ -1,9 +1,9 @@
 # Fuentes
 
 Toda cifra de la app, las figuras, el informe o el resumen que no calcule el código sale
-de una de estas fuentes (spec, sección 0). Las de la sección 12 del spec van tal cual.
+de una de estas fuentes.
 
-## Criptoanálisis de Enigma (spec, sección 12)
+## Criptoanálisis de Enigma
 
 - Turing, A. M. (c. 1941–42). *The Applications of Probability to Cryptography*. The National Archives, HW 25/37. Edición en arXiv: https://arxiv.org/abs/1505.04714
 - Rejewski, M. (1980). An application of the theory of permutations in breaking the Enigma cipher. *Applicationes Mathematicae*, 16(4), 543–559. https://impan.pl/Great/Rejewski/article.html

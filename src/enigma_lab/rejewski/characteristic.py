@@ -1,4 +1,4 @@
-"""La característica de Rejewski: la estructura de ciclos de AD, BE y CF (spec 5.7).
+"""La característica de Rejewski: la estructura de ciclos de AD, BE y CF.
 
 **El indicador.** Hasta mayo de 1940, el operador elegía una clave de mensaje de tres letras
 k₁k₂k₃, la tecleaba dos veces en la posición del día (Grundstellung) y transmitía las seis

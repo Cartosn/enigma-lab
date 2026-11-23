@@ -1,4 +1,4 @@
-"""Gráficos de la app y su exportación (spec 8.3: «todo gráfico se puede exportar»).
+"""Gráficos de la app y su exportación: todo gráfico se puede exportar.
 
 - **La figura:** el botón de la cámara en la barra de Plotly la baja en PNG a 2x.
 - **Los datos:** el botón «Datos (CSV)» baja las series de la propia figura
@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import io
 from collections.abc import Callable
+from functools import partial
 from pathlib import Path
 from typing import Any
 
@@ -19,6 +20,7 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
+from enigma_lab.experiments.common import PNG_DPI
 from enigma_lab.viz.plotly_figs import figure_table, plotly_config
 
 
@@ -71,12 +73,15 @@ def chart(
 
 
 def figure_bytes(make_figure: Callable[[], Any], fmt: str) -> bytes:
-    """Dibuja una figura de Matplotlib (estilo ``enigma_print``) y la devuelve en PNG o SVG."""
+    """Dibuja una figura de Matplotlib (estilo ``enigma_print``) y la devuelve en PNG o SVG.
+
+    Con la misma resolución y el mismo recorte que ``save_figure``: PNG a 2x (D-047).
+    """
     import matplotlib.pyplot as plt
 
     fig = make_figure()
     buffer = io.BytesIO()
-    fig.savefig(buffer, format=fmt)
+    fig.savefig(buffer, format=fmt, dpi=PNG_DPI, bbox_inches="tight")
     plt.close(fig)
     return buffer.getvalue()
 
@@ -116,7 +121,7 @@ def figure_downloads(
     ):
         col.download_button(
             f"Figura ({fmt.upper()})",
-            data=lambda fmt=fmt: figure_data(make_figure, fmt, saved),
+            data=partial(figure_data, make_figure, fmt, saved),
             file_name=f"{name}.{fmt}",
             mime=mime,
             icon=icon,

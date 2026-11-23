@@ -1,4 +1,4 @@
-"""``make resumen``: el paquete con el que los resultados llegan a las diapositivas (spec 11).
+"""``make resumen``: el paquete con el que los resultados llegan a las diapositivas.
 
 Arma ``results/presentacion/`` a partir de ``results/summary.json`` y los Parquet, sin
 volver a correr experimentos:
@@ -79,7 +79,7 @@ BENCH_FILE = "bench_demo2.json"
 
 
 def r1_table(summary: dict[str, Any], results_dir: Path) -> pd.DataFrame:
-    """Diapositiva 14: vectores de 6.1 más las cifras de E1, en las columnas del spec."""
+    """Diapositiva 14: vectores de prueba más las cifras de E1, en cuatro columnas fijas."""
     rows = pd.read_parquet(results_dir / "e1_vectores.parquet").to_dict("records")
     e1 = summary.get("e1", {})
     if e1:
@@ -110,7 +110,7 @@ def r1_table(summary: dict[str, Any], results_dir: Path) -> pd.DataFrame:
 
 
 def r2_table(results_dir: Path) -> pd.DataFrame:
-    """Diapositiva 15: supervivencia de las alineaciones falsas (E4), con las columnas del spec.
+    """Diapositiva 15: supervivencia de las alineaciones falsas (E4), con sus columnas fijas.
 
     Se agregan al final ``teorico_kappa`` (teoría con el IC del texto) y ``mensajes``.
     """
@@ -119,7 +119,7 @@ def r2_table(results_dir: Path) -> pd.DataFrame:
 
 
 def r3_table(results_dir: Path) -> pd.DataFrame:
-    """Diapositiva 16: paradas falsas por orden (E5), con las columnas del spec.
+    """Diapositiva 16: paradas falsas por orden (E5), con sus columnas fijas.
 
     Se agregan al final, entre otras, ``turing`` (la tabla de Turing para esa celda),
     ``hipotesis_media`` (hipótesis T↔x abiertas por orden) y ``aristas`` (letras del crib).
@@ -129,7 +129,7 @@ def r3_table(results_dir: Path) -> pd.DataFrame:
 
 
 def r4_table(results_dir: Path) -> pd.DataFrame:
-    """Diapositiva 17: el SPRT de E6, con las columnas del spec.
+    """Diapositiva 17: el SPRT de E6, con sus columnas fijas.
 
     Se agregan al final, entre otras, ``fuente`` (tasa 1/17 o alemán), ``hipotesis``
     (profundidad o azar), ``alfa``, ``identifica`` (el desplazamiento verdadero gana entre
@@ -202,7 +202,7 @@ def _slide_14(e1: dict[str, Any]) -> list[str]:
         f"fijos; cifrar dos veces devolvió el original en {fmt_int(e1['involucion_ok'])} "
         f"claves; el cifrado por lotes coincidió con el escalar en "
         f"{fmt_int(e1['lotes_igual_escalar'])}.",
-        f"- Vectores de 6.1: {e1['vectores_ok']} de {e1['vectores_total']} coinciden "
+        f"- Vectores de prueba: {e1['vectores_ok']} de {e1['vectores_total']} coinciden "
         "(tabla en `r1_validacion.csv`). CyberChef coincide en 6 de 6 casos comprobados a mano.",
         "- Mensaje real: el simulador descifra letra por letra el del U-264 (Enigma M4, "
         "25-11-1942, roto por el M4 Project en 2006).",
@@ -232,8 +232,7 @@ def _slide_15(e4: dict[str, Any], table: pd.DataFrame | None) -> list[str]:
     german_ok = e4["aleman"]["teoria_25_26_dentro_del_ic"]
     german_k = e4["aleman"]["teoria_kappa_dentro_del_ic"]
     lines += [
-        f"- Texto aleatorio: (25/26)^L cae dentro del IC 95 % en {random_ok} longitudes. "
-        "Es el criterio de aceptación de la fase 2 y se cumple.",
+        f"- Texto aleatorio: (25/26)^L cae dentro del IC 95 % en {random_ok} longitudes.",
         f"- Alemán real (X como separador, κ = {fmt_dec(e4['kappa_aleman_x'], 4)}): "
         f"(25/26)^L cae dentro del IC en {german_ok} longitudes. La teoría corregida, "
         f"(1 − (1 − κ)/25)^L, cae dentro en {german_k}. Con alemán sobreviven un poco más "
@@ -410,7 +409,7 @@ def _slide_17_model(e6: dict[str, Any]) -> list[str]:
         f"±{fmt_dec(w['umbral_db'], 2)} dB. Aproximación de Wald: "
         f"{fmt_int(round(wald['profundidad']))} letras para confirmar la profundidad y "
         f"{fmt_int(round(wald['azar']))} para descartarla.",
-        "- **Cifra para la diapositiva: la simulación del SPRT** (criterio de la fase 4). Letras "
+        "- **Cifra para la diapositiva: la simulación del SPRT.** Letras "
         "sueltas y un texto cuyas columnas en profundidad repiten con 1/17 exacta, cifrado con la "
         f"máquina real; {fmt_int(e6['n_pares'])} pares, semilla {e6['corrida']['semilla']}. "
         f"Confirmar la profundidad toma {_letters_ci(h1)} y descartarla, {_letters_ci(h0)}. "
@@ -542,7 +541,8 @@ def _e6_notes(e6: dict[str, Any]) -> list[str]:
         f"{_one_in(rates['corpus_x'])} con la X como separador y {_one_in(rates['corpus_letras'])} "
         f"solo con letras. Con él, la profundidad se confirma en unas {fmt_int(round(turing))} "
         "letras con los pesos de Turing. No contradice la diapositiva: es otro texto.",
-        "- Spec 5.6 («en profundidad … hasta que se mueve el rotor central»): con la máquina real "
+        "- La descripción habitual («en profundidad … hasta que se mueve el rotor central»): con "
+        "la máquina real "
         "los dos mensajes recorren la misma sucesión de estados, así que la profundidad dura todo "
         "el solapamiento. El rotor central decide si el desplazamiento verdadero es +δ o δ − 26 "
         "(D-042); por eso se prueban los desplazamientos de −25 a +25.",
@@ -804,7 +804,7 @@ def _bench_tail(chosen: dict[str, Any]) -> str | None:
         f"{fmt_dec(max(c['segundos_barrido'] for c in cases), 1)} s, así que valen los «6 a "
         "10 s» del paso 3 de la demo 2; «Verificar» suele tardar "
         f"{fmt_dec(median(c['segundos_verificacion'] for c in cases), 1)} s, pero llegó a "
-        f"{fmt_dec(max(c['segundos_verificacion'] for c in cases), 1)} s. Corrección: «{p50} s "
+        f"{fmt_dec(max(c['segundos_verificacion'] for c in cases), 1)} s. Mejor decir: «{p50} s "
         f"en un caso típico, {p95} s o menos en el 95 % de los casos y "
         f"{fmt_dec(chosen['maximo'], 1)} s en el peor», y en el paso 4, que «Verificar» puede "
         "tardar unos segundos."
@@ -818,7 +818,7 @@ def _message_length(bench: dict[str, Any], chosen: dict[str, Any]) -> str:
         "- Guion, «Antes de exponer · Compañero»: el éxito y los tiempos del banco son con "
         f"mensajes de {letters} letras ({chosen['exitos']} de {chosen['n']}), y el guion no "
         "fija el largo. Para que la demo sea la que se midió, conviene pedir uno parecido. "
-        f"Corrección: «cifra un mensaje de unas {fmt_int(round(letters, -1))} letras que "
+        f"Mejor pedir: «cifra un mensaje de unas {fmt_int(round(letters, -1))} letras que "
         "empiece por WETTERBERICHT»."
     )
 
@@ -832,14 +832,14 @@ def _kappa_note(e3: dict[str, Any], e4: dict[str, Any]) -> str:
         "(«Alemán ≈ 0,076») es el de solo letras: "
         f"{fmt_dec(e3['aleman']['ic_corpus'], 4)} en nuestro corpus y "
         f"{fmt_dec(e3['ic_referencia_aleman'], 4)} según Pommerening. Las dos cifras están "
-        "bien, pero juntas parecen contradecirse. Corrección en la 15: «… del alemán con X "
+        "bien, pero juntas parecen contradecirse. En la 15 conviene decir: «… del alemán con X "
         f"entre palabras (κ = {kappa})»."
     )
 
 
 def _guion_notes(summary: dict[str, Any], bench: dict[str, Any]) -> list[str]:
     """Lo que la versión 3 de las diapositivas y del guion dice distinto de la app o de los
-    resultados, o que se presta a confusión, con su corrección (para «Discrepancias»)."""
+    resultados, o que se presta a confusión, con la frase que conviene usar («Discrepancias»)."""
     head = (
         "**Con las diapositivas y el guion (versión 3, 23-11-2026).** Ninguna cifra contradice "
         "los resultados, y las ocho notas de la versión 2 quedaron corregidas: los pasos de la "
@@ -859,7 +859,8 @@ def _guion_notes(summary: dict[str, Any], bench: dict[str, Any]) -> list[str]:
     if not found:
         return [head]
     return [
-        head + " Quedan detalles que se prestan a confusión; cada uno trae su corrección:",
+        head
+        + " Quedan detalles que se prestan a confusión; cada uno con la frase que conviene usar:",
         "",
         *found,
     ]
@@ -889,7 +890,7 @@ def _discrepancies(
                 "coincidirían (ver D-031)."
             )
     lines.append(
-        "- Verificador (spec 6.4, «siempre»): recupera una clave equivalente en 200 de 200 de "
+        "- Verificador: recupera una clave equivalente en 200 de 200 de "
         "los casos de la prueba, que se usaron para ajustar su diseño, y en 198 de 200 casos "
         "nuevos. Las 2 fallas tienen el plugboard exacto y difieren en una sola letra, la "
         "segunda o la última del mensaje: un doble paso del central justo en el borde que el "

@@ -25,7 +25,7 @@ st.set_page_config(
 )
 
 # Módulos pesados que las páginas importan: se cargan al arrancar, detrás del indicador,
-# para que ninguna página quede en blanco más de 1 s al abrirla (spec 8.3).
+# para que ninguna página quede en blanco más de 1 s al abrirla.
 PRELOAD = (
     "scipy.stats",
     "pandas",

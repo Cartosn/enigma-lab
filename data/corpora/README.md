@@ -1,7 +1,7 @@
 # Corpus
 
 Textos de dominio público de Project Gutenberg, normalizados al alfabeto de Enigma por
-`enigma_lab.stats.corpus` (spec 5.3).
+`enigma_lab.stats.corpus`.
 
 | Idioma | Libro | Autor | Año | Ebook |
 | --- | --- | --- | --- | --- |

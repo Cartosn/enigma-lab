@@ -1,4 +1,4 @@
-"""Casos de prueba para la Bombe: clave, mensaje alemán, crib y su alineación (spec 6.4 y 7).
+"""Casos de prueba para la Bombe: clave, mensaje alemán, crib y su alineación.
 
 Lo usan las pruebas (``tests/test_bombe.py``), el experimento E5 y el banco de la demo 2
 (``scripts/bench_demo2.py``), para que todos generen los casos de la misma manera.

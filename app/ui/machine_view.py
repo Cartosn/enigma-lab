@@ -1,7 +1,7 @@
 """Puente entre la traza de Python y la animación SVG de ``components/enigma_machine.html``.
 
 El componente no sabe cifrar: recibe aquí, como JSON, la traza que calcula
-``Enigma.trace`` y solo la anima (regla clave del spec, sección 3).
+``Enigma.trace`` y solo la anima: la lógica de Enigma existe una sola vez, en Python.
 """
 
 from __future__ import annotations
@@ -67,7 +67,7 @@ def render_machine(
 def trace_table(traces: list[LetterTrace]) -> pd.DataFrame:
     """La traza como tabla: una fila por letra, con las ventanas y el camino de la corriente.
 
-    Son los datos de la animación, para descargarlos (spec 8.3).
+    Son los datos de la animación, para descargarlos.
     """
     return pd.DataFrame(
         {

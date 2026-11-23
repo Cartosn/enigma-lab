@@ -115,9 +115,9 @@ def hidden_in_demo(name: str) -> DeltaGenerator:
 
 
 def what_am_i_seeing(*lines: str) -> None:
-    """Panel plegable «¿Qué estoy viendo?» con 3 a 5 líneas (spec, sección 8.3).
+    """Panel plegable «¿Qué estoy viendo?» con 3 a 5 líneas.
 
-    En modo demo no se dibuja: es de los paneles que la demo no usa (spec 8.2, punto 11).
+    En modo demo no se dibuja: es de los paneles que la demo no usa.
     """
     if not 3 <= len(lines) <= 5:
         raise ValueError("el panel «¿Qué estoy viendo?» lleva de 3 a 5 líneas")

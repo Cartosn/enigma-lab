@@ -1,4 +1,4 @@
-"""Identidad visual «Bletchley nocturno» (spec, sección 8.1).
+"""Identidad visual «Bletchley nocturno».
 
 Un solo lugar para los colores de la app, de las figuras del informe y de las figuras
 de respaldo de las diapositivas:
@@ -59,7 +59,7 @@ DARK = Tokens(
     error="#E5534B",  # conflicto o error
     success="#57AB5A",
 )
-"""Tema oscuro por defecto (spec 8.1): la app y las figuras de respaldo de diapositivas."""
+"""Tema oscuro por defecto: la app y las figuras de respaldo de diapositivas."""
 
 PRINT = Tokens(
     background="#FFFFFF",
@@ -226,7 +226,7 @@ def register_plotly_templates() -> None:
     """Registra ``enigma_dark`` (16 px) y ``enigma_dark_demo`` en Plotly.
 
     La de modo demo parte de 22 px para que también las marcas de los ejes, que van 2 px
-    por debajo de la letra base, queden en 20 px (spec 8.1: 20 px en el modo demo).
+    por debajo de la letra base, queden en 20 px, el mínimo del modo demo.
     """
     import plotly.io as pio
 

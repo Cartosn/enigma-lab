@@ -59,7 +59,7 @@ reproduce: corpus ## Corre todos los experimentos en modo completo; arma el resu
 	$(UV) run python -m enigma_lab.resumen
 	$(UV) run python -m enigma_lab.figuras
 
-rapido: ## Corre todos los experimentos en modo rápido (para la app)
+rapido: ## Corre todos los experimentos en modo rápido; guarda en results/rapido/
 	$(UV) run python -m enigma_lab.experiments todos --mode rapido --seed $(SEMILLA)
 
 resumen: ## Arma results/presentacion/ (RESUMEN.md, cifras.json, CSV) sin correr nada

@@ -1,4 +1,4 @@
-"""Arrastre del crib: dónde puede ir una palabra probable dentro del cifrado (spec 5.4).
+"""Arrastre del crib: dónde puede ir una palabra probable dentro del cifrado.
 
 Un crib es un trozo de texto plano que se adivina (WETTERBERICHT, «parte
 meteorológico»). No se sabe en qué posición del mensaje está, así que se desliza sobre

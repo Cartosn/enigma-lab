@@ -1,8 +1,8 @@
-"""Exploración previa al plan: el riesgo de la demo 2, medido con el piloto.
+"""Exploración inicial: el riesgo de la demo 2, medido con el piloto.
 
 No es código del proyecto ni un resultado para las diapositivas: la fase 3 repite la
 medición con ``enigma_lab`` (E5 y ``make bench-demo``). Se conserva para que las cifras
-citadas en el plan y en ``docs/PROGRESS.md`` sean reproducibles.
+citadas en ``docs/PROGRESS.md`` sean reproducibles.
 
 Para claves aleatorias de Enigma I (rotores I–V, 10 cables) y un mensaje que empieza
 por WETTERBERICHT, mide:

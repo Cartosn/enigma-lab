@@ -1,4 +1,4 @@
-"""La Bombe de Turing-Welchman y su verificador (spec 5.5).
+"""La Bombe de Turing-Welchman y su verificador.
 
 - ``scrambler``: el aleatorizador (Enigma sin plugboard) precalculado por orden de
   rotores para las 17.576 posiciones del núcleo.

@@ -1,4 +1,4 @@
-"""Enlaces de CyberChef para validar el simulador a mano (spec 6.2).
+"""Enlaces de CyberChef para validar el simulador a mano.
 
 CyberChef (GCHQ) es una implementación independiente de Enigma que corre en el
 navegador. Este script arma, para varios casos, la URL de CyberChef con la receta
@@ -73,7 +73,7 @@ def url(config: EnigmaConfig, text: str) -> str:
 
 
 def cases() -> list[tuple[str, EnigmaConfig, str]]:
-    """Los casos: cuatro vectores de 6.1, el mensaje del U-264 y una clave M3 al azar."""
+    """Los casos: cuatro vectores de prueba, el mensaje del U-264 y una clave M3 al azar."""
     chosen = []
     for vid in ("bdzgo", "ewtyx", "portada", "m4_u264"):
         v = vector(vid)
@@ -123,7 +123,7 @@ def bombe_cases() -> list[tuple[str, BombeCase]]:
     backup = BombeCase(
         EnigmaConfig.from_dict(data["key"]), data["plaintext"], data["ciphertext"], 0, 13
     )
-    chosen = [("Caso de respaldo (6.1): 3 lazos", backup)]
+    chosen = [("Caso de respaldo: 3 lazos", backup)]
     rng = np.random.default_rng(2026)
     for loops, position, length in ((2, 0, 12), (1, 3, 11)):
         while True:
@@ -138,7 +138,8 @@ def bombe_cases() -> list[tuple[str, BombeCase]]:
 def expected_stops(case: BombeCase, test_letter: str) -> list[str]:
     """Las paradas de nuestra Bombe en el orden verdadero: «HEC T↔Q», ordenadas por posición."""
     wiring = wiring_from_menu(case.crib, case.cipher_segment, test_letter=test_letter)
-    order = case.config.rotors
+    left, middle, right = case.config.rotors
+    order = (left, middle, right)
     run = run_order(wiring, order, BombeSettings(orders=(order,)))
     return [f"{s.position_letters} {s.stecker_label(test_letter)}" for s in run.stops]
 

@@ -1,6 +1,6 @@
-# Lo que no entra en la imagen de Docker: el entorno local, las cachés, el historial de
-# git y lo que la app no usa. Sí entran src/, app/, data/ (con las muestras del corpus),
-# results/ (resultados guardados) y docs/ (la página Inicio lee docs/FUENTES.md).
+# El Dockerfile copia solo lo que usa la app: src/, app/, data/ (con las muestras del
+# corpus), results/ (los resultados guardados), .streamlit/ y docs/FUENTES.md (lo lee la
+# página Inicio). Esta lista deja fuera, además, las cachés y el corpus completo.
 
 # Entorno y cachés
 .venv/
@@ -25,6 +25,7 @@ docker-compose.yml
 # Datos que la app no necesita: el corpus completo se baja con make corpus
 data/corpora/fuentes/
 data/corpora/completo/
+results/rapido/
 
 # Documentos de la entrega que no usa la app
 docs/presentacion/

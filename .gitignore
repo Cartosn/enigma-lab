@@ -17,6 +17,9 @@ htmlcov/
 # Configuración local (Streamlit)
 .streamlit/secrets.toml
 
+# Resultados del modo rápido (make rapido); la corrida completa sí se versiona
+results/rapido/
+
 # Corpus completo y archivos descargados (make corpus); las muestras sí se versionan
 data/corpora/fuentes/
 data/corpora/completo/

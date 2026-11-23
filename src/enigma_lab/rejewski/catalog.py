@@ -1,4 +1,4 @@
-"""El catálogo de Rejewski: la característica de cada configuración de los rotores (spec 5.7).
+"""El catálogo de Rejewski: la característica de cada configuración de los rotores.
 
 En 1932 la Enigma tenía tres rotores (I, II y III) y el reflector A, que los alemanes
 cambiaron por el B el 2 de noviembre de 1937 (Rejewski, citado por Kuhl 2007). Hay 3! = 6

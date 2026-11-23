@@ -1,4 +1,4 @@
-"""Cifrado por lotes con tablas precalculadas, para los Monte Carlo (spec 5.1).
+"""Cifrado por lotes con tablas precalculadas, para los Monte Carlo.
 
 Cifra N mensajes de igual longitud con N claves de tres rotores a la vez: en cada
 instante t, todas las máquinas avanzan sus rotores y cifran su letra t con búsquedas

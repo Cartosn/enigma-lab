@@ -25,7 +25,7 @@ def test_quick_sample_matches_pyenigma() -> None:
 
 @pytest.mark.lento
 def test_10000_random_keys_match_pyenigma() -> None:
-    """La meta de 6.2: 100 % de coincidencia en 10.000 claves y mensajes aleatorios."""
+    """La meta: 100 % de coincidencia en 10.000 claves y mensajes aleatorios."""
     df = compare_with_pyenigma(10_000, np.random.default_rng(SEED).spawn(2)[0])
     mismatches = df[~df["coincide"]]
     assert mismatches.empty, mismatches.head().to_string()

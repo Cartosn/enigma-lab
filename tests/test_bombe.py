@@ -1,5 +1,5 @@
-"""La Bombe (spec 5.5, 6.3 y 6.4): aleatorizador, Numba frente a la referencia, la parada
-verdadera y el verificador, y el caso de respaldo de 6.5."""
+"""La Bombe: aleatorizador, Numba frente a la referencia, la parada
+verdadera y el verificador, y el caso de respaldo."""
 
 from __future__ import annotations
 
@@ -72,7 +72,7 @@ def test_scrambler_is_a_fixed_point_free_involution() -> None:
     assert (table != np.arange(26)).all()
 
 
-# ---------------------------------------------------------------- Numba = referencia (6.3)
+# ---------------------------------------------------------------- Numba = referencia
 
 REFERENCE_CASES = 24
 
@@ -169,9 +169,9 @@ def test_true_stop_and_key_recovered(k: int) -> None:
 
 
 @pytest.mark.lento
-def test_section_64_two_hundred_cases() -> None:
-    """Spec 6.4: en 200 casos aleatorios (crib de 12 a 16 letras, sin vuelta del central), la
-    clave verdadera siempre da parada y el verificador recupera una clave equivalente."""
+def test_two_hundred_random_cases() -> None:
+    """En 200 casos aleatorios (crib de 12 a 16 letras, sin vuelta del central), la clave
+    verdadera siempre da parada y el verificador recupera una clave equivalente."""
     results = [_check_case(SEED * 1000 + 100 + k) for k in range(200)]
     assert all(found for found, _ in results)
     assert all(recovered for _, recovered in results)
@@ -204,3 +204,11 @@ def test_performance_one_order_and_sixty() -> None:
     run_order(wiring, ("III", "V", "II"), BombeSettings())
     assert time.perf_counter() - start < 3
     assert run_bombe(wiring, BombeSettings()).seconds < 120
+
+
+def test_verify_short_ciphertext() -> None:
+    """Con un cifrado de menos de 4 letras, «Verificar» termina sin error."""
+    wiring = wiring_from_menu("BA", "AB")
+    run = run_bombe(wiring, BombeSettings(orders=(("I", "II", "III"),)))
+    verification = checker.verify(run, "ABC", 0)
+    assert verification.stops == run.n_stops

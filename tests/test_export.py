@@ -1,4 +1,4 @@
-"""Spec 8.3: todo gráfico se puede exportar; los datos salen de la propia figura."""
+"""Todo gráfico se puede exportar; los datos salen de la propia figura."""
 
 from __future__ import annotations
 

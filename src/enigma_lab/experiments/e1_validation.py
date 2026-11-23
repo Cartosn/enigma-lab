@@ -1,8 +1,8 @@
-"""E1 · ¿El simulador es correcto? (spec 7, con la validación de 6.1 a 6.3).
+"""E1 · ¿El simulador es correcto?
 
 Tres partes:
 
-1. **Vectores de 6.1:** la tabla de la diapositiva 14.
+1. **Vectores de prueba:** la tabla de la diapositiva 14.
 2. **py-enigma:** N claves y mensajes aleatorios (10.000 en modo completo), cifrados
    por el simulador y por py-enigma, una implementación independiente. La meta es
    100 % de coincidencia. Las claves mezclan Enigma I (la mitad), M3 y M4, con 0 a 10
@@ -31,6 +31,7 @@ from enigma_lab.core.vectors import check_all
 from enigma_lab.experiments.common import (
     Mode,
     RunInfo,
+    output_dir,
     save_figure,
     save_table,
     update_summary,
@@ -126,7 +127,7 @@ def check_properties(n_keys: int, length: int, rng: np.random.Generator) -> pd.D
 
 
 def vectors_table() -> pd.DataFrame:
-    """Tabla de los vectores de 6.1 con las columnas de ``r1_validacion.csv``."""
+    """Tabla de los vectores de prueba con las columnas de ``r1_validacion.csv``."""
     return pd.DataFrame(
         [
             {"prueba": r.label, "esperado": r.expected, "obtenido": r.obtained, "coincide": r.ok}
@@ -200,7 +201,7 @@ def figure(vectors: pd.DataFrame, theme: str = "enigma_print") -> Any:
             ax.text(
                 0.47,
                 i + 0.5,
-                _shorten(row.esperado, 30),
+                _shorten(row.esperado, 28),
                 fontsize=size - 2.5,
                 va="center",
                 family="JetBrains Mono",
@@ -211,23 +212,24 @@ def figure(vectors: pd.DataFrame, theme: str = "enigma_print") -> Any:
             ax.text(0.86, i + 0.5, status, fontsize=size - 1.5, va="center", color=color)
             ax.axhline(i + 1, color=tokens.grid, linewidth=0.5)
         ax.axhline(0, color=tokens.border, linewidth=0.8)
-        ax.set_title(f"E1 · Los {len(vectors)} vectores de la sección 6.1: {ok} coinciden")
+        ax.set_title(f"E1 · Los {len(vectors)} vectores de prueba: {ok} coinciden")
     return fig
 
 
 def main(mode: Mode = "completo", seed: int = SEED) -> dict[str, Any]:
     """Corre E1, guarda sus resultados y devuelve sus cifras clave."""
+    folder = output_dir(mode)
     started = time.perf_counter()
     vectors = vectors_table()
     df = run(PARAMS[mode], seed)
     figures = summary(df, vectors) | {"segundos": round(time.perf_counter() - started, 1)}
-    save_table(df, "e1_validacion")
-    save_table(vectors, "e1_vectores")
-    update_summary("e1", figures, RunInfo("e1", mode, seed))
+    save_table(df, "e1_validacion", folder)
+    save_table(vectors, "e1_vectores", folder)
+    update_summary("e1", figures, RunInfo("e1", mode, seed), folder)
 
     import matplotlib.pyplot as plt
 
     fig = figure(vectors)
-    save_figure(fig, "e1_vectores")
+    save_figure(fig, "e1_vectores", folder)
     plt.close(fig)
     return figures

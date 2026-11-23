@@ -1,4 +1,4 @@
-"""Dos mensajes en profundidad, cifrados con la máquina real (spec 5.6).
+"""Dos mensajes en profundidad, cifrados con la máquina real.
 
 **El procedimiento naval.** Los mensajes de un día comparten la clave diaria (orden de
 rotores, anillos y plugboard), y cada uno empieza en su propia clave de mensaje: la

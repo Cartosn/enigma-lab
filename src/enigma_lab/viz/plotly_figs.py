@@ -994,7 +994,7 @@ def _values(data: Any) -> list[Any]:
 
 
 def figure_table(fig: go.Figure) -> pd.DataFrame:
-    """Los datos de una figura de Plotly en formato largo, para descargarlos (spec 8.3).
+    """Los datos de una figura de Plotly en formato largo, para descargarlos.
 
     Una fila por punto de cada serie, con las columnas «serie», «x» e «y»; los mapas de
     calor agregan «z», con una fila por celda, y los bigotes de error, «error_y». Las

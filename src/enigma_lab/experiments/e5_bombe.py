@@ -1,4 +1,4 @@
-"""E5 · ¿Cuántas paradas falsas deja la Bombe? (spec 7)
+"""E5 · ¿Cuántas paradas falsas deja la Bombe?
 
 **Menús.** Cada menú sale de un crib alemán real (corpus con la X como separador) y su
 cifrado con una clave aleatoria de Enigma I (rotores I–V, 10 cables). Las celdas son
@@ -44,7 +44,14 @@ from enigma_lab.bombe.wiring import wiring_from_menu
 from enigma_lab.core.batch import ROTOR_NAMES, KeyBatch, encrypt_batch, to_texts
 from enigma_lab.core.machine import EnigmaConfig
 from enigma_lab.core.wiring import ALPHABET
-from enigma_lab.experiments.common import Mode, RunInfo, save_figure, save_table, update_summary
+from enigma_lab.experiments.common import (
+    Mode,
+    RunInfo,
+    output_dir,
+    save_figure,
+    save_table,
+    update_summary,
+)
 from enigma_lab.stats.corpus import Source, random_excerpts
 from enigma_lab.stats.inference import mean_ci, wilson_interval
 
@@ -469,17 +476,18 @@ def figure(df: pd.DataFrame, theme: str = "enigma_print") -> Any:
 
 def main(mode: Mode = "completo", seed: int = SEED) -> dict[str, Any]:
     """Corre E5 y guarda sus resultados."""
+    folder = output_dir(mode)
     started = time.perf_counter()
     params = PARAMS[mode]
     df = run(params, seed)
     figures = summary(df, params) | {"segundos": round(time.perf_counter() - started, 1)}
-    save_table(df, "e5_bombe_menus")
-    save_table(aggregate(df), "e5_bombe")
-    update_summary("e5", figures, RunInfo("e5", mode, seed))
+    save_table(df, "e5_bombe_menus", folder)
+    save_table(aggregate(df), "e5_bombe", folder)
+    update_summary("e5", figures, RunInfo("e5", mode, seed), folder)
 
     import matplotlib.pyplot as plt
 
     fig = figure(df)
-    save_figure(fig, "e5_bombe")
+    save_figure(fig, "e5_bombe", folder)
     plt.close(fig)
     return figures

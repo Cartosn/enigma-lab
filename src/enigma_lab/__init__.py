@@ -19,5 +19,5 @@ Subpaquetes (se completan por fases; ver ``docs/PROGRESS.md``):
 
 __version__ = "0.1.0"
 
-#: Semilla global del proyecto (sección 4 del spec).
+#: Semilla global del proyecto.
 SEED = 2026

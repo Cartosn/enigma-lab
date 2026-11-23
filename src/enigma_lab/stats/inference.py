@@ -1,4 +1,4 @@
-"""Inferencia: intervalos de confianza y la probabilidad del distinguidor (spec 7).
+"""Inferencia: intervalos de confianza y la probabilidad del distinguidor.
 
 - Proporciones con el **intervalo de Wilson**, que se porta bien aunque la proporción
   sea 0 o 1 (el intervalo normal daría [1, 1] con 10.000 aciertos de 10.000).

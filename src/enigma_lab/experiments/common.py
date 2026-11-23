@@ -62,6 +62,16 @@ def git_commit() -> str:
     return out.stdout.strip() + ("+cambios" if dirty.stdout.strip() else "")
 
 
+def output_dir(mode: Mode) -> Path:
+    """Dónde guarda un modo sus resultados: el completo en ``results/``, el rápido en
+    ``results/rapido/``.
+
+    La corrida completa es la que leen la app, el resumen y el informe; el modo rápido no
+    la pisa (D-075).
+    """
+    return paths.RESULTS if mode == "completo" else paths.RESULTS / "rapido"
+
+
 def save_table(df: pd.DataFrame, name: str, results_dir: Path | None = None) -> Path:
     """Guarda un resultado como Parquet en ``results/<name>.parquet``."""
     folder = results_dir or paths.RESULTS
@@ -101,7 +111,7 @@ def update_summary(
 
 
 PNG_DPI = 200
-"""PNG a 2x: el doble de los 100 puntos por pulgada de la figura (spec 7)."""
+"""PNG a 2x: el doble de los 100 puntos por pulgada de la figura."""
 
 
 def save_figure(fig: Any, name: str, results_dir: Path | None = None) -> list[Path]:

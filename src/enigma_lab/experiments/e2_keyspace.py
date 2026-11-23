@@ -1,4 +1,4 @@
-"""E2 · ¿Cuánto aporta cada componente de la clave? (spec 7 y 5.2)
+"""E2 · ¿Cuánto aporta cada componente de la clave?
 
 Es un cálculo exacto, sin azar, con enteros de Python (``core/keyspace.py``):
 - los bits por componente de Enigma I y de la M3;
@@ -17,7 +17,14 @@ import pandas as pd
 
 from enigma_lab import SEED
 from enigma_lab.core import keyspace as ks
-from enigma_lab.experiments.common import Mode, RunInfo, save_figure, save_table, update_summary
+from enigma_lab.experiments.common import (
+    Mode,
+    RunInfo,
+    output_dir,
+    save_figure,
+    save_table,
+    update_summary,
+)
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct, fmt_sci
 
 MODELS = {"Enigma I": ks.ENIGMA_I, "Enigma M3": ks.M3}
@@ -175,15 +182,16 @@ def figure(df: pd.DataFrame, theme: str = "enigma_print") -> Any:
 
 def main(mode: Mode = "completo", seed: int = SEED) -> dict[str, Any]:
     """Corre E2 (igual en los dos modos: es exacto) y guarda sus resultados."""
+    folder = output_dir(mode)
     started = time.perf_counter()
     df = run()
     figures = summary(df) | {"segundos": round(time.perf_counter() - started, 2)}
-    save_table(df, "e2_espacio_de_claves")
-    update_summary("e2", figures, RunInfo("e2", mode, seed))
+    save_table(df, "e2_espacio_de_claves", folder)
+    update_summary("e2", figures, RunInfo("e2", mode, seed), folder)
 
     import matplotlib.pyplot as plt
 
     fig = figure(df)
-    save_figure(fig, "e2_espacio_de_claves")
+    save_figure(fig, "e2_espacio_de_claves", folder)
     plt.close(fig)
     return figures

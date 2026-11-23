@@ -1,4 +1,4 @@
-# Enigma Lab · imagen de la app (spec, secciones 3 y 10)
+# Enigma Lab · imagen de la app
 #
 #   docker compose up          y luego abrir  http://localhost:8501
 #
@@ -29,8 +29,15 @@ WORKDIR /app
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 
-# 2. El proyecto (lo que no excluye .dockerignore) y su instalación.
-COPY . .
+# 2. Lo que usa la app, carpeta por carpeta (README.md lo pide pyproject.toml), y su
+#    instalación.
+COPY README.md ./
+COPY src ./src
+COPY app ./app
+COPY data ./data
+COPY results ./results
+COPY .streamlit ./.streamlit
+COPY docs/FUENTES.md ./docs/FUENTES.md
 RUN uv sync --frozen --no-dev
 
 # 3. Un usuario sin privilegios, con escritura en las cachés de Numba y Matplotlib.

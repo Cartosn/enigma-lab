@@ -1,4 +1,4 @@
-"""Descarga el corpus de dominio público y arma las muestras del repositorio (spec 5.3).
+"""Descarga el corpus de dominio público y arma las muestras del repositorio.
 
 Los textos vienen de Project Gutenberg, a través de su espejo oficial del Mirror Service
 (Reino Unido). URL y SHA-256 están fijos: si el archivo remoto cambia, la descarga
@@ -87,7 +87,8 @@ BOOKS = (
 def download(book: Book) -> bytes:
     """Descarga un libro (o lo lee de la caché local) y verifica su SHA-256."""
     cache = CORPORA / "fuentes" / Path(book.path).name
-    if cache.is_file():
+    from_cache = cache.is_file()
+    if from_cache:
         data = cache.read_bytes()
     else:
         request = urllib.request.Request(book.url, headers={"User-Agent": USER_AGENT})
@@ -97,7 +98,12 @@ def download(book: Book) -> bytes:
     if digest != book.sha256:
         raise RuntimeError(
             f"SHA-256 distinto para {book.title} ({book.url}):\n  esperado {book.sha256}\n"
-            f"  obtenido {digest}\nEl archivo remoto cambió: revisa antes de actualizar el hash."
+            f"  obtenido {digest}\n"
+            + (
+                f"La copia local {cache} está dañada: bórrala y corre otra vez make corpus."
+                if from_cache
+                else "El archivo remoto cambió: revísalo antes de actualizar el hash."
+            )
         )
     cache.parent.mkdir(parents=True, exist_ok=True)
     cache.write_bytes(data)

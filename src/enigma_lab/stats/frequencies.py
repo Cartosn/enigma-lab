@@ -1,4 +1,4 @@
-"""Frecuencias, índice de coincidencia y prueba χ² de uniformidad (spec 5.3).
+"""Frecuencias, índice de coincidencia y prueba χ² de uniformidad.
 
 Los textos se manejan como arreglos de enteros 0–25 (A = 0). Las funciones aceptan un
 texto (1 dimensión) o un lote de textos de igual longitud (2 dimensiones: una fila por

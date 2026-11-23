@@ -16,7 +16,7 @@ from enigma_lab.stats.frequencies import (
     pair_matrix,
 )
 from enigma_lab.stats.inference import mean_ci, no_fixed_point_probability, wilson_interval
-from enigma_lab.stats.ngrams import NgramModel, model
+from enigma_lab.stats.ngrams import NgramModel, chain_score, interpolated, model
 
 
 @pytest.mark.parametrize(
@@ -105,3 +105,26 @@ def test_inference_helpers() -> None:
     mean, lo, hi = mean_ci(np.array([1.0, 2.0, 3.0]))
     assert mean == 2.0 and lo < 2.0 < hi
     assert no_fixed_point_probability(13) == pytest.approx((25 / 26) ** 13)
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [("Fax", "FAX"), ("Xavier y Félix", "XAVIERXYXFELIX"), ("¡Hola!", "HOLA"), ("", "")],
+)
+def test_x_mode_keeps_the_letter_x_at_the_ends(text: str, expected: str) -> None:
+    """La X separa palabras, pero las X propias de una palabra se quedan, también en los bordes."""
+    assert normalize(text, "espanol", "x") == expected
+
+
+def test_chain_score_short_texts() -> None:
+    """Con menos de 4 letras el puntaje no falla: 0 con 0 a 2 letras; con 3, la tabla inicial."""
+    head, log_probs = interpolated("aleman", "muestra", "x")
+    assert chain_score(np.array([0, 1]), head, log_probs) == 0.0
+    assert chain_score(np.array([0, 1, 2]), head, log_probs) == pytest.approx(float(head[28]))
+    assert np.shape(chain_score(np.zeros((3, 2), dtype=int), head, log_probs)) == (3,)
+
+
+def test_interpolated_model_is_finite_without_some_letters() -> None:
+    """La muestra española no tiene K ni W: su modelo les da un piso, no −∞."""
+    head, log_probs = interpolated("espanol")
+    assert np.isfinite(head).all() and np.isfinite(log_probs).all()

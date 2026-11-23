@@ -1,4 +1,4 @@
-"""El ataque de Gillogly (1995), solo con texto cifrado (spec 5.8).
+"""El ataque de Gillogly (1995), solo con texto cifrado.
 
 Tres fases, como las describen Ostwald y Weierud (2017):
 
@@ -32,6 +32,7 @@ from numba import njit, prange
 from enigma_lab.attacks import hillclimb
 from enigma_lab.bombe.checker import _step_windows
 from enigma_lab.bombe.scrambler import N_POSITIONS, Order, rotor_orders, scrambler_table
+from enigma_lab.bombe.sweep import _LOCK
 from enigma_lab.core.batch import ROTOR_NAMES
 from enigma_lab.core.machine import EnigmaConfig
 
@@ -227,9 +228,11 @@ def phase1(
 ) -> tuple[list[Candidate], dict[Order, np.ndarray]]:
     """Fase 1: el IC de todas las posiciones de cada orden; las ``top`` mejores ubicaciones."""
     codes = np.asarray(cipher, dtype=np.int64)
-    scores = {
-        order: _phase1(scrambler_table(order, "B"), step_table(order), codes) for order in orders
-    }
+    scores: dict[Order, np.ndarray] = {}
+    for order in orders:
+        table, nxt = scrambler_table(order, "B"), step_table(order)
+        with _LOCK:  # un núcleo paralelo a la vez, como la Bombe (D-076)
+            scores[order] = _phase1(table, nxt, codes)
     flat = np.concatenate([scores[o] for o in orders])
     best = np.argpartition(-flat, min(top, len(flat) - 1))[:top]
     best = best[np.argsort(-flat[best], kind="stable")]
@@ -249,7 +252,9 @@ def phase2(cipher: np.ndarray, candidates: Sequence[Candidate], top: int = 10) -
         by_order.setdefault(c.order, []).extend(neighbours(c.start))
     for order, starts in by_order.items():
         unique = np.unique(np.array(starts, dtype=np.int64))
-        ic = _phase2(scrambler_table(order, "B"), step_table(order), codes, unique, RING_M, RING_R)
+        table, nxt = scrambler_table(order, "B"), step_table(order)
+        with _LOCK:
+            ic = _phase2(table, nxt, codes, unique, RING_M, RING_R)
         for k, start in enumerate(unique):
             j = int(np.argmax(ic[k]))
             found.append(
@@ -265,16 +270,11 @@ def refine(
     """Con el plugboard ya hallado, vuelve a elegir anillos y vecina por trigramas (D-066)."""
     codes = np.asarray(cipher, dtype=np.int64)
     starts = np.array(neighbours(candidate.start, both=True), dtype=np.int64)
-    scores = _refine(
-        scrambler_table(candidate.order, "B"),
-        step_table(candidate.order),
-        codes,
-        np.asarray(plug, dtype=np.int64),
-        starts,
-        RING_M,
-        RING_R,
-        logp3,
-    )
+    table, nxt = scrambler_table(candidate.order, "B"), step_table(candidate.order)
+    with _LOCK:
+        scores = _refine(
+            table, nxt, codes, np.asarray(plug, dtype=np.int64), starts, RING_M, RING_R, logp3
+        )
     k, j = np.unravel_index(int(np.argmax(scores)), scores.shape)
     return Candidate(candidate.order, int(starts[k]), int(RING_M[j]), int(RING_R[j]), candidate.ic)
 
@@ -387,10 +387,11 @@ def warm_up() -> float:
     start = time.perf_counter()
     order = ALL_ORDERS[0]
     cipher = np.arange(40, dtype=np.int64) % 26
-    _phase1(scrambler_table(order, "B"), step_table(order), cipher)
     table, nxt, one = scrambler_table(order, "B"), step_table(order), np.array([0], np.int64)
-    _phase2(table, nxt, cipher, one, RING_M[:2], RING_R[:2])
     logp3 = hillclimb.trigram_table()
-    _refine(table, nxt, cipher, np.arange(26), one, RING_M[:2], RING_R[:2], logp3)
+    with _LOCK:
+        _phase1(table, nxt, cipher)
+        _phase2(table, nxt, cipher, one, RING_M[:2], RING_R[:2])
+        _refine(table, nxt, cipher, np.arange(26), one, RING_M[:2], RING_R[:2], logp3)
     hillclimb.warm_up()
     return time.perf_counter() - start

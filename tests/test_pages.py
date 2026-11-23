@@ -146,7 +146,7 @@ def test_attack_page_runs_the_three_phases() -> None:
 
 @pytest.mark.parametrize("page", PAGES, ids=[p.stem for p in PAGES])
 def test_every_page_explains_itself_except_in_demo_mode(page) -> None:  # type: ignore[no-untyped-def]
-    """Spec 8.3: cada página tiene su «¿Qué estoy viendo?»; el modo demo lo oculta (8.2.11)."""
+    """Cada página tiene su «¿Qué estoy viendo?»; el modo demo lo oculta."""
     label = "¿Qué estoy viendo?"
     app = AppTest.from_file(str(page), default_timeout=120).run()
     assert [e for e in app.expander if e.label == label], page.stem

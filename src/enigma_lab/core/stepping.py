@@ -1,4 +1,4 @@
-"""El paso de los rotores: un odómetro con un tropiezo, el doble paso (spec 5.1 y 6.1).
+"""El paso de los rotores: un odómetro con un tropiezo, el doble paso.
 
 Antes de cifrar cada letra, el mecanismo hace avanzar los rotores. Solo giran los tres
 de la derecha (en la M4, el rotor griego queda fijo). Con las ventanas (L, M, R):

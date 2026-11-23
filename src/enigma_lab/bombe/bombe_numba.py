@@ -1,4 +1,4 @@
-"""La Bombe rápida: el modelo eléctrico con union-find en Numba (spec 5.5).
+"""La Bombe rápida: el modelo eléctrico con union-find en Numba.
 
 **Qué hace la corriente.** En el modelo de 26 cables × 26 hilos (ver
 :mod:`enigma_lab.bombe.wiring`), energizar un hilo enciende todos los hilos conectados

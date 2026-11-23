@@ -102,7 +102,8 @@ def odometer_walk() -> np.ndarray:
     codes = []
     for order in ORDERS:
         marks = notch_sets([ROTORS[n].notches for n in order])
-        position, visited = (0, 0, 0), []
+        position: tuple[int, ...] = (0, 0, 0)
+        visited: list[int] = []
         for _ in range(N_POSITIONS):
             visited.append(position_index(*position))
             position = step(position, marks).positions

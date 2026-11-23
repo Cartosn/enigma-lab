@@ -1,4 +1,4 @@
-"""El menú convertido en el cableado de la Bombe (spec 5.5).
+"""El menú convertido en el cableado de la Bombe.
 
 **Cables e hilos.** Cada letra del menú es un cable de 26 hilos. El hilo u del cable a
 representa la hipótesis «en el plugboard, a va con u». Los cables se numeran en orden

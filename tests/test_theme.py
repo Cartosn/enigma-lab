@@ -1,4 +1,4 @@
-"""Tema «Bletchley nocturno»: colores del spec, contraste y plantillas."""
+"""Tema «Bletchley nocturno»: colores, contraste y plantillas."""
 
 from __future__ import annotations
 
@@ -9,8 +9,8 @@ import pytest
 from enigma_lab.viz import theme
 
 
-def test_tokens_match_spec() -> None:
-    """Los colores de la sección 8.1 del spec, tal cual."""
+def test_tokens_match_the_palette() -> None:
+    """Los colores del tema, tal cual."""
     d = theme.DARK
     assert (d.background, d.surface, d.border) == ("#0F1216", "#171B21", "#2A3038")
     assert (d.text, d.text_muted) == ("#E8E6E3", "#9AA3AD")
@@ -67,7 +67,7 @@ def test_plotly_templates_registered() -> None:
     assert fig.layout.template.layout.separators == ",."
     demo = pio.templates["enigma_dark_demo"].layout
     assert demo.font.size == 22
-    assert demo.xaxis.tickfont.size == 20  # nada bajo 20 px en el modo demo (spec 8.1)
+    assert demo.xaxis.tickfont.size == 20  # nada bajo 20 px en el modo demo
 
 
 @pytest.mark.parametrize("style", ["enigma_print", "enigma_slides"])

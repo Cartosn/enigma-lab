@@ -1,4 +1,4 @@
-"""El ataque moderno solo con texto cifrado (spec 5.8).
+"""El ataque moderno solo con texto cifrado.
 
 - ``gillogly``: la búsqueda de Gillogly (1995). Barre los órdenes de rotores y las 17.576
   posiciones con anillos fijos y sin plugboard, puntuando con el índice de coincidencia;

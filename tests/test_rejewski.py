@@ -1,4 +1,4 @@
-"""El método de Rejewski (spec 5.7): la característica, el catálogo y el tráfico de un día."""
+"""El método de Rejewski: la característica, el catálogo y el tráfico de un día."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Página Estadística del cifrado: qué se filtra y qué no (spec 8.2, punto 4)."""
+"""Página Estadística del cifrado: qué se filtra y qué no."""
 
 from __future__ import annotations
 
@@ -41,8 +41,8 @@ if K + "seed" not in st.session_state:
     st.session_state[K + "seed"] = 2026
 
 controls = st.columns([1, 1, 2, 1])
-language = controls[0].selectbox("Idioma", list(LANGUAGES), format_func=LANGUAGES.get)
-mode = controls[1].selectbox("Normalización", list(MODES), format_func=MODES.get)
+language = controls[0].selectbox("Idioma", list(LANGUAGES), format_func=lambda k: LANGUAGES[k])
+mode = controls[1].selectbox("Normalización", list(MODES), format_func=lambda k: MODES[k])
 length = controls[2].slider("Longitud del mensaje (letras)", 26, 2000, 500, step=2)
 if controls[3].button("Otro fragmento y otra clave", icon=":material/casino:", width="stretch"):
     st.session_state[K + "seed"] += 1
@@ -121,7 +121,7 @@ chart(
     demo,
 )
 st.caption(
-    f"{fmt_int(n_messages * 200)} letras cifradas. Las filas oscuras son las letras más "
+    f"{fmt_int(n_messages * 200)} letras cifradas. Las filas más claras son las letras más "
     "frecuentes del idioma; la diagonal queda vacía."
 )
 

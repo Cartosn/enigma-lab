@@ -1,4 +1,4 @@
-"""Vectores de prueba de la sección 6.1: deben pasar siempre."""
+"""Vectores de prueba: deben pasar siempre."""
 
 from __future__ import annotations
 
@@ -46,7 +46,7 @@ def test_trace_of_first_letter_matches_slide_4() -> None:
 
 @pytest.mark.parametrize("name", ["portada.json", "respaldo_bombe.json"])
 def test_demo_files_agree_with_vectors(name: str) -> None:
-    """Los casos de data/demo/ (sección 6.1: «van también en data/demo/») cifran bien."""
+    """Los casos de data/demo/ cifran bien."""
     data = json.loads((paths.DEMO / name).read_text(encoding="utf-8"))
     config = EnigmaConfig.from_dict(data["key"])
     assert encrypt(config, data["plaintext"]) == data["ciphertext"]

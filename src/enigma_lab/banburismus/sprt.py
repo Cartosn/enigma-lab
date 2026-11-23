@@ -1,4 +1,4 @@
-"""La prueba secuencial de Wald (SPRT) con los decibanes del Banburismus (spec 5.6).
+"""La prueba secuencial de Wald (SPRT) con los decibanes del Banburismus.
 
 **La prueba.** Los decibanes se suman columna por columna. La profundidad (H1) se acepta
 en cuanto el puntaje llega a A = 10·log₁₀((1 − β)/α) y se descarta (H0) en cuanto baja a

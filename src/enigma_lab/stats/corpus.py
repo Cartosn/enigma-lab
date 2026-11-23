@@ -1,4 +1,4 @@
-"""Corpus de dominio público y normalización al alfabeto de Enigma (spec 5.3).
+"""Corpus de dominio público y normalización al alfabeto de Enigma.
 
 **Fuentes** (Project Gutenberg, descargadas por ``scripts/fetch_corpora.py``):
 - alemán: *Effi Briest* (Fontane, 1895) y *Die Verwandlung* (Kafka, 1915);
@@ -62,7 +62,9 @@ def normalize(text: str, language: Language, mode: Mode = "letras") -> str:
     plain = "".join(c for c in decomposed if unicodedata.category(c) != "Mn")
     if mode == "letras":
         return re.sub(r"[^A-Z]", "", plain)
-    return re.sub(r"[^A-Z]+", "X", plain).strip("X")
+    # Las palabras se unen con una X; las X propias de las palabras se quedan, también al
+    # principio y al final del texto («Fax» sigue siendo FAX).
+    return "X".join(re.findall(r"[A-Z]+", plain))
 
 
 def corpus_path(language: Language, source: Source = "muestra") -> Path:

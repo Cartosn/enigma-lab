@@ -1,4 +1,4 @@
-"""El menú: el crib convertido en un grafo (spec 5.4).
+"""El menú: el crib convertido en un grafo.
 
 Con el crib en una alineación, cada columna (letra plana p, letra cifrada c, paso i)
 dice que en el paso i la máquina, sin contar el plugboard, lleva S(p) a S(c), donde S es
