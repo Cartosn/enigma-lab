@@ -1,7 +1,7 @@
 # Resumen de resultados para la presentación
 
-- **Fecha:** 2026-11-23 04:18 UTC
-- **Commit:** 445e0e4
+- **Fecha:** 2026-11-23 12:54 UTC
+- **Commit:** 95636c8
 - **Semilla:** 2026
 - **Modo:** completo
 - **Corridas:** E1: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E2: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E3: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E4: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E5: modo completo, 2026-11-22 16:47 UTC, commit 67e022b; E6: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E7: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E8: modo completo, 2026-11-22 17:13 UTC, commit 67e022b
@@ -134,7 +134,7 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 | 16 | Turing, 12 letras: paradas por orden con 0, 1, 2 y 3 lazos; en 60 órdenes con 2 y 3 | 820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60 | 820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60 | sí |
 | 16 | nuestra Bombe, 12 letras, con diagonal board: paradas por orden con 0 a 3 lazos (E5) | 678 · 26 · 0,99 · 0,11 | 678 · 26 · 0,99 · 0,11 | sí |
 | 16 | parada verdadera en modo Bletchley · menús en que gira el central · modo robusto (E5) | 55 % · 45 % · 98 % | 55 % · 45 % · 98 % | sí |
-| 16 | modo robusto: veces el tiempo; segundos por orden frente al modo Bletchley (E5) | 12 veces; 0,11 s frente a 0,008 s | 12 veces; 0,11 s frente a 0,008 s | sí |
+| 16 | modo robusto: veces el tiempo; segundos por orden frente al Bletchley, mismos menús (E5) | 12 veces; 0,11 s frente a 0,009 s | 12 veces; 0,11 s frente a 0,009 s | sí |
 | 16, 23 | E5: menús de 12 letras distintas por celda | 100 | 100 | sí |
 | 20 | cada lazo divide las paradas falsas por (E5, media geométrica de 0 a 2 lazos) | 26 | 26 | sí |
 
@@ -146,27 +146,24 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 - **La app en clase:** abre `http://localhost:8501/maquina?demo=1` (el modo demo queda en la URL y sobrevive a una recarga) y, en otra pestaña, `http://localhost:8501/bombe?demo=1`; pliega la barra lateral para ganar ancho. En modo demo, Máquina muestra solo «Vector BDZGO» y «Portada», y La Bombe, «Cifrado del compañero» y «Caso de respaldo» (plan B).
 - **Demo 2 (diapositiva 12):** `make bench-demo` del 2026-11-21 18:25 UTC (commit 5b34896) en Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos, Windows 11. Casos de compañero: clave como la de «Clave aleatoria» (10 cables), mensaje alemán de 78 letras que empieza por el crib, crib en la posición 0. Flujo completo de la página La Bombe: barrido, máquina de verificación y «Verificar». Éxito: el descifrado es el mensaje letra por letra.
 
-| Configuración | Éxito (IC 95 %) | p50 | p95 | Barrido p95 | ¿Cumple? |
-| --- | --- | --- | --- | --- | --- |
-| 60 órdenes, modo robusto | 60 de 60 (94 %–100 %) | 6,4 s | 9,8 s | 7,3 s | sí |
-| Rotores I, II y III (6 órdenes), modo robusto | 60 de 60 (94 %–100 %) | 1,3 s | 1,7 s | 0,8 s | sí |
-| Crib WETTERBERICHTXFUER, 60 órdenes, modo robusto | 59 de 60 (91 %–100 %) | 8,9 s | 10,4 s | 10,4 s | sí |
+p95: el 95 % de los casos tardó eso o menos; «Máximo» es el más lento.
 
-- **Recomendada (la más simple con éxito ≥ 95% y p95 ≤ 30 s):** 60 órdenes, modo robusto: el compañero usa «Clave aleatoria» sin restricciones, con el modelo Enigma I que trae Máquina, y empieza su mensaje por WETTERBERICHT (con X entre palabras). En la demo, el botón «Cifrado del compañero» de La Bombe deja el crib en la posición 0, «Rotores I a V (60 órdenes)» y el modo robusto. Se pega el cifrado y se pulsa Ctrl+Enter: aparecen el menú y sus lazos. El barrido empieza con «Correr la Bombe», y al terminar, «Verificar» revisa todas las paradas consistentes y muestra el texto en grande. Éxito 100,0 %, p95 9,8 s.
+| Configuración | Éxito (IC 95 %) | p50 | p95 | Máximo | Barrido p95 | ¿Cumple? |
+| --- | --- | --- | --- | --- | --- | --- |
+| 60 órdenes, modo robusto | 60 de 60 (94 %–100 %) | 6,4 s | 9,8 s | 14,9 s | 7,3 s | sí |
+| Rotores I, II y III (6 órdenes), modo robusto | 60 de 60 (94 %–100 %) | 1,3 s | 1,7 s | 1,7 s | 0,8 s | sí |
+| Crib WETTERBERICHTXFUER, 60 órdenes, modo robusto | 59 de 60 (91 %–100 %) | 8,9 s | 10,4 s | 12,5 s | 10,4 s | sí |
+
+- **Recomendada (la más simple con éxito ≥ 95% y p95 ≤ 30 s):** 60 órdenes, modo robusto: el compañero usa «Clave aleatoria» sin restricciones, con el modelo Enigma I que trae Máquina, y escribe un mensaje de unas 80 letras, como los del banco, que empiece por WETTERBERICHT (con X entre palabras). En la demo, el botón «Cifrado del compañero» de La Bombe deja el crib en la posición 0, «Rotores I a V (60 órdenes)» y el modo robusto. Se pega el cifrado y se pulsa Ctrl+Enter: aparecen el menú y sus lazos. El barrido empieza con «Correr la Bombe», y al terminar, «Verificar» revisa todas las paradas consistentes y muestra el texto en grande. Éxito 100,0 %, p95 9,8 s y máximo 14,9 s.
 - Estos tiempos son del equipo indicado, un escritorio que es también el de la exposición (D-072): no hace falta medirlos en otro equipo.
 
 ## 4. Discrepancias
 
-**Con las diapositivas y el guion (versión 2, 22-11-2026).** Ninguna cifra contradice los resultados. Estas frases sí contradicen la app o se prestan a confusión; cada una trae su corrección:
+**Con las diapositivas y el guion (versión 3, 23-11-2026).** Ninguna cifra contradice los resultados, y las ocho notas de la versión 2 quedaron corregidas: los pasos de la demo 2, el pendiente del banco, «Vector BDZGO», el modelo del compañero, el tiempo de la diapositiva 16 y tres respuestas de «Preguntas probables». Quedan detalles que se prestan a confusión; cada uno trae su corrección:
 
-- Guion, diapositiva 12 (demo 2), pasos 2 y 3: el menú aparece solo después de Ctrl+Enter, y Ctrl+Enter no corre la Bombe. En la app: «Cifrado del compañero», pegar el cifrado, Ctrl+Enter (aparecen el menú y sus lazos), «Correr la Bombe» y, al terminar, «Verificar», que revisa todas las paradas consistentes sin que haya que elegir una y muestra el texto en grande. Mientras corre hay una sola barra, que avanza un orden de rotores a la vez («Orden 1 de 60», «Orden 2 de 60»…), un contador de paradas con el cronómetro y una columna de tambores por arista del menú. Corrección del paso 3: «la barra avanza un orden de rotores a la vez; el contador son las paradas».
-- Guion, «Pendiente» y «Antes de exponer · Computador»: el computador de la exposición es este escritorio (D-072), y `make bench-demo` ya corrió en él (2026-11-21 18:25 UTC): 60 órdenes, modo robusto, 60 de 60, p50 6,4 s y p95 9,8 s. El pendiente está cumplido: no hay que medir en otro equipo.
-- Guion, diapositiva 4 (demo 1), paso 2: «Vector BDZGO» ya deja AAAAA escrito y BDZGO en la salida. Si se escribe AAAAA otra vez, se agregan cinco letras a la entrada.
-- Guion, «Antes de exponer · Compañero»: «Clave aleatoria» sortea entre los rotores del modelo elegido en Máquina. Con Enigma I, el que trae la página, salen los rotores I a V y el reflector B, lo que barre la Bombe; si el compañero cambia el modelo a M3 o M4, puede salir un rotor VI a VIII y la Bombe no encontraría la clave.
-- Diapositiva 16, «a 12 veces el tiempo: 0,11 s por orden, frente a 0,008 s»: las 12,0 veces comparan los mismos menús (12 y 16 letras), donde el modo Bletchley tarda 0,009 s por orden. Los 0,008 s son su promedio con todos los menús, y con ellos el cociente daría 14. Corrección: «frente a 0,009 s».
-- Guion, pregunta «¿Por qué la simulación da más letras que Wald?»: las 30,9 letras son la diferencia entre el cálculo exacto (959,7) y Wald (928,8), y el sobrepaso explica 30,7. La simulación da 983, 54 más que Wald; el resto es azar de la simulación, porque el valor exacto cae dentro de su IC 95 % (954–1.012). Corrección: «el cálculo exacto da 30,9 letras más que Wald, y 30,7 son el sobrepaso; la simulación coincide con el exacto dentro de su IC».
-- Guion, pregunta «¿Por qué su catálogo no da lo mismo que Kuhl?» («la diferencia es menor del 1 %»): vale para las dos cifras de la diapositiva 9 (−0,02 % y 0,98 %), no para la clase más frecuente: 1.728 frente a 1.771 (−2,4 %).
-- Guion, pregunta «¿Hoy se rompería por fuerza bruta?» («con 10 cables casi nunca (3,5 %)»): el 3,5 % es el promedio de todas las longitudes, de 25 a 1.500 letras. Con 1.500 letras se lee el 25 % de los mensajes con 10 cables.
+- Guion, «Antes de exponer · Computador» («6,4 s en un caso típico y 9,8 s en el peor 5 %»): 9,8 s es el percentil 95 del total (barrido y «Verificar»). El 95 % de los casos tardó eso o menos, y los 3 más lentos tardaron 10,2 s, 11,6 s y 14,9 s. En el más lento, el barrido tardó 8,6 s y «Verificar», 6,3 s. El barrido nunca pasó de 8,6 s, así que valen los «6 a 10 s» del paso 3 de la demo 2; «Verificar» suele tardar 0,8 s, pero llegó a 6,3 s. Corrección: «6,4 s en un caso típico, 9,8 s o menos en el 95 % de los casos y 14,9 s en el peor», y en el paso 4, que «Verificar» puede tardar unos segundos.
+- Guion, «Antes de exponer · Compañero»: el éxito y los tiempos del banco son con mensajes de 78 letras (60 de 60), y el guion no fija el largo. Para que la demo sea la que se midió, conviene pedir uno parecido. Corrección: «cifra un mensaje de unas 80 letras que empiece por WETTERBERICHT».
+- Diapositivas 15 y 23: κ = 0,080, «el índice de coincidencia del alemán» de la 15, es el del alemán escrito con X entre palabras, como los mensajes de E4. El de la 23 («Alemán ≈ 0,076») es el de solo letras: 0,0757 en nuestro corpus y 0,0758 según Pommerening. Las dos cifras están bien, pero juntas parecen contradecirse. Corrección en la 15: «… del alemán con X entre palabras (κ = 0,080)».
 
 **Notas sobre los resultados y las fuentes.**
 
@@ -183,4 +180,4 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 
 ## 5. Pendientes
 
-- Guion (versión 2) · corregir los pasos de la demo 2 y quitar el pendiente del banco de la demo, con las notas de «Con las diapositivas y el guion» (Discrepancias): antes del primer ensayo.
+- Guion y diapositiva 15 · las notas de «Con las diapositivas y el guion» (Discrepancias); ninguna cambia una cifra: antes del primer ensayo.

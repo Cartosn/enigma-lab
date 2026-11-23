@@ -466,9 +466,9 @@
     },
     {
       "diapositivas": "16",
-      "cifra": "modo robusto: veces el tiempo; segundos por orden frente al modo Bletchley (E5)",
-      "esperado": "12 veces; 0,11 s frente a 0,008 s",
-      "obtenido": "12 veces; 0,11 s frente a 0,008 s",
+      "cifra": "modo robusto: veces el tiempo; segundos por orden frente al Bletchley, mismos menús (E5)",
+      "esperado": "12 veces; 0,11 s frente a 0,009 s",
+      "obtenido": "12 veces; 0,11 s frente a 0,009 s",
       "coincide": true,
       "pendiente": ""
     },
