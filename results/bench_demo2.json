@@ -3,7 +3,6 @@
   "commit": "5b34896",
   "semilla": 2026,
   "equipo": {
-    "nodo": "DESKTOP-QQ6240V",
     "procesador": "Intel64 Family 6 Model 158 Stepping 10, GenuineIntel",
     "nucleos_logicos": 6,
     "sistema": "Windows 11",

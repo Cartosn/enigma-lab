@@ -1,7 +1,7 @@
 # Resumen de resultados para la presentación
 
-- **Fecha:** 2026-11-23 12:54 UTC
-- **Commit:** 95636c8
+- **Fecha:** 2026-11-23 22:53 UTC
+- **Commit:** 6fde69a
 - **Semilla:** 2026
 - **Modo:** completo
 - **Corridas:** E1: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E2: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E3: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E4: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E5: modo completo, 2026-11-22 16:47 UTC, commit 67e022b; E6: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E7: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E8: modo completo, 2026-11-22 17:13 UTC, commit 67e022b
@@ -24,14 +24,14 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 - **Cifra para la diapositiva:** 10.000 de 10.000 claves y mensajes aleatorios coinciden con py-enigma (100 %; IC 95 % de Wilson 99,96 %–100,00 %). N = 10.000, semilla 2026, 1.007.710 letras.
 - Por modelo: Enigma I: 4.945 de 4.945, M3: 2.568 de 2.568, M4: 2.487 de 2.487. Cables de 0 a 10 (py-enigma no admite más); reflectores B y C (B y C delgados en la M4).
 - Propiedades con 2.000 claves de Enigma I y 200.000 letras: 0 puntos fijos; cifrar dos veces devolvió el original en 2.000 claves; el cifrado por lotes coincidió con el escalar en 2.000.
-- Vectores de 6.1: 9 de 9 coinciden (tabla en `r1_validacion.csv`). CyberChef coincide en 6 de 6 casos comprobados a mano.
+- Vectores de prueba: 9 de 9 coinciden (tabla en `r1_validacion.csv`). CyberChef coincide en 6 de 6 casos comprobados a mano.
 - Mensaje real: el simulador descifra letra por letra el del U-264 (Enigma M4, 25-11-1942, roto por el M4 Project en 2006).
 
 ### Diapositiva 15 · Cribs (E4)
 
 - **L = 13:** con texto aleatorio sobrevive el 60,1 % de las alineaciones falsas (IC 95 % 59,9 %–60,3 %); teoría (25/26)^13 = 60,1 %. Con **alemán real**, el 61,6 % (61,4 %–61,8 %).
 - **L = 50:** con texto aleatorio sobrevive el 14,1 % de las alineaciones falsas (IC 95 % 13,9 %–14,3 %); teoría (25/26)^50 = 14,1 %. Con **alemán real**, el 15,4 % (15,2 %–15,6 %).
-- Texto aleatorio: (25/26)^L cae dentro del IC 95 % en 10 de 10 longitudes. Es el criterio de aceptación de la fase 2 y se cumple.
+- Texto aleatorio: (25/26)^L cae dentro del IC 95 % en 10 de 10 longitudes.
 - Alemán real (X como separador, κ = 0,0802): (25/26)^L cae dentro del IC en 0 de 10 longitudes. La teoría corregida, (1 − (1 − κ)/25)^L, cae dentro en 10 de 10. Con alemán sobreviven un poco más alineaciones falsas: una letra del crib igual a la letra plana de esa posición nunca puede chocar.
 - Diseño: 1.000 mensajes de 250 letras por longitud y por tipo de texto, claves aleatorias de Enigma I con 10 cables, semilla 2026. La alineación verdadera sobrevivió siempre: sí. Tabla completa en `r2_cribs.csv`.
 
@@ -51,7 +51,7 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 ### Diapositiva 17 · Banburismus (E6)
 
 - **Cifras de Turing** (diapositivas 13 y 17, comprobadas en `test_presentacion.py`): +1,845 dB por repetición y −0,093 dB por no repetición; en promedio, +0,0211 dB por letra en profundidad y −0,0184 dB al azar. Umbrales con α = β = 1 %: ±19,96 dB. Aproximación de Wald: 929 letras para confirmar la profundidad y 1.062 para descartarla.
-- **Cifra para la diapositiva: la simulación del SPRT** (criterio de la fase 4). Letras sueltas y un texto cuyas columnas en profundidad repiten con 1/17 exacta, cifrado con la máquina real; 2.000 pares, semilla 2026. Confirmar la profundidad toma 983 letras (IC 95 % 954–1.012) y descartarla, 1.090 letras (IC 95 % 1.061–1.120). El cálculo exacto, sin simulación, da 959,7 y 1.067,4, dentro de los dos IC. Errores en la simulación: 1,1 % en profundidad y 1,2 % al azar (exactos: 0,99 % y 0,86 %).
+- **Cifra para la diapositiva: la simulación del SPRT.** Letras sueltas y un texto cuyas columnas en profundidad repiten con 1/17 exacta, cifrado con la máquina real; 2.000 pares, semilla 2026. Confirmar la profundidad toma 983 letras (IC 95 % 954–1.012) y descartarla, 1.090 letras (IC 95 % 1.061–1.120). El cálculo exacto, sin simulación, da 959,7 y 1.067,4, dentro de los dos IC. Errores en la simulación: 1,1 % en profundidad y 1,2 % al azar (exactos: 0,99 % y 0,86 %).
 - **La diferencia con Wald es el sobrepaso.** Wald supone que el puntaje se detiene justo en ±19,96 dB; en realidad se detiene al cruzarlo, y lo pasa. Una repetición suma 1,845 dB de golpe: arriba, el puntaje pasa el umbral por 0,65 dB en promedio (simulación: 0,67). La identidad de Wald, E[N] = E[S_N] / μ, es exacta, así que en profundidad son 30,9 letras más: 30,7 por ese sobrepaso y 0,2 por lo demás. Abajo, cada no repetición resta solo 0,093 dB y el sobrepaso es de 0,045 dB. Al azar la diferencia es de 5,1 letras: 2,4 por el sobrepaso de abajo, 2,9 porque el error real queda por debajo del 1 % y −0,3 por el de arriba. Con la simulación, E[S_N] / μ da 963 y 1.072 letras.
 - **Con texto alemán real** (corpus, X como separador): en profundidad las letras repiten 1 de cada 12,5, medido con la máquina, y no 1 de cada 17. El IC del corpus es 0,0802 con la X y 0,0757 sin ella (1 de cada 13,2); al azar se miden 1 de cada 26. Con los pesos de Turing, confirmar la profundidad toma 332 letras (IC 95 % 325–340): la decisión llega antes que las 929 de Wald. Descartarla toma 1.090 letras (IC 95 % 1.063–1.118), como con 1/17.
 - **Cuánto aceleran los multigramas** (pesos medidos en el corpus, α = β = 1 %). Con letras sueltas y la tasa del corpus: 262 letras en profundidad y 323 al azar, con un error de 1,8 % en profundidad: las repeticiones del texto real vienen en racimos, y un modelo de letras independientes no lo sabe. Con bigramas y trigramas: 254 y 357, con errores de 1,1 % y 0,8 %; hasta tetragramas, 254 y 357. Frente a los pesos de Turing, los bigramas y trigramas necesitan un 24 % menos de letras para confirmar y un 67 % menos para descartar.
@@ -116,14 +116,14 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 | 10 | conflicto de las alineaciones 4 y 5 | T sobre la T de la posición 7 | T sobre la T de la posición 7 | sí |
 | 11 | menú de la alineación 0: letras, aristas, componentes y lazos | 11 · 13 · 1 · 3 | 11 · 13 · 1 · 3 | sí |
 | 11 | letra de prueba y su grado | T, grado 6 | T, grado 6 | sí |
-| 6.5 | menú del caso de respaldo: letras, aristas, componentes y lazos | 11 · 13 · 1 · 3 | 11 · 13 · 1 · 3 | sí |
-| 6.5 | letra de prueba del caso de respaldo | T, grado 4 | T, grado 4 | sí |
+| 12 | menú del caso de respaldo: letras, aristas, componentes y lazos | 11 · 13 · 1 · 3 | 11 · 13 · 1 · 3 | sí |
+| 12 | letra de prueba del caso de respaldo | T, grado 4 | T, grado 4 | sí |
 | 9 | configuraciones del catálogo: 6 órdenes × 17.576 posiciones (E7) | 105.456 | 105.456 | sí |
 | 9 | nuestro catálogo: características distintas y únicas (E7, exacto) | 21.225 · 11.578 | 21.225 · 11.578 | sí |
 | 9 | Kuhl (2007): características distintas y únicas, junto a las nuestras | 21.230 · 11.466 | 21.230 · 11.466 | sí |
 | 9 | días en que el catálogo encuentra la configuración del día (E7) | 75 % de 4.000 días | 75 % de 4.000 días | sí |
 | 13, 17 | decibanes por repetición: 10·log₁₀((1/17)/(1/26)) | +1,845 dB | +1,845 dB | sí |
-| 5.6 | decibanes por no repetición: 10·log₁₀((16/17)/(25/26)) | −0,093 dB | −0,093 dB | sí |
+| 13 | decibanes por no repetición: 10·log₁₀((16/17)/(25/26)) | −0,093 dB | −0,093 dB | sí |
 | 17 | decibanes por letra, en promedio, en profundidad | +0,0211 dB | +0,0211 dB | sí |
 | 17 | decibanes por letra, en promedio, al azar | −0,0184 dB | −0,0184 dB | sí |
 | 13, 17 | umbrales de Wald con α = β = 1 % | ±19,96 dB | ±19,96 dB | sí |
@@ -159,19 +159,19 @@ p95: el 95 % de los casos tardó eso o menos; «Máximo» es el más lento.
 
 ## 4. Discrepancias
 
-**Con las diapositivas y el guion (versión 3, 23-11-2026).** Ninguna cifra contradice los resultados, y las ocho notas de la versión 2 quedaron corregidas: los pasos de la demo 2, el pendiente del banco, «Vector BDZGO», el modelo del compañero, el tiempo de la diapositiva 16 y tres respuestas de «Preguntas probables». Quedan detalles que se prestan a confusión; cada uno trae su corrección:
+**Con las diapositivas y el guion (versión 3, 23-11-2026).** Ninguna cifra contradice los resultados, y las ocho notas de la versión 2 quedaron corregidas: los pasos de la demo 2, el pendiente del banco, «Vector BDZGO», el modelo del compañero, el tiempo de la diapositiva 16 y tres respuestas de «Preguntas probables». Quedan detalles que se prestan a confusión; cada uno con la frase que conviene usar:
 
-- Guion, «Antes de exponer · Computador» («6,4 s en un caso típico y 9,8 s en el peor 5 %»): 9,8 s es el percentil 95 del total (barrido y «Verificar»). El 95 % de los casos tardó eso o menos, y los 3 más lentos tardaron 10,2 s, 11,6 s y 14,9 s. En el más lento, el barrido tardó 8,6 s y «Verificar», 6,3 s. El barrido nunca pasó de 8,6 s, así que valen los «6 a 10 s» del paso 3 de la demo 2; «Verificar» suele tardar 0,8 s, pero llegó a 6,3 s. Corrección: «6,4 s en un caso típico, 9,8 s o menos en el 95 % de los casos y 14,9 s en el peor», y en el paso 4, que «Verificar» puede tardar unos segundos.
-- Guion, «Antes de exponer · Compañero»: el éxito y los tiempos del banco son con mensajes de 78 letras (60 de 60), y el guion no fija el largo. Para que la demo sea la que se midió, conviene pedir uno parecido. Corrección: «cifra un mensaje de unas 80 letras que empiece por WETTERBERICHT».
-- Diapositivas 15 y 23: κ = 0,080, «el índice de coincidencia del alemán» de la 15, es el del alemán escrito con X entre palabras, como los mensajes de E4. El de la 23 («Alemán ≈ 0,076») es el de solo letras: 0,0757 en nuestro corpus y 0,0758 según Pommerening. Las dos cifras están bien, pero juntas parecen contradecirse. Corrección en la 15: «… del alemán con X entre palabras (κ = 0,080)».
+- Guion, «Antes de exponer · Computador» («6,4 s en un caso típico y 9,8 s en el peor 5 %»): 9,8 s es el percentil 95 del total (barrido y «Verificar»). El 95 % de los casos tardó eso o menos, y los 3 más lentos tardaron 10,2 s, 11,6 s y 14,9 s. En el más lento, el barrido tardó 8,6 s y «Verificar», 6,3 s. El barrido nunca pasó de 8,6 s, así que valen los «6 a 10 s» del paso 3 de la demo 2; «Verificar» suele tardar 0,8 s, pero llegó a 6,3 s. Mejor decir: «6,4 s en un caso típico, 9,8 s o menos en el 95 % de los casos y 14,9 s en el peor», y en el paso 4, que «Verificar» puede tardar unos segundos.
+- Guion, «Antes de exponer · Compañero»: el éxito y los tiempos del banco son con mensajes de 78 letras (60 de 60), y el guion no fija el largo. Para que la demo sea la que se midió, conviene pedir uno parecido. Mejor pedir: «cifra un mensaje de unas 80 letras que empiece por WETTERBERICHT».
+- Diapositivas 15 y 23: κ = 0,080, «el índice de coincidencia del alemán» de la 15, es el del alemán escrito con X entre palabras, como los mensajes de E4. El de la 23 («Alemán ≈ 0,076») es el de solo letras: 0,0757 en nuestro corpus y 0,0758 según Pommerening. Las dos cifras están bien, pero juntas parecen contradecirse. En la 15 conviene decir: «… del alemán con X entre palabras (κ = 0,080)».
 
 **Notas sobre los resultados y las fuentes.**
 
 - Diapositivas 13 y 17: 929 y 1.062 letras son la aproximación de Wald, que ignora el sobrepaso de los umbrales. Con las mismas tasas, el valor exacto es 959,7 y 1.067,4, y la simulación lo confirma. Las dos diapositivas las presentan como de Wald, y así siguen bien.
 - Diapositiva 13 y guion («en el tráfico naval … 1 de cada 17»): es la tasa del tráfico naval que da Wikipedia. Nuestro corpus literario repite 1 de cada 12,5 con la X como separador y 1 de cada 13,2 solo con letras. Con él, la profundidad se confirma en unas 332 letras con los pesos de Turing. No contradice la diapositiva: es otro texto.
-- Spec 5.6 («en profundidad … hasta que se mueve el rotor central»): con la máquina real los dos mensajes recorren la misma sucesión de estados, así que la profundidad dura todo el solapamiento. El rotor central decide si el desplazamiento verdadero es +δ o δ − 26 (D-042); por eso se prueban los desplazamientos de −25 a +25.
+- La descripción habitual («en profundidad … hasta que se mueve el rotor central»): con la máquina real los dos mensajes recorren la misma sucesión de estados, así que la profundidad dura todo el solapamiento. El rotor central decide si el desplazamiento verdadero es +δ o δ − 26 (D-042); por eso se prueban los desplazamientos de −25 a +25.
 - Diapositiva 16: la tabla de Turing cuenta «letras del menú» como letras distintas (vértices del grafo), igual que la diapositiva 11 (11 letras, 13 aristas). Con esa lectura, nuestra Bombe da 678 · 26,3 · 0,99 · 0,11 paradas falsas por orden con 12 letras y 0 a 3 lazos, frente a 820 · 31 · 1,2 · 0,04 de Turing. Si «letras» fueran aristas (letras del crib), no coincidirían (ver D-031).
-- Verificador (spec 6.4, «siempre»): recupera una clave equivalente en 200 de 200 de los casos de la prueba, que se usaron para ajustar su diseño, y en 198 de 200 casos nuevos. Las 2 fallas tienen el plugboard exacto y difieren en una sola letra, la segunda o la última del mensaje: un doble paso del central justo en el borde que el texto no alcanza a decidir. La parada verdadera aparece siempre (400 de 400).
+- Verificador: recupera una clave equivalente en 200 de 200 de los casos de la prueba, que se usaron para ajustar su diseño, y en 198 de 200 casos nuevos. Las 2 fallas tienen el plugboard exacto y difieren en una sola letra, la segunda o la última del mensaje: un doble paso del central justo en el borde que el texto no alcanza a decidir. La parada verdadera aparece siempre (400 de 400).
 - Diapositiva 15: con alemán real, el 60 % de 13 letras pasa a 61,6 %, por encima de (25/26)^13 y fuera de su IC. No es un error del filtro: es el efecto del IC del idioma, y la corrección (1 − (1 − κ)/25)^13 = 61,4 % lo explica. La diapositiva da los dos valores: el 60 % de la teoría y el del alemán real.
 - py-enigma admite como máximo 10 cables: la comparación de 10.000 claves usa de 0 a 10 cables, y las pruebas con hypothesis cubren de 0 a 13.
 - Mensaje histórico: no se encontró una fuente verificable del mensaje de Barbarossa (1941). Se usa el del U-264 (M4), publicado con clave, cifrado y texto por D. Rijmenants.
