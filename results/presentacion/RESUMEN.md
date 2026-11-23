@@ -1,7 +1,7 @@
 # Resumen de resultados para la presentación
 
-- **Fecha:** 2026-11-23 03:33 UTC
-- **Commit:** 8840e61
+- **Fecha:** 2026-11-23 04:18 UTC
+- **Commit:** 445e0e4
 - **Semilla:** 2026
 - **Modo:** completo
 - **Corridas:** E1: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E2: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E3: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E4: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E5: modo completo, 2026-11-22 16:47 UTC, commit 67e022b; E6: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E7: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E8: modo completo, 2026-11-22 17:13 UTC, commit 67e022b
@@ -25,7 +25,7 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 - Por modelo: Enigma I: 4.945 de 4.945, M3: 2.568 de 2.568, M4: 2.487 de 2.487. Cables de 0 a 10 (py-enigma no admite más); reflectores B y C (B y C delgados en la M4).
 - Propiedades con 2.000 claves de Enigma I y 200.000 letras: 0 puntos fijos; cifrar dos veces devolvió el original en 2.000 claves; el cifrado por lotes coincidió con el escalar en 2.000.
 - Vectores de 6.1: 9 de 9 coinciden (tabla en `r1_validacion.csv`). CyberChef coincide en 6 de 6 casos comprobados a mano.
-- Nuevo para la diapositiva 14, si cabe: el simulador descifra letra por letra un mensaje real, el del U-264 (Enigma M4, 25-11-1942, roto por el M4 Project en 2006).
+- Mensaje real: el simulador descifra letra por letra el del U-264 (Enigma M4, 25-11-1942, roto por el M4 Project en 2006).
 
 ### Diapositiva 15 · Cribs (E4)
 
@@ -45,7 +45,7 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 - **Pocas letras y sin lazos:** con 8 letras Turing da 40.000 paradas por orden, más que las 17.576 posiciones. Su cifra cuenta hipótesis abiertas, no posiciones: medimos 37.546 hipótesis en 17.219 posiciones.
 - **Éxito:** en modo Bletchley aparece la parada verdadera en el 55,0 % de los menús. El central se movió dentro del tramo en el 45,0 %; sin esa vuelta, en el 100,0 %.
 - **Modo robusto** (menús de 12 y 16 letras): éxito 98,0 %, 12,0 veces el tiempo y 10,9 veces las paradas del modo Bletchley.
-- **Tiempo por orden** (17.576 posiciones, en el equipo de `make reproduce`): 0,008 s en modo Bletchley y 0,114 s en modo robusto.
+- **Tiempo por orden** (17.576 posiciones, en el equipo de `make reproduce`): 0,008 s en modo Bletchley, en promedio con todos los menús (8 a 16 letras), y 0,114 s en modo robusto, con los de 12 y 16 letras. En esos mismos menús el modo Bletchley tarda 0,009 s: de ahí las 12,0 veces.
 - **«Letras» son vértices** (P-002, D-031): las letras distintas del menú. Con esa lectura la columna de 12 letras queda cerca de la de Turing (entre 0,8 y 2,8 veces su valor); contando aristas no.
 
 ### Diapositiva 17 · Banburismus (E6)
@@ -99,12 +99,18 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 | 14 | AAAAA con I-II-III y anillos AAA | BDZGO | BDZGO | sí |
 | 14 | lo mismo con anillos BBB | EWTYX | EWTYX | sí |
 | 14 | ejemplo de py-enigma (10 cables) | THEXRUSSIANSXAREXCOMINGX | THEXRUSSIANSXAREXCOMINGX | sí |
+| 14 | mensaje real del U-264 (M4, 1942), descifrado | VONVONJLOOKS | VONVONJLOOKS | sí |
+| 14 | claves aleatorias iguales a py-enigma (E1) | 10.000 de 10.000 | 10.000 de 10.000 | sí |
 | 6 | (25/26)¹⁰⁰: ningún punto fijo en 100 letras al azar | 1,98 % | 1,98 % | sí |
 | 6, 14 | claves con involución (de 2.000) | 2.000 | 2.000 | sí |
 | 6, 14 | letras cifradas con esas 2.000 claves | 200.000 | 200.000 | sí |
 | 6, 14 | puntos fijos en esas 200.000 letras | 0 | 0 | sí |
 | 15, 20 | (25/26)¹³: sobreviven a un crib de 13 letras | 60,1 % | 60,1 % | sí |
 | 15 | (25/26)⁵⁰: sobreviven a un crib de 50 letras | 14,1 % | 14,1 % | sí |
+| 15 | sobreviven con alemán real, con 13 y con 50 letras (E4) | 61,6 % y 15,4 % | 61,6 % y 15,4 % | sí |
+| 15 | cota del semiancho de los IC 95 % de E4, en puntos | ±0,25 | ±0,25 | sí |
+| 15 | κ del alemán; longitudes con la teoría corregida dentro del IC (E4) | κ = 0,080; 10 de 10 | κ = 0,080; 10 de 10 | sí |
+| 15, 23 | E4: mensajes por longitud | 1.000 de 250 letras | 1.000 de 250 letras | sí |
 | 10 | alineaciones de WETTERBERICHT sobre BBGCCKITCTTEZZZLCZ | 6 | 6 | sí |
 | 10 | alineaciones sin conflictos | 0, 1, 2, 3 | 0, 1, 2, 3 | sí |
 | 10 | conflicto de las alineaciones 4 y 5 | T sobre la T de la posición 7 | T sobre la T de la posición 7 | sí |
@@ -113,20 +119,30 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 | 6.5 | menú del caso de respaldo: letras, aristas, componentes y lazos | 11 · 13 · 1 · 3 | 11 · 13 · 1 · 3 | sí |
 | 6.5 | letra de prueba del caso de respaldo | T, grado 4 | T, grado 4 | sí |
 | 9 | configuraciones del catálogo: 6 órdenes × 17.576 posiciones (E7) | 105.456 | 105.456 | sí |
-| 9 | Kuhl (2007): características distintas y únicas (E7 da 21.225 y 11.578: Discrepancias) | 21.230 · 11.466 | 21.230 · 11.466 | sí |
+| 9 | nuestro catálogo: características distintas y únicas (E7, exacto) | 21.225 · 11.578 | 21.225 · 11.578 | sí |
+| 9 | Kuhl (2007): características distintas y únicas, junto a las nuestras | 21.230 · 11.466 | 21.230 · 11.466 | sí |
+| 9 | días en que el catálogo encuentra la configuración del día (E7) | 75 % de 4.000 días | 75 % de 4.000 días | sí |
 | 13, 17 | decibanes por repetición: 10·log₁₀((1/17)/(1/26)) | +1,845 dB | +1,845 dB | sí |
 | 5.6 | decibanes por no repetición: 10·log₁₀((16/17)/(25/26)) | −0,093 dB | −0,093 dB | sí |
 | 17 | decibanes por letra, en promedio, en profundidad | +0,0211 dB | +0,0211 dB | sí |
 | 17 | decibanes por letra, en promedio, al azar | −0,0184 dB | −0,0184 dB | sí |
 | 13, 17 | umbrales de Wald con α = β = 1 % | ±19,96 dB | ±19,96 dB | sí |
 | 13, 17 | letras esperadas según Wald, en profundidad y al azar | 929 y 1.062 | 929 y 1.062 | sí |
+| 17 | SPRT simulado, tasa 1/17: letras para confirmar y para descartar la profundidad (E6) | 983 · 1.090 | 983 · 1.090 | sí |
+| 17 | alemán real: letras para confirmar, con bigramas y trigramas y con pesos de Turing (E6) | 254 · 332 | 254 · 332 | sí |
+| 17, 23 | E6: pares por hipótesis | 2.000 | 2.000 | sí |
 | 16 | Turing, 12 letras: paradas por orden con 0, 1, 2 y 3 lazos; en 60 órdenes con 2 y 3 | 820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60 | 820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60 | sí |
+| 16 | nuestra Bombe, 12 letras, con diagonal board: paradas por orden con 0 a 3 lazos (E5) | 678 · 26 · 0,99 · 0,11 | 678 · 26 · 0,99 · 0,11 | sí |
+| 16 | parada verdadera en modo Bletchley · menús en que gira el central · modo robusto (E5) | 55 % · 45 % · 98 % | 55 % · 45 % · 98 % | sí |
+| 16 | modo robusto: veces el tiempo; segundos por orden frente al modo Bletchley (E5) | 12 veces; 0,11 s frente a 0,008 s | 12 veces; 0,11 s frente a 0,008 s | sí |
+| 16, 23 | E5: menús de 12 letras distintas por celda | 100 | 100 | sí |
+| 20 | cada lazo divide las paradas falsas por (E5, media geométrica de 0 a 2 lazos) | 26 | 26 | sí |
 
-45 de 45 cifras calculadas coinciden.
+61 de 61 cifras calculadas coinciden.
 
 ## 3. Demos
 
-- **Demo 1 (diapositiva 4):** el cálculo es instantáneo. La traza de «Vector BDZGO» tarda 0,2 ms y la de «Portada» 0,6 ms en el equipo donde corrió `make resumen` (Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos). Los 45 s del guion los pone la interacción.
+- **Demo 1 (diapositiva 4):** el cálculo es instantáneo. La traza de «Vector BDZGO» tarda 0,2 ms y la de «Portada» 0,7 ms en el equipo donde corrió `make resumen` (Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos). Los 45 s del guion los pone la interacción.
 - **La app en clase:** abre `http://localhost:8501/maquina?demo=1` (el modo demo queda en la URL y sobrevive a una recarga) y, en otra pestaña, `http://localhost:8501/bombe?demo=1`; pliega la barra lateral para ganar ancho. En modo demo, Máquina muestra solo «Vector BDZGO» y «Portada», y La Bombe, «Cifrado del compañero» y «Caso de respaldo» (plan B).
 - **Demo 2 (diapositiva 12):** `make bench-demo` del 2026-11-21 18:25 UTC (commit 5b34896) en Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos, Windows 11. Casos de compañero: clave como la de «Clave aleatoria» (10 cables), mensaje alemán de 78 letras que empieza por el crib, crib en la posición 0. Flujo completo de la página La Bombe: barrido, máquina de verificación y «Verificar». Éxito: el descifrado es el mensaje letra por letra.
 
@@ -136,26 +152,35 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 | Rotores I, II y III (6 órdenes), modo robusto | 60 de 60 (94 %–100 %) | 1,3 s | 1,7 s | 0,8 s | sí |
 | Crib WETTERBERICHTXFUER, 60 órdenes, modo robusto | 59 de 60 (91 %–100 %) | 8,9 s | 10,4 s | 10,4 s | sí |
 
-- **Recomendada (la más simple con éxito ≥ 95% y p95 ≤ 30 s):** 60 órdenes, modo robusto: el compañero usa «Clave aleatoria» sin restricciones y empieza su mensaje por WETTERBERICHT (con X entre palabras). En la demo, el botón «Cifrado del compañero» de La Bombe deja el crib en la posición 0, «Rotores I a V (60 órdenes)» y el modo robusto; se pega el cifrado y se pulsa Ctrl+Enter. Éxito 100,0 %, p95 9,8 s.
+- **Recomendada (la más simple con éxito ≥ 95% y p95 ≤ 30 s):** 60 órdenes, modo robusto: el compañero usa «Clave aleatoria» sin restricciones, con el modelo Enigma I que trae Máquina, y empieza su mensaje por WETTERBERICHT (con X entre palabras). En la demo, el botón «Cifrado del compañero» de La Bombe deja el crib en la posición 0, «Rotores I a V (60 órdenes)» y el modo robusto. Se pega el cifrado y se pulsa Ctrl+Enter: aparecen el menú y sus lazos. El barrido empieza con «Correr la Bombe», y al terminar, «Verificar» revisa todas las paradas consistentes y muestra el texto en grande. Éxito 100,0 %, p95 9,8 s.
 - Estos tiempos son del equipo indicado, un escritorio que es también el de la exposición (D-072): no hace falta medirlos en otro equipo.
 
 ## 4. Discrepancias
 
-Ninguna contradicción con las diapositivas ni con el guion. Notas:
+**Con las diapositivas y el guion (versión 2, 22-11-2026).** Ninguna cifra contradice los resultados. Estas frases sí contradicen la app o se prestan a confusión; cada una trae su corrección:
 
-- Diapositivas 13 y 17: 929 y 1.062 letras son la aproximación de Wald, que ignora el sobrepaso de los umbrales. Con las mismas tasas, el valor exacto es 959,7 y 1.067,4, y la simulación lo confirma. Las cifras de la diapositiva siguen bien si se presentan como «según Wald».
-- Diapositiva 13 y guion («las letras se repiten 1 de cada 17 veces»): es la tasa del tráfico naval que da Wikipedia. Nuestro corpus literario repite 1 de cada 12,5 con la X como separador y 1 de cada 13,2 solo con letras. Con él, la profundidad se confirma en unas 332 letras con los pesos de Turing. No contradice la diapositiva: es otro texto.
+- Guion, diapositiva 12 (demo 2), pasos 2 y 3: el menú aparece solo después de Ctrl+Enter, y Ctrl+Enter no corre la Bombe. En la app: «Cifrado del compañero», pegar el cifrado, Ctrl+Enter (aparecen el menú y sus lazos), «Correr la Bombe» y, al terminar, «Verificar», que revisa todas las paradas consistentes sin que haya que elegir una y muestra el texto en grande. Mientras corre hay una sola barra, que avanza un orden de rotores a la vez («Orden 1 de 60», «Orden 2 de 60»…), un contador de paradas con el cronómetro y una columna de tambores por arista del menú. Corrección del paso 3: «la barra avanza un orden de rotores a la vez; el contador son las paradas».
+- Guion, «Pendiente» y «Antes de exponer · Computador»: el computador de la exposición es este escritorio (D-072), y `make bench-demo` ya corrió en él (2026-11-21 18:25 UTC): 60 órdenes, modo robusto, 60 de 60, p50 6,4 s y p95 9,8 s. El pendiente está cumplido: no hay que medir en otro equipo.
+- Guion, diapositiva 4 (demo 1), paso 2: «Vector BDZGO» ya deja AAAAA escrito y BDZGO en la salida. Si se escribe AAAAA otra vez, se agregan cinco letras a la entrada.
+- Guion, «Antes de exponer · Compañero»: «Clave aleatoria» sortea entre los rotores del modelo elegido en Máquina. Con Enigma I, el que trae la página, salen los rotores I a V y el reflector B, lo que barre la Bombe; si el compañero cambia el modelo a M3 o M4, puede salir un rotor VI a VIII y la Bombe no encontraría la clave.
+- Diapositiva 16, «a 12 veces el tiempo: 0,11 s por orden, frente a 0,008 s»: las 12,0 veces comparan los mismos menús (12 y 16 letras), donde el modo Bletchley tarda 0,009 s por orden. Los 0,008 s son su promedio con todos los menús, y con ellos el cociente daría 14. Corrección: «frente a 0,009 s».
+- Guion, pregunta «¿Por qué la simulación da más letras que Wald?»: las 30,9 letras son la diferencia entre el cálculo exacto (959,7) y Wald (928,8), y el sobrepaso explica 30,7. La simulación da 983, 54 más que Wald; el resto es azar de la simulación, porque el valor exacto cae dentro de su IC 95 % (954–1.012). Corrección: «el cálculo exacto da 30,9 letras más que Wald, y 30,7 son el sobrepaso; la simulación coincide con el exacto dentro de su IC».
+- Guion, pregunta «¿Por qué su catálogo no da lo mismo que Kuhl?» («la diferencia es menor del 1 %»): vale para las dos cifras de la diapositiva 9 (−0,02 % y 0,98 %), no para la clase más frecuente: 1.728 frente a 1.771 (−2,4 %).
+- Guion, pregunta «¿Hoy se rompería por fuerza bruta?» («con 10 cables casi nunca (3,5 %)»): el 3,5 % es el promedio de todas las longitudes, de 25 a 1.500 letras. Con 1.500 letras se lee el 25 % de los mensajes con 10 cables.
+
+**Notas sobre los resultados y las fuentes.**
+
+- Diapositivas 13 y 17: 929 y 1.062 letras son la aproximación de Wald, que ignora el sobrepaso de los umbrales. Con las mismas tasas, el valor exacto es 959,7 y 1.067,4, y la simulación lo confirma. Las dos diapositivas las presentan como de Wald, y así siguen bien.
+- Diapositiva 13 y guion («en el tráfico naval … 1 de cada 17»): es la tasa del tráfico naval que da Wikipedia. Nuestro corpus literario repite 1 de cada 12,5 con la X como separador y 1 de cada 13,2 solo con letras. Con él, la profundidad se confirma en unas 332 letras con los pesos de Turing. No contradice la diapositiva: es otro texto.
 - Spec 5.6 («en profundidad … hasta que se mueve el rotor central»): con la máquina real los dos mensajes recorren la misma sucesión de estados, así que la profundidad dura todo el solapamiento. El rotor central decide si el desplazamiento verdadero es +δ o δ − 26 (D-042); por eso se prueban los desplazamientos de −25 a +25.
 - Diapositiva 16: la tabla de Turing cuenta «letras del menú» como letras distintas (vértices del grafo), igual que la diapositiva 11 (11 letras, 13 aristas). Con esa lectura, nuestra Bombe da 678 · 26,3 · 0,99 · 0,11 paradas falsas por orden con 12 letras y 0 a 3 lazos, frente a 820 · 31 · 1,2 · 0,04 de Turing. Si «letras» fueran aristas (letras del crib), no coincidirían (ver D-031).
-- Guion, diapositiva 16: «en los 60 órdenes quedan unas 2 paradas falsas en total; con dos lazos serían unas 72» son cifras de Turing (0,04 y 1,2 por 60). Nuestra Bombe da 6,6 y 59,4. El mensaje del guion se sostiene (con 3 lazos, unas pocas paradas en los 60 órdenes; con 2, decenas).
 - Verificador (spec 6.4, «siempre»): recupera una clave equivalente en 200 de 200 de los casos de la prueba, que se usaron para ajustar su diseño, y en 198 de 200 casos nuevos. Las 2 fallas tienen el plugboard exacto y difieren en una sola letra, la segunda o la última del mensaje: un doble paso del central justo en el borde que el texto no alcanza a decidir. La parada verdadera aparece siempre (400 de 400).
-- Diapositiva 12 y guion: la configuración de la demo 2 es la recomendada en «Demos»; el guion la tiene pendiente.
-- Diapositiva 15: con alemán real, el 60 % de 13 letras pasa a 61,6 %, por encima de (25/26)^13 y fuera de su IC. No es un error del filtro: es el efecto del IC del idioma, y la corrección (1 − (1 − κ)/25)^13 = 61,4 % lo explica. La diapositiva puede seguir diciendo «60 %» para la teoría y agregar el valor real.
+- Diapositiva 15: con alemán real, el 60 % de 13 letras pasa a 61,6 %, por encima de (25/26)^13 y fuera de su IC. No es un error del filtro: es el efecto del IC del idioma, y la corrección (1 − (1 − κ)/25)^13 = 61,4 % lo explica. La diapositiva da los dos valores: el 60 % de la teoría y el del alemán real.
 - py-enigma admite como máximo 10 cables: la comparación de 10.000 claves usa de 0 a 10 cables, y las pruebas con hypothesis cubren de 0 a 13.
 - Mensaje histórico: no se encontró una fuente verificable del mensaje de Barbarossa (1941). Se usa el del U-264 (M4), publicado con clave, cifrado y texto por D. Rijmenants.
 - Corpus: gutenberg.org estaba en mantenimiento el 20-11-2026; se descargó de su espejo oficial (Mirror Service), con SHA-256 verificado.
-- Diapositiva 9: nuestro catálogo da 21.225 características, 11.578 únicas y 1.728 en la más frecuente; Kuhl, 21.230, 11.466 y 1.771. No se ajustó nada: Kuhl no dice qué supone del rotor central ni de los anillos, y ninguna de las 33 variantes de los supuestos que probamos reproduce sus cifras (`scripts/kuhl_variantes.py`, VALIDACION). Su artículo tiene además erratas: escribe 105.465 configuraciones, da 11.466 como el 54,40 % (es el 54,01 %) y dice que 20.433 tienen 10 o menos cuando su tabla 2 suma 19.604. Sugerencia: la diapositiva puede seguir citando a Kuhl («Kuhl calculó…») y agregar, si cabe, «nuestro catálogo: 21.225 y 11.578».
+- Diapositiva 9: nuestro catálogo da 21.225 características, 11.578 únicas y 1.728 en la más frecuente; Kuhl, 21.230, 11.466 y 1.771. No se ajustó nada: Kuhl no dice qué supone del rotor central ni de los anillos, y ninguna de las 33 variantes de los supuestos que probamos reproduce sus cifras (`scripts/kuhl_variantes.py`, VALIDACION). Su artículo tiene además erratas: escribe 105.465 configuraciones, da 11.466 como el 54,40 % (es el 54,01 %) y dice que 20.433 tienen 10 o menos cuando su tabla 2 suma 19.604. La diapositiva da las dos cifras, las nuestras y las de Kuhl.
 
 ## 5. Pendientes
 
-- Diapositiva 21 · poner el enlace del repositorio, https://github.com/Cartosn/enigma-lab (público; la CI corre en cada push): antes de la presentación.
+- Guion (versión 2) · corregir los pasos de la demo 2 y quitar el pendiente del banco de la demo, con las notas de «Con las diapositivas y el guion» (Discrepancias): antes del primer ensayo.

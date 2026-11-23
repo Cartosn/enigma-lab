@@ -185,6 +185,22 @@
       "pendiente": ""
     },
     {
+      "diapositivas": "14",
+      "cifra": "mensaje real del U-264 (M4, 1942), descifrado",
+      "esperado": "VONVONJLOOKS",
+      "obtenido": "VONVONJLOOKS",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "14",
+      "cifra": "claves aleatorias iguales a py-enigma (E1)",
+      "esperado": "10.000 de 10.000",
+      "obtenido": "10.000 de 10.000",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
       "diapositivas": "6",
       "cifra": "(25/26)¹⁰⁰: ningún punto fijo en 100 letras al azar",
       "esperado": "1,98 %",
@@ -229,6 +245,38 @@
       "cifra": "(25/26)⁵⁰: sobreviven a un crib de 50 letras",
       "esperado": "14,1 %",
       "obtenido": "14,1 %",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "15",
+      "cifra": "sobreviven con alemán real, con 13 y con 50 letras (E4)",
+      "esperado": "61,6 % y 15,4 %",
+      "obtenido": "61,6 % y 15,4 %",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "15",
+      "cifra": "cota del semiancho de los IC 95 % de E4, en puntos",
+      "esperado": "±0,25",
+      "obtenido": "±0,25",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "15",
+      "cifra": "κ del alemán; longitudes con la teoría corregida dentro del IC (E4)",
+      "esperado": "κ = 0,080; 10 de 10",
+      "obtenido": "κ = 0,080; 10 de 10",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "15, 23",
+      "cifra": "E4: mensajes por longitud",
+      "esperado": "1.000 de 250 letras",
+      "obtenido": "1.000 de 250 letras",
       "coincide": true,
       "pendiente": ""
     },
@@ -298,9 +346,25 @@
     },
     {
       "diapositivas": "9",
-      "cifra": "Kuhl (2007): características distintas y únicas (E7 da 21.225 y 11.578: Discrepancias)",
+      "cifra": "nuestro catálogo: características distintas y únicas (E7, exacto)",
+      "esperado": "21.225 · 11.578",
+      "obtenido": "21.225 · 11.578",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "9",
+      "cifra": "Kuhl (2007): características distintas y únicas, junto a las nuestras",
       "esperado": "21.230 · 11.466",
       "obtenido": "21.230 · 11.466",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "9",
+      "cifra": "días en que el catálogo encuentra la configuración del día (E7)",
+      "esperado": "75 % de 4.000 días",
+      "obtenido": "75 % de 4.000 días",
       "coincide": true,
       "pendiente": ""
     },
@@ -353,10 +417,74 @@
       "pendiente": ""
     },
     {
+      "diapositivas": "17",
+      "cifra": "SPRT simulado, tasa 1/17: letras para confirmar y para descartar la profundidad (E6)",
+      "esperado": "983 · 1.090",
+      "obtenido": "983 · 1.090",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "17",
+      "cifra": "alemán real: letras para confirmar, con bigramas y trigramas y con pesos de Turing (E6)",
+      "esperado": "254 · 332",
+      "obtenido": "254 · 332",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "17, 23",
+      "cifra": "E6: pares por hipótesis",
+      "esperado": "2.000",
+      "obtenido": "2.000",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
       "diapositivas": "16",
       "cifra": "Turing, 12 letras: paradas por orden con 0, 1, 2 y 3 lazos; en 60 órdenes con 2 y 3",
       "esperado": "820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60",
       "obtenido": "820 · 31 · 1,2 · 0,04; 72 y 2,4 en 60",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "16",
+      "cifra": "nuestra Bombe, 12 letras, con diagonal board: paradas por orden con 0 a 3 lazos (E5)",
+      "esperado": "678 · 26 · 0,99 · 0,11",
+      "obtenido": "678 · 26 · 0,99 · 0,11",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "16",
+      "cifra": "parada verdadera en modo Bletchley · menús en que gira el central · modo robusto (E5)",
+      "esperado": "55 % · 45 % · 98 %",
+      "obtenido": "55 % · 45 % · 98 %",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "16",
+      "cifra": "modo robusto: veces el tiempo; segundos por orden frente al modo Bletchley (E5)",
+      "esperado": "12 veces; 0,11 s frente a 0,008 s",
+      "obtenido": "12 veces; 0,11 s frente a 0,008 s",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "16, 23",
+      "cifra": "E5: menús de 12 letras distintas por celda",
+      "esperado": "100",
+      "obtenido": "100",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "20",
+      "cifra": "cada lazo divide las paradas falsas por (E5, media geométrica de 0 a 2 lazos)",
+      "esperado": "26",
+      "obtenido": "26",
       "coincide": true,
       "pendiente": ""
     }
