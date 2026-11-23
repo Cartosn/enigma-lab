@@ -1,9 +1,9 @@
 # Progreso
 
-Última actualización: 22-11-2026 · fase 5 cerrada: E7 (Rejewski) y E8 (ataque moderno). Docker
+Última actualización: 23-11-2026 · fase 5 cerrada: E7 (Rejewski) y E8 (ataque moderno). Docker
 probado después de la fase 5; Experimentos ya funciona sin el corpus completo (D-071). Repositorio
 remoto creado, con la CI en verde. La exposición será en este equipo (P-001 resuelto, D-072).
-Diapositivas y guion en su versión 2: sus 61 cifras coinciden con el código (D-073).
+Diapositivas y guion en su versión 3: sus 61 cifras coinciden con el código (D-073, D-074).
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
@@ -98,6 +98,21 @@ y la 17 frente a los CSV:
 
 `make test`: 353 pruebas en 2 min 5 s, con las lentas incluidas; `make lint`, sin errores.
 
+**Presentación, versión 3** (23-11-2026, D-074). El guion corrige las ocho notas de la versión
+2, y la diapositiva 16 dice «frente a 0,009 s». El PDF es el mismo mazo en vectores (184 KB en
+vez de 5,6 MB de imágenes): su texto, página por página, es el de la versión 2 salvo ese cambio,
+y las 24 páginas se revisaron renderizadas.
+- **Cifras:** 61 de 61. La de la diapositiva 16 compara ahora los mismos menús
+  (`e5_bombe.bletchley_same_menus`).
+- **Notas nuevas** en «Discrepancias», ninguna sobre una cifra:
+  - el «peor 5 %» del guion es el p95, y el caso más lento tardó 14,9 s;
+  - el banco midió con mensajes de 78 letras, y el guion no fija el largo;
+  - la 15 da κ = 0,080 (con X entre palabras) y la 23, 0,076 (solo letras).
+- **«Demos»** da ahora el máximo del banco y el largo del mensaje.
+- **Guía de estudio:** las 10 primeras preguntas siguen las del guion v3.
+
+`make test`: 353 pruebas en 2 min 56 s, con las lentas incluidas; `make lint`, sin errores.
+
 **Qué quedó:**
 - **`rejewski/`:**
   - `characteristic.py`: las seis permutaciones del indicador con la máquina real, AD, BE y CF, su
@@ -160,8 +175,8 @@ y la 17 frente a los CSV:
 **Qué falta:** nada del código.
 
 **Pendiente del autor:**
-- corregir el guion (la demo 2 antes que nada) y la diapositiva 16 con «Discrepancias» de
-  `results/presentacion/RESUMEN.md`;
+- si quiere, pasar al guion y a la diapositiva 15 las tres notas de «Discrepancias» de
+  `results/presentacion/RESUMEN.md` (ninguna cambia una cifra);
 - reescribir con su voz los 6 párrafos `% REVISAR` del informe, entre ellos el nuevo de
   «Rejewski y ataque moderno»;
 - ensayar dos veces con cronómetro, las dos demos incluidas, y preguntarle al profesor si las

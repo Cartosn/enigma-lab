@@ -326,12 +326,15 @@ def _bombe_success() -> str:
 
 
 def _robust_cost() -> str:
-    """Lo que cuesta el modo robusto (E5): veces el tiempo y segundos por orden de cada modo."""
+    """Lo que cuesta el modo robusto (E5): veces el tiempo y segundos por orden de cada modo,
+    los dos en los mismos menús (D-074)."""
+    from enigma_lab.experiments.e5_bombe import bletchley_same_menus
+
     e5 = _saved("e5")
     return (
         f"{fmt_int(round(e5['robusto_tiempo_relativo']))} veces; "
         f"{fmt_dec(e5['s_por_orden_robusto'], 2)}{NBSP}s frente a "
-        f"{fmt_dec(e5['s_por_orden_bletchley'], 3)}{NBSP}s"
+        f"{fmt_dec(bletchley_same_menus(e5), 3)}{NBSP}s"
     )
 
 
@@ -616,8 +619,8 @@ CIFRAS: tuple[Cifra, ...] = (
     ),
     Cifra(
         "16",
-        "modo robusto: veces el tiempo; segundos por orden frente al modo Bletchley (E5)",
-        f"12 veces; 0,11{NBSP}s frente a 0,008{NBSP}s",
+        "modo robusto: veces el tiempo; segundos por orden frente al Bletchley, mismos menús (E5)",
+        f"12 veces; 0,11{NBSP}s frente a 0,009{NBSP}s",
         _robust_cost,
     ),
     Cifra("16, 23", "E5: menús de 12 letras distintas por celda", "100", _e5_menus),

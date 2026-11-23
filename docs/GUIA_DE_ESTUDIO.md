@@ -592,7 +592,7 @@ texto que parece alemán.
 
 ## Las 15 preguntas más probables
 
-Las diez primeras son las «Preguntas probables» del guion (versión 2), en su orden. Cada
+Las diez primeras son las «Preguntas probables» del guion (versión 3), en su orden. Cada
 respuesta dice dónde está en el código. La de por qué con alemán real sobreviven más
 alineaciones que (25/26)^L está entre las preguntas del tema 3.
 
@@ -615,10 +615,10 @@ alineaciones que (25/26)^L está entre las preguntas del tema 3.
    por segundo tomaría unos 5.037 años (`core/keyspace.py` · `brute_force_years`). Los ataques
    de solo texto cifrado no prueban claves: buscan los rotores con el índice de coincidencia y el
    plugboard por hill climbing (Gillogly 1995; Ostwald y Weierud 2017). E8 implementa el de
-   Gillogly (`attacks/gillogly.py`): con 6 cables lee la mitad de los mensajes desde unas
-   314 letras, en 1,7 s por mensaje; con 10 cables casi no lee nada (el 3,5 % de los mensajes
-   de 25 a 1.500 letras; con 1.500 letras, el 25 %), porque su fase 1 supone los anillos
-   (tema 6.4).
+   Gillogly (`attacks/gillogly.py`), que tarda 1,7 s por mensaje. Con 6 cables lee la mitad
+   de los mensajes desde unas 314 letras, y con 8, desde unas 845. Con 10 cables casi no lee
+   nada (el 3,5 % de los mensajes de 25 a 1.500 letras; con 1.500 letras, el 25 %), porque
+   su fase 1 supone los anillos (tema 6.4).
 6. *¿Qué es un decibán?* 10·log₁₀ del factor de Bayes, P(datos | profundidad) /
    P(datos | azar). La evidencia de observaciones independientes se suma, porque el
    logaritmo convierte el producto en una suma. Una repetición suma +1,845 dB a favor de la

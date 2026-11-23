@@ -278,6 +278,17 @@ def turing_agreement(table: pd.DataFrame) -> tuple[int, int]:
     return int(((ratio >= 0.5) & (ratio <= 2)).sum()), len(exact)
 
 
+def bletchley_same_menus(e5: dict[str, Any]) -> float:
+    """Segundos por orden del modo Bletchley en los menús donde se midió el robusto.
+
+    ``robusto_tiempo_relativo`` divide el tiempo del robusto por el del Bletchley en esos
+    mismos menús, así que este tiempo es el del robusto entre el cociente. Es el que se
+    compara con el robusto; ``s_por_orden_bletchley`` promedia todos los menús (8 a 16
+    letras). Requiere la corrida del modo robusto.
+    """
+    return float(e5["s_por_orden_robusto"] / e5["robusto_tiempo_relativo"])
+
+
 def aggregate(df: pd.DataFrame) -> pd.DataFrame:
     """Tabla de la diapositiva 16 (``r3_bombe.csv``): una fila por celda, diagonal y modo."""
     out = []

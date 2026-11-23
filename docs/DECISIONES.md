@@ -791,6 +791,24 @@ configuración de ese banco (D-050).
   la del alemán real frente a (25/26)^L queda entre las del tema 3, donde ya estaba. El modo
   robusto cuesta «unas 12 veces el tiempo», como en la corrida actual, y no «13 a 14».
 
+### D-074 · Presentación, versión 3: el tiempo de la diapositiva 16 y las notas que quedan
+- **Qué llegó.** El autor reemplazó las diapositivas y el guion por la versión 3 (23-11-2026),
+  hecha con «Discrepancias» de `RESUMEN.md`. El guion corrige las ocho notas de la versión 2 y
+  nada más. El PDF es el mismo mazo en vectores (texto y gráficos) en vez de una imagen por
+  página: 184 KB en lugar de 5,6 MB, con el mismo texto salvo «frente a 0,009 s» en la 16. Se
+  guarda con el nombre de siempre, `Romper Enigma presentación final.pdf`.
+- **El tiempo de la diapositiva 16 se compara en los mismos menús.** La cifra del registro era
+  0,11 s frente a 0,008 s, el promedio del modo Bletchley con todos los menús (8 a 16 letras).
+  Ahora es frente a 0,009 s, el del Bletchley en los menús de 12 y 16 letras donde se midió el
+  robusto, que es lo que dan las 12,0 veces. `e5_bombe.bletchley_same_menus` lo calcula para el
+  registro y para el resumen.
+- **Notas nuevas en «Discrepancias»**, ninguna sobre una cifra. El «9,8 s en el peor 5 %» del
+  guion es el p95: el caso más lento tardó 14,9 s, 6,3 de ellos en «Verificar». El banco midió
+  con mensajes de 78 letras, y el guion no fija el largo. La diapositiva 15 llama «IC del
+  alemán» a κ = 0,080, el del alemán con X entre palabras, y la 23 da 0,076, el de solo letras.
+  «Demos» muestra ahora el máximo del banco y el largo del mensaje: de su «p95» salió el «peor
+  5 %».
+
 ## Pendientes de decidir
 
 Ninguno.

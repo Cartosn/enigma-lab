@@ -23,8 +23,10 @@ import os
 import platform
 import sys
 import time
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
+from statistics import median
 from typing import Any
 
 import pandas as pd
@@ -34,13 +36,13 @@ from enigma_lab.cifras import evaluate
 from enigma_lab.core.machine import Enigma, EnigmaConfig
 from enigma_lab.core.vectors import vector
 from enigma_lab.experiments.common import git_commit, read_summary
-from enigma_lab.experiments.e5_bombe import turing_agreement
+from enigma_lab.experiments.e5_bombe import bletchley_same_menus, turing_agreement
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 
 PHASES_LEFT = [
     (
-        "Guion (versión 2) · corregir los pasos de la demo 2 y quitar el pendiente del banco "
-        "de la demo, con las notas de «Con las diapositivas y el guion» (Discrepancias)",
+        "Guion y diapositiva 15 · las notas de «Con las diapositivas y el guion» "
+        "(Discrepancias); ninguna cambia una cifra",
         "antes del primer ensayo",
     ),
 ]
@@ -255,7 +257,7 @@ def _stops(value: float) -> str:
     return f"{value:.3g}".replace(".", ",")
 
 
-def _and(values: list[int]) -> str:
+def _and(values: Sequence[object]) -> str:
     """[12, 16] → «12 y 16»."""
     words = [str(v) for v in values]
     return words[0] if len(words) == 1 else ", ".join(words[:-1]) + " y " + words[-1]
@@ -269,15 +271,6 @@ def _cell(table: pd.DataFrame, letters: int, loops: int, diagonal: str, mode: st
         & (table["modo"] == mode)
     ]
     return None if match.empty else match.iloc[0]
-
-
-def _bletchley_same_menus(e5: dict[str, Any]) -> float:
-    """Segundos por orden del modo Bletchley en los menús donde se midió el robusto.
-
-    ``robusto_tiempo_relativo`` compara los mismos menús: es el tiempo del robusto dividido
-    por el del Bletchley en ellos, así que ese tiempo es el del robusto entre el cociente.
-    """
-    return float(e5["s_por_orden_robusto"] / e5["robusto_tiempo_relativo"])
 
 
 def _slide_16(e5: dict[str, Any], table: pd.DataFrame | None) -> list[str]:
@@ -364,7 +357,7 @@ def _slide_16(e5: dict[str, Any], table: pd.DataFrame | None) -> list[str]:
             f", en promedio con todos los menús ({min(letters)} a {max(letters)} letras), y "
             f"{fmt_dec(e5['s_por_orden_robusto'], 3)} s en modo robusto, con los de "
             f"{_and(e5.get('letras_robusto', [12]))} letras. En esos mismos menús el modo "
-            f"Bletchley tarda {fmt_dec(_bletchley_same_menus(e5), 3)} s: de ahí las "
+            f"Bletchley tarda {fmt_dec(bletchley_same_menus(e5), 3)} s: de ahí las "
             f"{fmt_dec(e5['robusto_tiempo_relativo'], 1)} veces."
         )
     lines.append(timing + ("" if timing.endswith(".") else "."))
@@ -572,15 +565,18 @@ def _demo_2(bench: dict[str, Any]) -> list[str]:
         "barrido, máquina de verificación y «Verificar». Éxito: el descifrado es el mensaje "
         "letra por letra.",
         "",
-        "| Configuración | Éxito (IC 95 %) | p50 | p95 | Barrido p95 | ¿Cumple? |",
-        "| --- | --- | --- | --- | --- | --- |",
+        "p95: el 95 % de los casos tardó eso o menos; «Máximo» es el más lento.",
+        "",
+        "| Configuración | Éxito (IC 95 %) | p50 | p95 | Máximo | Barrido p95 | ¿Cumple? |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
     ]
     for c in bench["configuraciones"]:
         low, high = c["exito_ic"]
+        slowest = f"{fmt_dec(c['maximo'], 1)} s" if c.get("maximo") is not None else "—"
         lines.append(
             f"| {c['nombre']} | {c['exitos']} de {c['n']} ({fmt_pct(low, 0)}–"
             f"{fmt_pct(high, 0)}) | {fmt_dec(c['p50'], 1)} s | {fmt_dec(c['p95'], 1)} s | "
-            f"{fmt_dec(c['p95_barrido'], 1)} s | {'sí' if c['cumple'] else 'no'} |"
+            f"{slowest} | {fmt_dec(c['p95_barrido'], 1)} s | {'sí' if c['cumple'] else 'no'} |"
         )
     chosen = next((c for c in bench["configuraciones"] if c["id"] == bench["recomendada"]), None)
     lines.append("")
@@ -591,8 +587,10 @@ def _demo_2(bench: dict[str, Any]) -> list[str]:
     else:
         how = {
             "60_robusto": "el compañero usa «Clave aleatoria» sin restricciones, con el modelo "
-            "Enigma I que trae Máquina, y empieza su mensaje por WETTERBERICHT (con X entre "
-            "palabras). En la demo, el botón «Cifrado del compañero» de La Bombe deja el crib "
+            "Enigma I que trae Máquina, y escribe un mensaje de unas "
+            f"{fmt_int(round(bench['letras_mensaje'], -1))} letras, como los del banco, que "
+            "empiece por WETTERBERICHT (con X entre palabras). En la demo, el botón «Cifrado "
+            "del compañero» de La Bombe deja el crib "
             "en la posición 0, «Rotores I a V (60 órdenes)» y el modo robusto. Se pega el "
             "cifrado y se pulsa Ctrl+Enter: aparecen el menú y sus lazos. El barrido empieza "
             "con «Correr la Bombe», y al terminar, «Verificar» revisa todas las paradas "
@@ -606,9 +604,14 @@ def _demo_2(bench: dict[str, Any]) -> list[str]:
             "«Cifrado del compañero» deja ese crib, «Rotores I a V (60 órdenes)» y el modo "
             "robusto.",
         }[chosen["id"]]
+        slowest = (
+            f" y máximo {fmt_dec(chosen['maximo'], 1)} s"
+            if chosen.get("maximo") is not None
+            else ""
+        )
         lines.append(
             f"- **Recomendada ({bench['criterio']}):** {chosen['nombre']}: {how} Éxito "
-            f"{fmt_pct(chosen['exito'])}, p95 {fmt_dec(chosen['p95'], 1)} s."
+            f"{fmt_pct(chosen['exito'])}, p95 {fmt_dec(chosen['p95'], 1)} s{slowest}."
         )
     lines.append(
         "- Estos tiempos son del equipo indicado, un escritorio que es también el de la "
@@ -783,97 +786,83 @@ def _other_results(e2: dict[str, Any], e3: dict[str, Any]) -> list[str]:
     return lines or ["Sin resultados de E2 ni E3."]
 
 
+def _bench_tail(chosen: dict[str, Any]) -> str | None:
+    """Lo que el p95 del banco de la demo 2 no dice: los casos más lentos y en qué se van."""
+    cases = chosen.get("casos") or []
+    if not cases or chosen.get("maximo") is None:
+        return None
+    slowest = max(cases, key=lambda c: c["segundos"])
+    slower = sorted(c["segundos"] for c in cases if c["segundos"] > chosen["p95"])
+    p50, p95 = fmt_dec(chosen["p50"], 1), fmt_dec(chosen["p95"], 1)
+    return (
+        f"- Guion, «Antes de exponer · Computador» («{p50} s en un caso típico y {p95} s en el "
+        f"peor 5 %»): {p95} s es el percentil 95 del total (barrido y «Verificar»). El 95 % de "
+        f"los casos tardó eso o menos, y los {len(slower)} más lentos tardaron "
+        f"{_and([f'{fmt_dec(v, 1)} s' for v in slower])}. En el más lento, el barrido tardó "
+        f"{fmt_dec(slowest['segundos_barrido'], 1)} s y «Verificar», "
+        f"{fmt_dec(slowest['segundos_verificacion'], 1)} s. El barrido nunca pasó de "
+        f"{fmt_dec(max(c['segundos_barrido'] for c in cases), 1)} s, así que valen los «6 a "
+        "10 s» del paso 3 de la demo 2; «Verificar» suele tardar "
+        f"{fmt_dec(median(c['segundos_verificacion'] for c in cases), 1)} s, pero llegó a "
+        f"{fmt_dec(max(c['segundos_verificacion'] for c in cases), 1)} s. Corrección: «{p50} s "
+        f"en un caso típico, {p95} s o menos en el 95 % de los casos y "
+        f"{fmt_dec(chosen['maximo'], 1)} s en el peor», y en el paso 4, que «Verificar» puede "
+        "tardar unos segundos."
+    )
+
+
+def _message_length(bench: dict[str, Any], chosen: dict[str, Any]) -> str:
+    """El largo del mensaje del compañero: el banco midió con uno solo."""
+    letters = bench["letras_mensaje"]
+    return (
+        "- Guion, «Antes de exponer · Compañero»: el éxito y los tiempos del banco son con "
+        f"mensajes de {letters} letras ({chosen['exitos']} de {chosen['n']}), y el guion no "
+        "fija el largo. Para que la demo sea la que se midió, conviene pedir uno parecido. "
+        f"Corrección: «cifra un mensaje de unas {fmt_int(round(letters, -1))} letras que "
+        "empiece por WETTERBERICHT»."
+    )
+
+
+def _kappa_note(e3: dict[str, Any], e4: dict[str, Any]) -> str:
+    """Diapositivas 15 y 23: dos IC del alemán, con X entre palabras y sin ellas."""
+    kappa = fmt_dec(e4["kappa_aleman_x"], 3)
+    return (
+        f"- Diapositivas 15 y 23: κ = {kappa}, «el índice de coincidencia del alemán» de la 15, "
+        "es el del alemán escrito con X entre palabras, como los mensajes de E4. El de la 23 "
+        "(«Alemán ≈ 0,076») es el de solo letras: "
+        f"{fmt_dec(e3['aleman']['ic_corpus'], 4)} en nuestro corpus y "
+        f"{fmt_dec(e3['ic_referencia_aleman'], 4)} según Pommerening. Las dos cifras están "
+        "bien, pero juntas parecen contradecirse. Corrección en la 15: «… del alemán con X "
+        f"entre palabras (κ = {kappa})»."
+    )
+
+
 def _guion_notes(summary: dict[str, Any], bench: dict[str, Any]) -> list[str]:
-    """Lo que la versión 2 de las diapositivas y del guion dice distinto de la app o de los
+    """Lo que la versión 3 de las diapositivas y del guion dice distinto de la app o de los
     resultados, o que se presta a confusión, con su corrección (para «Discrepancias»)."""
-    lines = [
-        "**Con las diapositivas y el guion (versión 2, 22-11-2026).** Ninguna cifra contradice "
-        "los resultados. Estas frases sí contradicen la app o se prestan a confusión; cada una "
-        "trae su corrección:",
-        "",
-        "- Guion, diapositiva 12 (demo 2), pasos 2 y 3: el menú aparece solo después de "
-        "Ctrl+Enter, y Ctrl+Enter no corre la Bombe. En la app: «Cifrado del compañero», pegar "
-        "el cifrado, Ctrl+Enter (aparecen el menú y sus lazos), «Correr la Bombe» y, al "
-        "terminar, «Verificar», que revisa todas las paradas consistentes sin que haya que "
-        "elegir una y muestra el texto en grande. Mientras corre hay una sola barra, que avanza "
-        "un orden de rotores a la vez («Orden 1 de 60», «Orden 2 de 60»…), un contador de "
-        "paradas con el cronómetro y una columna de tambores por arista del menú. Corrección "
-        "del paso 3: «la barra avanza un orden de rotores a la vez; el contador son las "
-        "paradas».",
-    ]
+    head = (
+        "**Con las diapositivas y el guion (versión 3, 23-11-2026).** Ninguna cifra contradice "
+        "los resultados, y las ocho notas de la versión 2 quedaron corregidas: los pasos de la "
+        "demo 2, el pendiente del banco, «Vector BDZGO», el modelo del compañero, el tiempo de "
+        "la diapositiva 16 y tres respuestas de «Preguntas probables»."
+    )
+    notes: list[str | None] = []
     chosen = next(
         (c for c in bench.get("configuraciones", []) if c["id"] == bench.get("recomendada")), None
     )
     if chosen is not None:
-        lines.append(
-            "- Guion, «Pendiente» y «Antes de exponer · Computador»: el computador de la "
-            "exposición es este escritorio (D-072), y `make bench-demo` ya corrió en él "
-            f"({bench['fecha']}): {chosen['nombre']}, {chosen['exitos']} de {chosen['n']}, p50 "
-            f"{fmt_dec(chosen['p50'], 1)} s y p95 {fmt_dec(chosen['p95'], 1)} s. El pendiente "
-            "está cumplido: no hay que medir en otro equipo."
-        )
-    lines += [
-        "- Guion, diapositiva 4 (demo 1), paso 2: «Vector BDZGO» ya deja AAAAA escrito y "
-        "BDZGO en la salida. Si se escribe AAAAA otra vez, se agregan cinco letras a la entrada.",
-        "- Guion, «Antes de exponer · Compañero»: «Clave aleatoria» sortea entre los rotores "
-        "del modelo elegido en Máquina. Con Enigma I, el que trae la página, salen los rotores "
-        "I a V y el reflector B, lo que barre la Bombe; si el compañero cambia el modelo a M3 o "
-        "M4, puede salir un rotor VI a VIII y la Bombe no encontraría la clave.",
+        notes += [_bench_tail(chosen), _message_length(bench, chosen)]
+    e3, e4 = summary.get("e3", {}), summary.get("e4", {})
+    if e3 and e4.get("kappa_aleman_x") is not None:
+        notes.append(_kappa_note(e3, e4))
+    found = [n for n in notes if n]
+    if not found:
+        return [head]
+    return [
+        head + " Quedan detalles que se prestan a confusión; cada uno trae su corrección:",
+        "",
+        *found,
     ]
-    e5, e6, e7, e8 = (summary.get(k, {}) for k in ("e5", "e6", "e7", "e8"))
-    if e5.get("s_por_orden_robusto"):
-        same = _bletchley_same_menus(e5)
-        lines.append(
-            f"- Diapositiva 16, «a {fmt_int(round(e5['robusto_tiempo_relativo']))} veces el "
-            f"tiempo: {fmt_dec(e5['s_por_orden_robusto'], 2)} s por orden, frente a "
-            f"{fmt_dec(e5['s_por_orden_bletchley'], 3)} s»: las "
-            f"{fmt_dec(e5['robusto_tiempo_relativo'], 1)} veces comparan los mismos menús "
-            f"({_and(e5['letras_robusto'])} letras), donde el modo Bletchley tarda "
-            f"{fmt_dec(same, 3)} s por orden. Los {fmt_dec(e5['s_por_orden_bletchley'], 3)} s son "
-            "su promedio con todos los menús, y con ellos el cociente daría "
-            f"{fmt_dec(e5['s_por_orden_robusto'] / e5['s_por_orden_bletchley'], 0)}. "
-            f"Corrección: «frente a {fmt_dec(same, 3)} s»."
-        )
-    if e6:
-        simulated = e6["simulacion"]["tasa_1_17/letras_1_17"]["profundidad"]
-        gap, wald = e6["brecha_wald"]["profundidad"], e6["wald"]["profundidad"]
-        low, high = simulated["ic"]
-        lines.append(
-            "- Guion, pregunta «¿Por qué la simulación da más letras que Wald?»: las "
-            f"{fmt_dec(gap['total'], 1)} letras son la diferencia entre el cálculo exacto "
-            f"({fmt_dec(e6['exacto']['profundidad']['letras'], 1)}) y Wald ({fmt_dec(wald, 1)}), "
-            f"y el sobrepaso explica {fmt_dec(gap['sobrepaso_arriba'], 1)}. La simulación da "
-            f"{fmt_int(round(simulated['letras']))}, "
-            f"{fmt_int(round(simulated['letras'] - wald))} más que Wald; el resto es azar de la "
-            "simulación, porque el valor exacto cae dentro de su IC 95 % "
-            f"({fmt_int(round(low))}–{fmt_int(round(high))}). Corrección: «el cálculo exacto da "
-            f"{fmt_dec(gap['total'], 1)} letras más que Wald, y "
-            f"{fmt_dec(gap['sobrepaso_arriba'], 1)} son el sobrepaso; la simulación coincide con "
-            "el exacto dentro de su IC»."
-        )
-    if e7:
-        k = e7["catalogo"]["kuhl"]
-        lines.append(
-            "- Guion, pregunta «¿Por qué su catálogo no da lo mismo que Kuhl?» («la diferencia "
-            "es menor del 1 %»): vale para las dos cifras de la diapositiva 9 "
-            f"({fmt_pct(k['caracteristicas_distintas']['relativa'], 2)} y "
-            f"{fmt_pct(k['caracteristicas_unicas']['relativa'], 2)}), no para la clase más "
-            f"frecuente: {fmt_int(k['mayor_clase']['e7'])} frente a "
-            f"{fmt_int(k['mayor_clase']['kuhl'])} ({fmt_pct(k['mayor_clase']['relativa'], 1)})."
-        )
-    if e8:
-        longest = max(e8["longitudes"])
-        cell = e8["celdas"].get(f"10/{longest}")
-        ten = e8["por_cables"]["10"]["exito"]
-        if cell is not None:
-            lines.append(
-                "- Guion, pregunta «¿Hoy se rompería por fuerza bruta?» («con 10 cables casi "
-                f"nunca ({fmt_pct(ten)})»): el {fmt_pct(ten)} es el promedio de todas las "
-                f"longitudes, de {fmt_int(min(e8['longitudes']))} a {fmt_int(longest)} letras. "
-                f"Con {fmt_int(longest)} letras se lee el {fmt_pct(cell['exito'], 0)} de los "
-                "mensajes con 10 cables."
-            )
-    return lines
 
 
 def _discrepancies(
