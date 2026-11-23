@@ -1,7 +1,7 @@
 # Resumen de resultados para la presentación
 
-- **Fecha:** 2026-11-22 23:24 UTC
-- **Commit:** 7da5139
+- **Fecha:** 2026-11-23 03:33 UTC
+- **Commit:** 8840e61
 - **Semilla:** 2026
 - **Modo:** completo
 - **Corridas:** E1: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E2: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E3: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E4: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E5: modo completo, 2026-11-22 16:47 UTC, commit 67e022b; E6: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E7: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E8: modo completo, 2026-11-22 17:13 UTC, commit 67e022b
@@ -126,7 +126,7 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 
 ## 3. Demos
 
-- **Demo 1 (diapositiva 4):** el cálculo es instantáneo. La traza de «Vector BDZGO» tarda 0,2 ms y la de «Portada» 0,6 ms en el equipo donde corrió `make resumen` (Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos). Los 45 s del guion los pone la interacción. Falta cronometrar el recorrido completo en el portátil del autor.
+- **Demo 1 (diapositiva 4):** el cálculo es instantáneo. La traza de «Vector BDZGO» tarda 0,2 ms y la de «Portada» 0,6 ms en el equipo donde corrió `make resumen` (Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos). Los 45 s del guion los pone la interacción.
 - **La app en clase:** abre `http://localhost:8501/maquina?demo=1` (el modo demo queda en la URL y sobrevive a una recarga) y, en otra pestaña, `http://localhost:8501/bombe?demo=1`; pliega la barra lateral para ganar ancho. En modo demo, Máquina muestra solo «Vector BDZGO» y «Portada», y La Bombe, «Cifrado del compañero» y «Caso de respaldo» (plan B).
 - **Demo 2 (diapositiva 12):** `make bench-demo` del 2026-11-21 18:25 UTC (commit 5b34896) en Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos, Windows 11. Casos de compañero: clave como la de «Clave aleatoria» (10 cables), mensaje alemán de 78 letras que empieza por el crib, crib en la posición 0. Flujo completo de la página La Bombe: barrido, máquina de verificación y «Verificar». Éxito: el descifrado es el mensaje letra por letra.
 
@@ -137,7 +137,7 @@ Generado por `make resumen` a partir de `results/summary.json` y los Parquet, si
 | Crib WETTERBERICHTXFUER, 60 órdenes, modo robusto | 59 de 60 (91 %–100 %) | 8,9 s | 10,4 s | 10,4 s | sí |
 
 - **Recomendada (la más simple con éxito ≥ 95% y p95 ≤ 30 s):** 60 órdenes, modo robusto: el compañero usa «Clave aleatoria» sin restricciones y empieza su mensaje por WETTERBERICHT (con X entre palabras). En la demo, el botón «Cifrado del compañero» de La Bombe deja el crib en la posición 0, «Rotores I a V (60 órdenes)» y el modo robusto; se pega el cifrado y se pulsa Ctrl+Enter. Éxito 100,0 %, p95 9,8 s.
-- Estos tiempos son del equipo indicado. Este equipo es un escritorio; el presupuesto de 30 s es del portátil del autor (P-001): corre `make bench-demo` allí antes de ensayar y usa la configuración que recomiende.
+- Estos tiempos son del equipo indicado, un escritorio que es también el de la exposición (D-072): no hace falta medirlos en otro equipo.
 
 ## 4. Discrepancias
 
@@ -158,5 +158,4 @@ Ninguna contradicción con las diapositivas ni con el guion. Notas:
 
 ## 5. Pendientes
 
-- Demos · correr `make bench-demo` en el portátil del autor (P-001) y ensayar las dos demos allí: antes de ensayar.
 - Diapositiva 21 · poner el enlace del repositorio, https://github.com/Cartosn/enigma-lab (público; la CI corre en cada push): antes de la presentación.
