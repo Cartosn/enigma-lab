@@ -60,8 +60,8 @@ versión 4: 17:55 de exposición, los mitos a los anexos (18 «Lecciones del cur
 - cumpleaños: con 157 claves de mensaje entre 17.576, alguna se repite con probabilidad 50,28 %
   (con 156, 49,84 %); con las dos primeras letras (676 valores), bastan 31 (50,26 %).
 
-`make test`: 401 pruebas (38 nuevas) en 2 min 14 s, con las lentas incluidas; `make lint`, sin
-errores (mypy en 84 archivos); `make report`: 3 páginas.
+`make test`: 402 pruebas (39 nuevas, la última de D-079) en 2 min 10 s, con las lentas
+incluidas; `make lint`, sin errores (mypy en 84 archivos); `make report`: 3 páginas.
 
 **Revisado en el navegador** (Inicio, Máquina, Espacio de claves, Estadística, Cribs y menús,
 Experimentos y La Bombe; las pruebas cubren las diez páginas, con y sin modo demo): la línea se
@@ -69,13 +69,13 @@ ve a 16 px, y a 20 px en modo demo; «Portada» descifra la portada; la calculad
 Estadística dan sus cifras. Se encontró y corrigió un texto suelto que la «magia» de Streamlit
 dibujaba en Espacio de claves (una prueba nueva lo vigila en todas las páginas).
 
-**Encontrado, sin corregir (no es de este cambio):** con el servidor recién arrancado, si la
-primera página que se abre es `http://localhost:8501/maquina?demo=1` o `/bombe?demo=1`,
-Streamlit la corre sin pasar por `Inicio.py`: sin modo demo, sin estilos y con la barra lateral
-de nombres de archivo. Pasa porque las páginas viven en `app/pages/`, la carpeta que Streamlit
-descubre sola antes de que `st.navigation` se registre. Desde la segunda carga, o si primero se
-abre `http://localhost:8501`, todo funciona. `make app` abre la raíz, así que la demo no se ve
-afectada si se arranca así.
+**Encontrado y corregido (D-079):** con el servidor recién arrancado, si la primera página que
+se abría era `http://localhost:8501/maquina?demo=1` o `/bombe?demo=1`, Streamlit la corría sin
+pasar por `Inicio.py`: sin modo demo, sin estilos y con la barra lateral de nombres de archivo.
+Pasaba porque las páginas vivían en `app/pages/`, la carpeta que activa el modo antiguo de
+varias páginas de Streamlit hasta que una ejecución llama a `st.navigation`. Ahora viven en
+`app/paginas/` (las URL no cambian) y una prueba lo vigila. En el navegador, con el servidor
+recién arrancado, las dos URL del guion abren como primera página en modo demo.
 
 **Pendiente:**
 - pasar al guion y a las diapositivas 5, 6, 13 y 15 las seis notas de «Discrepancias» de
@@ -83,9 +83,7 @@ afectada si se arranca así.
 - reescribir con voz propia «Contexto en el curso» y «Análisis y lecciones» del informe, que
   cambiaron;
 - ensayar dos veces con cronómetro y preguntar al profesor si las preguntas cuentan dentro de
-  los 20 minutos;
-- decidir si se corrige la primera carga directa de las páginas (por ejemplo, con otro nombre
-  para `app/pages/`).
+  los 20 minutos.
 
 ## Revisión final (23-11-2026)
 

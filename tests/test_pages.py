@@ -43,7 +43,7 @@ def test_experiments_page_without_the_full_corpus(
     monkeypatch.setattr(corpus, "FULL_DIR", tmp_path)  # carpeta vacía: no hay corpus completo
     clear_caches()
     try:
-        page = str(paths.APP / "pages" / "experimentos.py")
+        page = str(paths.APP / "paginas" / "experimentos.py")
         app = AppTest.from_file(page, default_timeout=120).run()
         assert not app.exception, app.exception
         assert len([r for r in app.radio if r.label == "Resultados"]) == 8
@@ -62,14 +62,14 @@ def test_experiments_page_without_the_full_corpus(
 
 
 def test_cribs_page_shows_slide_11_menu() -> None:
-    app = AppTest.from_file(str(paths.APP / "pages" / "cribs.py"), default_timeout=60).run()
+    app = AppTest.from_file(str(paths.APP / "paginas" / "cribs.py"), default_timeout=60).run()
     values = {m.label: m.value for m in app.metric}
     assert values["Letras"] == "11" and values["Aristas"] == "13" and values["Lazos"] == "3"
     assert values["Letra de prueba"] == "T"
 
 
 def test_cribs_page_backup_case() -> None:
-    app = AppTest.from_file(str(paths.APP / "pages" / "cribs.py"), default_timeout=60).run()
+    app = AppTest.from_file(str(paths.APP / "paginas" / "cribs.py"), default_timeout=60).run()
     next(b for b in app.button if b.label == "Caso de respaldo").click().run()
     assert not app.exception
     values = {m.label: m.value for m in app.metric}
@@ -77,7 +77,7 @@ def test_cribs_page_backup_case() -> None:
 
 
 def test_keyspace_page_figures() -> None:
-    app = AppTest.from_file(str(paths.APP / "pages" / "espacio.py"), default_timeout=60).run()
+    app = AppTest.from_file(str(paths.APP / "paginas" / "espacio.py"), default_timeout=60).run()
     values = {m.label: m.value for m in app.metric}
     assert values["Barrido de la Bombe"] == "1.054.560"
     assert re.match(r"70,2\s%", values["Parte del plugboard"])
@@ -85,7 +85,7 @@ def test_keyspace_page_figures() -> None:
 
 def test_keyspace_page_parallel_attack() -> None:
     """La calculadora reparte la fuerza bruta: con 1.000 máquinas de 10⁹, unos 5,04 años."""
-    app = AppTest.from_file(str(paths.APP / "pages" / "espacio.py"), default_timeout=60).run()
+    app = AppTest.from_file(str(paths.APP / "paginas" / "espacio.py"), default_timeout=60).run()
     label = "Probar las 1,6 × 10²⁰ claves"
     assert {m.label: m.value for m in app.metric}[label] == "5.037,2 años"
     app.select_slider[0].set_value(1_000).run()
@@ -147,7 +147,7 @@ def test_course_labels_follow_the_course_weeks() -> None:
 
 def test_banburismus_page_shows_turing_figures_and_finds_the_offset() -> None:
     """Cifras de las diapositivas 13 y 17; con 1.500 letras gana el desplazamiento verdadero."""
-    page = str(paths.APP / "pages" / "banburismus.py")
+    page = str(paths.APP / "paginas" / "banburismus.py")
     app = AppTest.from_file(page, default_timeout=120).run()
     assert not app.exception
     values = {m.label: m.value for m in app.metric}
@@ -170,7 +170,7 @@ def test_bombe_page_backup_case_decrypts() -> None:
     from enigma_lab.core.machine import groups_of_five
 
     data = json.loads((paths.DEMO / "respaldo_bombe.json").read_text(encoding="utf-8"))
-    app = AppTest.from_file(str(paths.APP / "pages" / "bombe.py"), default_timeout=300).run()
+    app = AppTest.from_file(str(paths.APP / "paginas" / "bombe.py"), default_timeout=300).run()
     assert not app.exception
     values = {m.label: m.value for m in app.metric}
     assert values["Lazos"] == "3" and values["Letra de prueba"] == "T"
@@ -183,7 +183,7 @@ def test_bombe_page_backup_case_decrypts() -> None:
 
 
 def test_rejewski_page_reconstructs_a_day_and_searches_the_catalog() -> None:
-    page = str(paths.APP / "pages" / "rejewski.py")
+    page = str(paths.APP / "paginas" / "rejewski.py")
     app = AppTest.from_file(page, default_timeout=180).run()
     assert not app.exception
     app.slider(key="rej_messages").set_value(150).run()
@@ -197,7 +197,7 @@ def test_rejewski_page_reconstructs_a_day_and_searches_the_catalog() -> None:
 
 
 def test_attack_page_runs_the_three_phases() -> None:
-    page = str(paths.APP / "pages" / "ataque.py")
+    page = str(paths.APP / "paginas" / "ataque.py")
     app = AppTest.from_file(page, default_timeout=300).run()
     assert not app.exception
     app.slider(key="att_length").set_value(800).run()
@@ -227,7 +227,7 @@ def test_bombe_companion_button_sets_the_recommended_demo_2() -> None:
 
     bench = json.loads((paths.RESULTS / "bench_demo2.json").read_text(encoding="utf-8"))
     chosen = next(c for c in bench["configuraciones"] if c["id"] == bench["recomendada"])
-    app = AppTest.from_file(str(paths.APP / "pages" / "bombe.py"), default_timeout=300)
+    app = AppTest.from_file(str(paths.APP / "paginas" / "bombe.py"), default_timeout=300)
     app.session_state["demo_mode"] = True
     app.run()
     next(b for b in app.button if b.label == "Cifrado del compañero").click().run()
@@ -252,7 +252,7 @@ def test_bombe_demo_mode_backup_case_shows_the_result_large() -> None:
     from enigma_lab.core.machine import groups_of_five
 
     data = json.loads((paths.DEMO / "respaldo_bombe.json").read_text(encoding="utf-8"))
-    app = AppTest.from_file(str(paths.APP / "pages" / "bombe.py"), default_timeout=300)
+    app = AppTest.from_file(str(paths.APP / "paginas" / "bombe.py"), default_timeout=300)
     app.session_state["demo_mode"] = True
     app.run()
     next(b for b in app.button if b.label == "Caso de respaldo").click().run()

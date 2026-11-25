@@ -18,7 +18,7 @@ class Module:
     summary: str
     phase: str
     icon: str
-    page: str | None = None  # ruta relativa a app/, p. ej. "pages/maquina.py"
+    page: str | None = None  # ruta relativa a app/, p. ej. "paginas/maquina.py"
 
 
 MODULES: tuple[Module, ...] = (
@@ -28,7 +28,7 @@ MODULES: tuple[Module, ...] = (
         "Configura una Enigma I, M3 o M4, cifra y sigue el camino de cada letra.",
         "Fase 1",
         ":material/keyboard:",
-        page="pages/maquina.py",
+        page="paginas/maquina.py",
     ),
     Module(
         "espacio",
@@ -36,7 +36,7 @@ MODULES: tuple[Module, ...] = (
         "Cuántos bits aporta cada componente y por qué domina el plugboard.",
         "Fase 2",
         ":material/key:",
-        page="pages/espacio.py",
+        page="paginas/espacio.py",
     ),
     Module(
         "estadistica",
@@ -44,7 +44,7 @@ MODULES: tuple[Module, ...] = (
         "Qué estadística del idioma deja pasar el cifrado y cuál no.",
         "Fase 2",
         ":material/bar_chart:",
-        page="pages/estadistica.py",
+        page="paginas/estadistica.py",
     ),
     Module(
         "cribs",
@@ -52,7 +52,7 @@ MODULES: tuple[Module, ...] = (
         "El crib deslizándose sobre el cifrado y el menú que alimenta a la Bombe.",
         "Fase 2",
         ":material/hub:",
-        page="pages/cribs.py",
+        page="paginas/cribs.py",
     ),
     Module(
         "bombe",
@@ -60,7 +60,7 @@ MODULES: tuple[Module, ...] = (
         "Barrido de los rotores, paradas y verificación de la clave.",
         "Fase 3",
         ":material/settings:",
-        page="pages/bombe.py",
+        page="paginas/bombe.py",
     ),
     Module(
         "experimentos",
@@ -68,7 +68,7 @@ MODULES: tuple[Module, ...] = (
         "E1 a E8: pregunta, método, resultados con intervalos y la referencia publicada.",
         "Fases 2 a 5",
         ":material/science:",
-        page="pages/experimentos.py",
+        page="paginas/experimentos.py",
     ),
     Module(
         "banburismus",
@@ -76,7 +76,7 @@ MODULES: tuple[Module, ...] = (
         "Decibanes y la prueba secuencial de Wald con dos mensajes en profundidad.",
         "Fase 4",
         ":material/stacked_line_chart:",
-        page="pages/banburismus.py",
+        page="paginas/banburismus.py",
     ),
     Module(
         "rejewski",
@@ -84,7 +84,7 @@ MODULES: tuple[Module, ...] = (
         "Ciclos de AD, BE y CF y el catálogo de características.",
         "Fase 5",
         ":material/cycle:",
-        page="pages/rejewski.py",
+        page="paginas/rejewski.py",
     ),
     Module(
         "ataque",
@@ -92,6 +92,6 @@ MODULES: tuple[Module, ...] = (
         "Índice de coincidencia y hill climbing solo con texto cifrado.",
         "Fase 5",
         ":material/bolt:",
-        page="pages/ataque.py",
+        page="paginas/ataque.py",
     ),
 )

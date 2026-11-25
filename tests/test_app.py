@@ -18,6 +18,28 @@ def _run_app() -> AppTest:
     return AppTest.from_file(str(ENTRYPOINT), default_timeout=60).run()
 
 
+def test_streamlit_starts_without_the_old_pages_mode() -> None:
+    """Las páginas no viven en ``app/pages/`` (D-079).
+
+    Con una carpeta ``pages/`` junto al punto de entrada, Streamlit arranca en su modo antiguo
+    de varias páginas (``PagesManager.uses_pages_directory``). Hasta que alguna ejecución llama
+    a ``st.navigation``, la primera página que se abre directo, como ``/bombe?demo=1`` con el
+    servidor recién arrancado, corre sola, sin pasar por ``Inicio.py``: sin modo demo, sin
+    estilos y con la barra lateral de nombres de archivo. ``AppTest`` no lo reproduce, porque
+    pide la página solo por su hash; por eso se comprueba la decisión de Streamlit.
+    """
+    from streamlit.runtime.pages_manager import PagesManager
+
+    assert not (paths.APP / "pages").exists()
+    saved = PagesManager.uses_pages_directory
+    try:
+        PagesManager.uses_pages_directory = None  # como en un servidor recién arrancado
+        PagesManager(str(ENTRYPOINT))
+        assert PagesManager.uses_pages_directory is False
+    finally:
+        PagesManager.uses_pages_directory = saved
+
+
 def test_inicio_runs_without_errors() -> None:
     app = _run_app()
     assert not app.exception

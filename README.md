@@ -99,7 +99,7 @@ vienen en `results/`, así que la app y el informe los muestran sin correr nada.
 
 ```
 enigma-lab/
-├── app/                 la interfaz Streamlit: Inicio.py (entrada), pages/, ui/, components/ (HTML+SVG+JS) y static/fonts/
+├── app/                 la interfaz Streamlit: Inicio.py (entrada), paginas/, ui/, components/ (HTML+SVG+JS) y static/fonts/
 ├── src/enigma_lab/      toda la lógica, en Python
 │   ├── core/            máquina, paso y doble paso, cifrado por lotes, espacio de claves, vectores
 │   ├── stats/           corpus, frecuencias, IC, χ², n-gramas e intervalos

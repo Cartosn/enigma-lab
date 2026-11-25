@@ -896,6 +896,27 @@ pestañas, pueden detener el proceso. Ahora toman el mismo candado.
   difieren en el rotor derecho, las del Banburismus (31 mensajes entre 676 valores).
 - **El computador de la exposición** sigue siendo este escritorio (D-072).
 
+### D-079 · Las páginas viven en `app/paginas/`, no en `app/pages/`
+- **El problema.** Con el servidor recién arrancado, si la primera página que se abría era
+  `http://localhost:8501/maquina?demo=1` o `/bombe?demo=1` (las dos pestañas de las demos),
+  Streamlit la corría sola, sin pasar por `Inicio.py`: sin modo demo, sin estilos y con la barra
+  lateral de nombres de archivo. Desde la segunda carga, o si antes se abría la raíz, todo
+  funcionaba; por eso no se había visto.
+- **La causa** (Streamlit 1.67). Al arrancar, `PagesManager.uses_pages_directory` vale `True` si
+  hay una carpeta `pages/` junto al punto de entrada. Mientras ninguna ejecución llame a
+  `st.navigation`, que lo pone en `False`, cada ejecución usa el modo antiguo de varias páginas
+  (`_mpa_v1`): arma la navegación con los archivos de `pages/` y corre la página pedida por su
+  nombre, sin el punto de entrada. Abrir primero la raíz corre `Inicio.py`, y desde ahí todo va
+  por `st.navigation`.
+- **La decisión.** Las páginas pasan a `app/paginas/`. Sin una carpeta `pages/`, Streamlit arranca
+  con el modo antiguo apagado. Las URL no cambian: salen del nombre de cada archivo (`/maquina`,
+  `/bombe`).
+- **Las pruebas.** `test_streamlit_starts_without_the_old_pages_mode` comprueba que no exista
+  `app/pages/` y que `PagesManager` decida `False` para `Inicio.py`; con una carpeta `pages/`
+  vacía, falla. `AppTest` no reproduce el error, porque pide la página solo por su hash, sin el
+  nombre que manda el navegador. En el navegador, con el servidor recién arrancado,
+  `/bombe?demo=1` y `/maquina?demo=1` abren como primera página en modo demo.
+
 ## Pendientes de decidir
 
 Ninguno.

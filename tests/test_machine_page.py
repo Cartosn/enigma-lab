@@ -12,7 +12,7 @@ from enigma_lab.core.machine import Enigma, EnigmaConfig
 from enigma_lab.core.wiring import REFLECTORS, ROTORS
 from ui.machine_view import COMPONENT, MAX_ANIMATED, machine_html, machine_payload
 
-PAGE = paths.APP / "pages" / "maquina.py"
+PAGE = paths.APP / "paginas" / "maquina.py"
 
 
 def _page() -> AppTest:

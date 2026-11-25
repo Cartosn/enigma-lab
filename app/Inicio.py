@@ -2,7 +2,12 @@
 
 Arma la navegación con las páginas que ya existen (``ui/catalog.py``), registra la
 plantilla Plotly del tema y aplica el estilo común y el modo demo. El contenido de la
-página Inicio está en ``pages/inicio.py``.
+página Inicio está en ``paginas/inicio.py``.
+
+Las páginas viven en ``paginas/`` y no en ``pages/``: con una carpeta ``pages/`` junto a este
+archivo, Streamlit arranca en su modo antiguo de varias páginas, y la primera página que se
+abre directo (``/bombe?demo=1`` con el servidor recién arrancado) corre sola, sin pasar por
+aquí: sin modo demo ni estilos (D-079).
 """
 
 from __future__ import annotations
@@ -61,7 +66,7 @@ def _setup_once() -> bool:
 
 _setup_once()
 
-pages = [st.Page("pages/inicio.py", title="Inicio", icon=":material/home:", default=True)]
+pages = [st.Page("paginas/inicio.py", title="Inicio", icon=":material/home:", default=True)]
 pages += [st.Page(m.page, title=m.title, icon=m.icon) for m in MODULES if m.page]
 navigation = st.navigation(pages)
 

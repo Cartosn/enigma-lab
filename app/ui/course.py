@@ -37,7 +37,7 @@ PAGES: dict[str, tuple[str, ...]] = {
     "rejewski": (SLIDES[9],),
     "ataque": (SLIDES[16],),
 }
-"""La línea de cada página, por el nombre de su archivo en ``app/pages/``."""
+"""La línea de cada página, por el nombre de su archivo en ``app/paginas/``."""
 
 EXPERIMENTS: dict[str, str] = {
     "e1": "Semana 1 · Kerckhoffs: los ataques suponen conocido el cableado",

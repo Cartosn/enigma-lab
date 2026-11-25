@@ -33,7 +33,7 @@ flowchart LR
 
     subgraph appdir["app/"]
         ui["ui/<br/>layout · charts · vistas"]
-        pages["pages/<br/>10 páginas"]
+        pages["paginas/<br/>10 páginas"]
         comp["components/<br/>HTML + SVG + JS"]
     end
 
@@ -95,28 +95,28 @@ completo, que no está en Docker ni en un clon sin `make corpus` (D-071).
 | `stats/` | Corpus y normalización, frecuencias, IC, χ², n-gramas e intervalos | 2 |
 | `cribs/` | Arrastre del crib (escalar y vectorizado) y menú con lazos y letra de prueba | 2 |
 | `experiments/` E2–E4 | Espacio de claves, estadística del cifrado y supervivencia de cribs | 2 |
-| `app/pages/` | Espacio de claves, Estadística, Cribs y menús (con dos animaciones) y Experimentos | 2 |
+| `app/paginas/` | Espacio de claves, Estadística, Cribs y menús (con dos animaciones) y Experimentos | 2 |
 | `bombe/scrambler.py`, `wiring.py` | Aleatorizador precalculado por orden; el menú como cables, aristas y diagonal board | 3 |
 | `bombe/bombe_numba.py`, `sweep.py` | Barrido con union-find en Numba, modos Bletchley y robusto, paradas como arreglos | 3 |
 | `bombe/bombe_reference.py` | La misma Bombe en Python puro (propaga hilo por hilo), solo para las pruebas | 3 |
 | `bombe/checker.py`, `cases.py` | Máquina de verificación, descifrado de prueba y clave equivalente; casos de prueba | 3 |
 | `stats/ngrams.py` (interpolado) | Modelo de 4 letras interpolado y puntaje por la regla de la cadena | 3 |
 | `experiments/` E5 | Paradas falsas por letras y lazos, con y sin diagonal board, frente a Turing | 3 |
-| `app/pages/bombe.py`, `components/bombe_drums.html` | Página La Bombe y los tambores | 3 |
+| `app/paginas/bombe.py`, `components/bombe_drums.html` | Página La Bombe y los tambores | 3 |
 | `scripts/bench_demo2.py` | `make bench-demo`: éxito y tiempos de la demo 2 | 3 |
 | `banburismus/depth.py` | Pares en profundidad cifrados con la máquina real; desplazamiento verdadero por estados | 4 |
 | `banburismus/scoring.py` | Decibanes de Turing, modelo de rachas para multigramas y puntaje por desplazamiento | 4 |
 | `banburismus/sprt.py` | Umbrales y aproximación de Wald, cálculo exacto con sobrepaso y SPRT en Numba | 4 |
 | `experiments/` E6 | SPRT frente a Wald, aciertos por solapamiento, identificación del desplazamiento y ROC | 4 |
-| `app/pages/banburismus.py` | Página Banburismus y pestaña E6 en Experimentos | 4 |
+| `app/paginas/banburismus.py` | Página Banburismus y pestaña E6 en Experimentos | 4 |
 | `rejewski/characteristic.py` | El indicador doble, AD, BE y CF, su estructura de ciclos y las 101 particiones de 13 | 5 |
 | `rejewski/catalog.py` | El catálogo de las 105.456 configuraciones (I–III, reflector A) con las tablas de la Bombe | 5 |
 | `rejewski/traffic.py` | Un día de tráfico con la máquina real, la completación con el teorema y el coleccionista de cupones | 5 |
 | `attacks/gillogly.py` | Las tres fases de Gillogly en Numba, con vecinas y reajuste de anillos | 5 |
 | `attacks/hillclimb.py` | Hill climbing del plugboard con IC y trigramas, y la búsqueda parcial de la E | 5 |
 | `experiments/` E7, E8 | El catálogo frente a Kuhl y los mensajes por día; el éxito del ataque según la longitud | 5 |
-| `app/pages/rejewski.py`, `components/cycles.html` | Página Rejewski: el tráfico, los ciclos y la búsqueda en el catálogo | 5 |
-| `app/pages/ataque.py` | Página Ataque moderno: la curva del IC, el hill climbing y la curva de éxito | 5 |
+| `app/paginas/rejewski.py`, `components/cycles.html` | Página Rejewski: el tráfico, los ciclos y la búsqueda en el catálogo | 5 |
+| `app/paginas/ataque.py` | Página Ataque moderno: la curva del IC, el hill climbing y la curva de éxito | 5 |
 | `scripts/kuhl_variantes.py` | 33 variantes de los supuestos del catálogo frente a Kuhl | 5 |
 | `app/ui/layout.py` | Modo demo: 20 px, paneles ocultos, resultado en grande y `?demo=1` en la URL | 6 |
 | `app/ui/charts.py` | Gráficos con su descarga de datos (CSV) y figuras del informe diferidas | 6 |
@@ -131,7 +131,7 @@ completo, que no está en Docker ni en un clon sin `make corpus` (D-071).
 ```mermaid
 sequenceDiagram
     participant U as Persona
-    participant P as pages/maquina.py
+    participant P as paginas/maquina.py
     participant E as core.machine.Enigma
     participant V as ui/machine_view.py
     participant J as enigma_machine.html (JS)
@@ -148,7 +148,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant U as Persona
-    participant P as pages/bombe.py
+    participant P as paginas/bombe.py
     participant W as bombe.wiring
     participant S as bombe.sweep (Numba)
     participant C as bombe.checker
@@ -173,7 +173,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant U as Persona
-    participant P as pages/banburismus.py
+    participant P as paginas/banburismus.py
     participant D as banburismus.depth
     participant S as banburismus.scoring
     participant W as banburismus.sprt
@@ -194,7 +194,7 @@ E6 usa las mismas piezas con miles de pares y corre la prueba con el núcleo de 
 ```mermaid
 sequenceDiagram
     participant U as Persona
-    participant P as pages/rejewski.py
+    participant P as paginas/rejewski.py
     participant T as rejewski.traffic
     participant C as rejewski.catalog
     participant V as ui/rejewski_view.py
@@ -214,7 +214,7 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant U as Persona
-    participant P as pages/ataque.py (o E8)
+    participant P as paginas/ataque.py (o E8)
     participant G as attacks.gillogly
     participant H as attacks.hillclimb
     U->>P: «Atacar» un cifrado
@@ -248,3 +248,9 @@ trae las muestras del corpus y `results/`, así que la app funciona sin internet
 - Azar siempre con `numpy.random.Generator` sembrado (semilla global 2026).
 - Las páginas importan sus utilidades como `ui.*` (`app/ui/`), porque Streamlit pone
   `app/` en `sys.path`.
+- Las páginas viven en `app/paginas/` y no en `app/pages/`: con una carpeta `pages/` junto a
+  `Inicio.py`, Streamlit arranca en su modo antiguo de varias páginas y la primera página que
+  se abre directo corre sin pasar por el punto de entrada (D-079). Una prueba lo vigila
+  (`tests/test_app.py`).
+- Ninguna página deja texto suelto a nivel de módulo: la magia de Streamlit lo dibujaría
+  (`tests/test_pages.py`).
