@@ -142,6 +142,33 @@ def test_bigram_repeat_weighs_more_than_two_letters() -> None:
 # ---------------------------------------------------------------- profundidad
 
 
+def test_birthday_of_message_keys() -> None:
+    """Con 157 claves de mensaje entre 17.576, P(alguna se repite) = 50,28 %; con 156, 49,84 %."""
+    assert depth.MESSAGE_KEYS == 17_576
+    assert depth.messages_for_repeat() == 157
+    assert round(float(depth.repeat_probability(157)), 4) == 0.5028
+    assert round(float(depth.repeat_probability(156)), 4) == 0.4984
+    # Con las mismas dos primeras letras (676 pares), alcanzan 31 mensajes.
+    assert depth.messages_for_repeat(26**2) == 31
+
+
+def test_birthday_is_exact() -> None:
+    """La fórmula con fracciones es el producto ∏ (1 − i/K), y la aproximación se le acerca."""
+    from fractions import Fraction
+
+    keys = 17_576
+    for n in (0, 1, 2, 23, 157, 400):
+        product = Fraction(1)
+        for i in range(n):
+            product *= Fraction(keys - i, keys)
+        assert depth.repeat_probability(n, keys) == 1 - product
+        approx = 1 - math.exp(-n * (n - 1) / (2 * keys))
+        assert float(depth.repeat_probability(n, keys)) == pytest.approx(approx, abs=0.01)
+    assert depth.repeat_probability(keys + 1, keys) == 1  # más mensajes que claves
+    with pytest.raises(ValueError):
+        depth.repeat_probability(-1)
+
+
 def test_true_offset_is_delta_or_delta_minus_26() -> None:
     """Con rotores I–V siempre hay profundidad: +δ si el central no se mueve, δ − 26 si sí."""
     rng = np.random.default_rng(SEED)

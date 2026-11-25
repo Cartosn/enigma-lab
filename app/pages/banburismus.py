@@ -40,7 +40,8 @@ from enigma_lab.viz import plotly_figs
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 from enigma_lab.viz.theme import CATEGORICAL, DARK
 from ui.charts import chart
-from ui.layout import is_demo, what_am_i_seeing
+from ui.course import PAGES as IN_CLASS
+from ui.layout import in_class, is_demo, what_am_i_seeing
 
 K = "banb_"
 CORPUS: Source = "muestra"  # la muestra del repositorio: la app funciona sin internet
@@ -122,6 +123,7 @@ def _decision(values: np.ndarray, upper: float, lower: float) -> str:
 demo = is_demo()
 st.title("Banburismus")
 st.caption("Enigma Lab › Banburismus")
+in_class(*IN_CLASS["banburismus"])
 what_am_i_seeing(
     "Dos mensajes con la misma clave diaria y claves de mensaje que solo difieren en el rotor "
     "derecho quedan en profundidad: corridos d letras, pasan por los mismos estados.",

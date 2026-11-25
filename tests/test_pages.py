@@ -12,6 +12,8 @@ from enigma_lab import paths
 from ui.catalog import MODULES
 
 PAGES = [paths.APP / m.page for m in MODULES if m.page]
+WITH_HOME = [paths.APP / "Inicio.py", *PAGES]
+"""Las páginas y la de Inicio, que corre desde el punto de entrada (usa ``st.navigation``)."""
 
 
 @pytest.mark.parametrize("page", PAGES, ids=[p.stem for p in PAGES])
@@ -79,6 +81,68 @@ def test_keyspace_page_figures() -> None:
     values = {m.label: m.value for m in app.metric}
     assert values["Barrido de la Bombe"] == "1.054.560"
     assert re.match(r"70,2\s%", values["Parte del plugboard"])
+
+
+def test_keyspace_page_parallel_attack() -> None:
+    """La calculadora reparte la fuerza bruta: con 1.000 máquinas de 10⁹, unos 5,04 años."""
+    app = AppTest.from_file(str(paths.APP / "pages" / "espacio.py"), default_timeout=60).run()
+    label = "Probar las 1,6 × 10²⁰ claves"
+    assert {m.label: m.value for m in app.metric}[label] == "5.037,2 años"
+    app.select_slider[0].set_value(1_000).run()
+    assert not app.exception
+    assert {m.label: m.value for m in app.metric}[label] == "5,04 años"
+
+
+@pytest.mark.parametrize("page", WITH_HOME, ids=[p.stem for p in WITH_HOME])
+def test_pages_have_no_stray_strings(page) -> None:  # type: ignore[no-untyped-def]
+    """En una página, Streamlit dibuja todo texto suelto («magia»): solo vale el docstring."""
+    import ast
+
+    tree = ast.parse(page.read_text(encoding="utf-8"))
+    body = tree.body[1:] if ast.get_docstring(tree) else tree.body
+    stray = [
+        node.lineno
+        for node in body
+        if isinstance(node, ast.Expr)
+        and isinstance(node.value, ast.Constant)
+        and isinstance(node.value.value, str)
+    ]
+    assert not stray, f"{page.name}: textos sueltos en las líneas {stray}"
+
+
+def _course_lines(app: AppTest) -> list[str]:
+    return [str(m.value) for m in app.markdown if 'class="el-inclass"' in str(m.value)]
+
+
+@pytest.mark.parametrize("page", WITH_HOME, ids=[p.stem for p in WITH_HOME])
+def test_every_page_says_its_course_connection(page) -> None:  # type: ignore[no-untyped-def]
+    """Debajo del título, la línea «En clase» con la etiqueta de su diapositiva (también en
+    modo demo); en Experimentos, una por pestaña."""
+    from ui.course import EXPERIMENTS
+    from ui.course import PAGES as IN_CLASS
+
+    key = page.stem.lower()
+    expected = list(EXPERIMENTS.values()) if key == "experimentos" else IN_CLASS[key]
+    for demo in (False, True):
+        app = AppTest.from_file(str(page), default_timeout=120)
+        app.session_state["demo_mode"] = demo
+        app.run()
+        assert not app.exception, app.exception
+        lines = _course_lines(app)
+        assert lines, page.stem
+        shown = " ".join(lines)
+        assert all(label in shown for label in expected), page.stem
+
+
+def test_course_labels_follow_the_course_weeks() -> None:
+    """Cada etiqueta empieza por la semana del curso, y toda página y pestaña tiene la suya."""
+    from ui.course import EXPERIMENTS, SLIDES
+    from ui.course import PAGES as IN_CLASS
+
+    assert set(IN_CLASS) == {p.stem.lower() for p in WITH_HOME} - {"experimentos"}
+    assert set(EXPERIMENTS) == {f"e{n}" for n in range(1, 9)}
+    labels = [*SLIDES.values(), *EXPERIMENTS.values()] + [x for v in IN_CLASS.values() for x in v]
+    assert all(label.startswith(("Semana ", "Semanas ")) and " · " in label for label in labels)
 
 
 def test_banburismus_page_shows_turing_figures_and_finds_the_offset() -> None:

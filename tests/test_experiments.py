@@ -227,6 +227,8 @@ def test_resumen_builds_from_saved_results(tmp_path) -> None:  # type: ignore[no
     out = resumen.main(tmp_path)
     text = (out / "RESUMEN.md").read_text(encoding="utf-8")
     assert "## 1. Por diapositiva de resultados" in text and "## 4. Discrepancias" in text
+    assert "### Conexiones con el curso" in text and "650 a un paso del ciclo y 26 a dos" in text
+    assert "Los 30 s del guion" in text
     data = json.loads((out / "cifras.json").read_text(encoding="utf-8"))
     computed = [c for c in data["cifras"] if c["obtenido"] is not None]
     assert computed and all(c["coincide"] for c in computed)

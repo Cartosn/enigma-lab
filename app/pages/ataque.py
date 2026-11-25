@@ -25,7 +25,8 @@ from enigma_lab.viz import plotly_figs
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 from enigma_lab.viz.theme import DARK
 from ui.charts import chart
-from ui.layout import big_result, is_demo, what_am_i_seeing, x_as_space
+from ui.course import PAGES as IN_CLASS
+from ui.layout import big_result, in_class, is_demo, what_am_i_seeing, x_as_space
 
 K = "att_"
 ORDER_SETS = {
@@ -121,6 +122,7 @@ def _references() -> list[tuple[float, str]]:
 demo = is_demo()
 st.title("Ataque moderno")
 st.caption("Enigma Lab › Ataque moderno")
+in_class(*IN_CLASS["ataque"])
 what_am_i_seeing(
     "Solo con el texto cifrado: sin crib, sin indicador y sin saber nada de la clave "
     "(Gillogly 1995).",

@@ -15,7 +15,8 @@ from enigma_lab.core.vectors import vector
 from enigma_lab.core.wiring import ALPHABET, MODELS
 from enigma_lab.viz.numfmt import fmt_int
 from ui.charts import csv_button
-from ui.layout import big_result, hidden_in_demo, is_demo, what_am_i_seeing, x_as_space
+from ui.course import PAGES as IN_CLASS
+from ui.layout import big_result, hidden_in_demo, in_class, is_demo, what_am_i_seeing, x_as_space
 from ui.machine_view import render_machine, trace_table
 
 K = "maq_"  # prefijo de las claves de st.session_state de esta página
@@ -96,6 +97,7 @@ if K + "model" not in st.session_state:
 demo = is_demo()
 st.title("Máquina")
 st.caption("Enigma Lab › Máquina")
+in_class(*IN_CLASS["maquina"])
 what_am_i_seeing(
     "Una Enigma simulada en Python: modelo, rotores, anillos, posición inicial y cables.",
     "La animación muestra el paso de los rotores (el doble paso en ámbar) y la letra que "

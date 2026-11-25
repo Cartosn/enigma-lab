@@ -86,3 +86,37 @@ def test_brute_force_years() -> None:
 def test_brute_force_rejects_non_positive_rate() -> None:
     with pytest.raises(ValueError):
         ks.brute_force_years(10, 0)
+
+
+def test_parallel_brute_force_divides_the_time() -> None:
+    """Ataque paralelo: con 1.000 máquinas, 1.000 veces menos; unos 5,04 años."""
+    keys = ks.keyspace(ks.ENIGMA_I).total_without_rings
+    one = ks.brute_force_years(keys, 1e9)
+    thousand = ks.brute_force_years(keys, 1e9, machines=1_000)
+    assert math.isclose(thousand * 1_000, one)
+    assert round(thousand, 2) == 5.04
+    with pytest.raises(ValueError):
+        ks.brute_force_years(keys, 1e9, machines=0)
+
+
+def test_fixed_point_free_involutions_are_the_full_plugboards() -> None:
+    """25!! = 7.905.853.580.625 = N(13): emparejar las 26 letras es poner los 13 cables."""
+    assert ks.fixed_point_free_involutions() == 7_905_853_580_625
+    assert ks.fixed_point_free_involutions() == ks.plugboard_settings(13)
+    assert ks.permutations() == 403_291_461_126_605_635_584_000_000
+
+
+def test_fixed_point_free_involutions_by_brute_force() -> None:
+    """Para alfabetos pequeños, contar las permutaciones σ con σ(σ(x)) = x y σ(x) ≠ x."""
+    from itertools import permutations
+
+    for n in range(0, 9):
+        found = sum(
+            all(p[p[x]] == x and p[x] != x for x in range(n)) for p in permutations(range(n))
+        )
+        if n % 2:
+            assert found == 0
+            with pytest.raises(ValueError):
+                ks.fixed_point_free_involutions(n)
+        else:
+            assert ks.fixed_point_free_involutions(n) == found

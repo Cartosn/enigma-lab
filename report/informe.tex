@@ -45,7 +45,7 @@
   de Enigma~I, la Bombe de Turing-Welchman y el Banburismus}\\[6pt]
   Carlos Daniel Guarin Ortiz · Criptografía · Universidad Nacional de Colombia · 2026\\[2pt]
   {\small Código, app y datos: \href{https://github.com/Cartosn/enigma-lab}{github.com/Cartosn/enigma-lab}
-  · cifras de la corrida en modo \ELmodo{} del \ELfecha{} (commit \texttt{\ELcommit}, semilla \ELsemilla)}
+  · corrida en modo \ELmodo{} del \ELdia{}, commit \texttt{\ELcommit}, semilla \ELsemilla}
 \end{center}
 
 \section{Objetivo}
@@ -56,34 +56,38 @@ cada ataque? La hipótesis es «divide y vencerás»: el plugboard aporta \ELbit
 bits (el \ELfraccionPlugboard), pero la estructura de la máquina permite apartarlo, y la Bombe
 de Turing-Welchman solo recorre 60 órdenes de rotores por 17.576 posiciones: \ELbarrido{}
 configuraciones, \ELbitsBarrido{} bits. El objetivo fue reproducir en software los ataques
-históricos y medir con simulación Monte Carlo cuánto cuestan y con qué probabilidad funcionan,
-comparando cada resultado con las cifras de Turing y de la literatura.
+históricos, medir con simulación Monte Carlo su costo y su probabilidad de éxito frente a las
+cifras de Turing y de la literatura, y leerlos con los temas del curso.
 
 \section{Contexto en el curso}
 
-Enigma reúne los temas del curso: el cableado se conocía desde 1932, así que solo la clave era
-secreta (Kerckhoffs); es un cifrado de flujo de permutaciones cuyo odómetro se repite cada
-\ELperiodo{} letras; los cribs son texto plano conocido; que ninguna letra se cifre a sí misma
-es un distinguidor perfecto; y los mensajes «en profundidad» son la reutilización del flujo que
-hoy evita un nonce único. Y deja la lección del costo del mejor ataque: \ELbitsSinAnillos{} bits
-separables valen mucho menos, como el doble DES ante el encuentro a medio camino.
+El curso sigue \emph{Serious Cryptography} (2.ª ed.), y Enigma recorre casi todo su programa.
+Es un Vigenère con otro alfabeto en cada letra, y el índice de coincidencia aplicado entre dos
+mensajes es el Banburismus (semana~1). Una hipótesis falsa cierra un lazo del menú con
+probabilidad 1/26, como cada cero de la prueba de esfuerzo divide la probabilidad por 2, y las
+claves de mensaje predecibles son un fallo de aleatoriedad (2). Que ninguna letra se cifre a
+sí misma es un problema de indistinguibilidad, y la seguridad la fija el mejor ataque (3). En
+cada posición, Enigma es una de \ELinvoluciones{} involuciones sin puntos fijos, entre
+\ELpermutaciones{} permutaciones, y los rotores avanzan como el contador de CTR (4). Los cribs
+son texto conocido, como contra A5/1, y la Bombe es fuerza bruta sobre 20 bits (5). El paso de
+los rotores dibuja una $\rho$: \ELfueraCiclo{} posiciones de cola que caen en un ciclo de
+\ELperiodo{} (6). Dos mensajes en profundidad son un nonce repetido (8), y la clave del día,
+que cifraba las claves de mensaje, es la falta de forward secrecy (11 y 13).
 
 \section{Método}
 
 Todo está en Python 3.12 (NumPy, Numba, pandas, SciPy y statsmodels), con una app en Streamlit
-que hace de demostración en vivo; la lógica de Enigma existe una sola vez, en el paquete
-\texttt{enigma\_lab}, y las animaciones solo dibujan trazas calculadas en Python.
+para la demo en vivo; la lógica de Enigma existe una sola vez, en \texttt{enigma\_lab}.
 \begin{itemize}
   \item \textbf{Simulador.} Enigma~I, M3 y M4 con anillos, plugboard y doble paso, más una
   versión vectorizada para el Monte Carlo. Se validó (E1) con los vectores publicados, contra
   py-enigma (una implementación independiente) en \ELpyenigmaCasos{} claves y mensajes
   aleatorios, a mano con CyberChef y con pruebas de propiedades.
-  \item \textbf{Espacio de claves (E2).} Conteo exacto con enteros:
-  $N(k)=26!/\bigl((26-2k)!\,k!\,2^k\bigr)$ formas de poner $k$ cables.
+  \item \textbf{Espacio de claves (E2).} Conteo exacto:
+  $N(k)=26!/\bigl((26-2k)!\,k!\,2^k\bigr)$ plugboards de $k$ cables.
   \item \textbf{Cribs (E4).} \ELcribN{} mensajes de \ELcribLetras{} letras por longitud $L$
   (5 a 50), con el crib en una posición al azar, en texto aleatorio y en alemán real (Fontane y
-  Kafka, de Project Gutenberg, con la X como separador): fracción de alineaciones falsas sin
-  conflictos.
+  Kafka, con la X como separador): alineaciones falsas sin conflictos.
   \item \textbf{Bombe (E5).} Modelo eléctrico de 26 cables por 26 hilos: cada arista $(a,b,i)$
   del menú une el hilo $u$ del cable $a$ con el hilo $S_i(u)$ del cable $b$, y el diagonal board
   une el hilo $u$ de $a$ con el hilo $a$ de $u$. La componente encendida se calcula con
@@ -98,11 +102,10 @@ que hace de demostración en vivo; la lógica de Enigma existe una sola vez, en 
   cálculo exacto del tiempo de parada.
   \item \textbf{Rejewski y ataque moderno (E7 y E8).} El catálogo exacto de los ciclos de AD, BE y
   CF en las \ELrejConfiguraciones{} configuraciones de I--III con el reflector A, y \ELrejDias{}
-  días de tráfico; el ataque de Gillogly (IC sin plugboard, anillos y hill climbing con trigramas)
-  sobre \ELataqueMensajes{} mensajes de 25 a 1.500 letras con 6, 8 y 10 cables.
+  días de tráfico; el ataque de Gillogly (IC, anillos y hill climbing) sobre \ELataqueMensajes{} mensajes de 25 a 1.500 letras con 6, 8 y 10 cables.
 \end{itemize}
-Semilla \ELsemilla; intervalos de Wilson para proporciones y normales para medias.
-\texttt{make reproduce} repite los ocho experimentos en unos \ELminutosExperimentos{} minutos.
+Semilla \ELsemilla; IC de Wilson para proporciones y normales para medias; \texttt{make reproduce}
+repite los ocho experimentos en unos \ELminutosExperimentos{} minutos.
 
 \section{Resultados}
 
@@ -172,8 +175,8 @@ letras, con un p95 de \ELdemoPnoventaycinco~s (escritorio de \ELdemoNucleos{} n�
 \textbf{Banburismus (figura~\ref{fig:e6}).} Con la tasa 1/17, la profundidad se confirma en
 \ELsimProfundidad{} letras en promedio (IC \ELsimProfundidadBajo--\ELsimProfundidadAlto) y se
 descarta en \ELsimAzar; la aproximación de Wald da \ELwaldProfundidad{} y \ELwaldAzar, y el
-cálculo exacto, \ELexactoProfundidad{} y \ELexactoAzar. Con alemán real y los mismos pesos de
-Turing bastan \ELalemanLetrasProfundidad{} letras, y \ELalemanTrigramasProfundidad{} puntuando
+cálculo exacto, \ELexactoProfundidad{} y \ELexactoAzar. Con alemán real bastan
+\ELalemanLetrasProfundidad{} letras con los pesos de Turing, y \ELalemanTrigramasProfundidad{} con
 bigramas y trigramas.
 
 \textbf{Rejewski y ataque moderno.} El catálogo tiene \ELrejCaracteristicas{} características,
@@ -187,7 +190,7 @@ la fase 1, que supone los anillos.
 
 \begin{figure}[t]
   \centering
-  \includegraphics[width=\textwidth]{figuras/e6_sprt.pdf}
+  \includegraphics[width=0.92\textwidth]{figuras/e6_sprt.pdf}
   \caption{E6: letras hasta que el SPRT decide ($\alpha=\beta=1~\%$), media e IC 95~\% de
   \ELparesBanbu{} pares por condición. Las líneas punteadas son la aproximación de Wald con letras
   sueltas.}\label{fig:e6}
@@ -195,35 +198,40 @@ la fase 1, que supone los anillos.
 
 \section{Análisis y lecciones}
 
-\textbf{Divide y vencerás.} El experimento confirma la hipótesis: la Bombe no necesita los
-\ELbitsPlugboard{} bits del plugboard porque prueba hipótesis sobre un solo stecker y deja que
-el menú propague las consecuencias; recorre \ELbitsBarrido{} bits y no \ELbitsSinAnillos.
+\textbf{Divide y vencerás (semana~3).} El experimento confirma la hipótesis: la Bombe no
+necesita los \ELbitsPlugboard{} bits del plugboard porque prueba hipótesis sobre un solo stecker y
+las propaga por el menú: recorre \ELbitsBarrido{} bits, no \ELbitsSinAnillos. La fuerza bruta
+tardaría \ELanosFuerzaBruta{} años (\ELanosMilMaquinas{} con mil máquinas): la seguridad la fija
+el mejor ataque.
 
-\textbf{Cribs y menús.} El filtro del crib es barato pero débil: con 13 letras deja pasar el
-\ELsobreviveTrece{} de las posiciones falsas; con alemán real, algo más, por su índice de
-coincidencia. La fuerza está en los lazos: hasta 2, cada uno divide las paradas por unas 26,
-porque la letra supuesta debe ser un punto fijo de la permutación del lazo. Con 3 lazos medimos
-\ELparadasTres{} frente a \ELturingTres{} de Turing: son muy pocas paradas, pero el IC no incluye
-su valor y lo reportamos como diferencia. Sin diagonal board, un menú sin lazos no descarta casi
-nada.
+\textbf{Cribs y menús (semanas~1, 2 y~5).} El filtro del crib (texto conocido, como contra A5/1)
+es débil: con 13 letras deja pasar el \ELsobreviveTrece{} de las posiciones falsas; con alemán
+real, algo más, por sus frecuencias. La fuerza está en los lazos: hasta 2, cada uno divide las
+paradas por unas \ELporLazo, porque la letra supuesta debe ser un punto fijo de la permutación
+del lazo, y una hipótesis falsa lo es con probabilidad 1/26. Con 3 lazos medimos
+\ELparadasTres{} frente a \ELturingTres{} de Turing: son pocas paradas, pero su IC excluye ese
+valor, y queda como diferencia.
 
-\textbf{Wald y el sobrepaso.} La aproximación de Wald supone que la prueba se detiene justo en el
+\textbf{Profundidad y Wald (semanas~1, 3 y~8).} La profundidad es un nonce repetido, y
+frecuente: con \ELcumpleanos{} claves de mensaje, que dos coincidan tiene probabilidad
+\ELcumpleanosP{} (cumpleaños). Wald supone que la prueba se detiene justo en el
 umbral; en realidad lo pasa (en promedio \ELsobrepasoArriba~dB arriba), y eso explica
 \ELbrechaSobrepaso{} de las \ELbrechaTotal{} letras de diferencia en profundidad. Con texto real
 la profundidad se confirma en un tercio de las letras porque el alemán literario repite 1 de cada
 \ELtasaCorpusInversa{} letras, más que el 1 de cada 17 del tráfico naval.
 
-\textbf{Lecciones y límites.} El tamaño de la clave no es la seguridad: cuenta el mejor ataque;
-cualquier sesgo es un distinguidor y reutilizar un nonce deja dos mensajes en profundidad. E7 no
-reproduce del todo a Kuhl; E8 usa \ELataqueN{} mensajes por celda. El corpus es literario, no
-naval.
+\textbf{Lecciones y límites.} Cada error de Enigma tiene su defensa en el curso: permutaciones
+que no se distinguen del azar (semanas~3 y~4), un nonce único (1 y 8), claves de un generador
+aleatorio (2) y forward secrecy (11 y 13), sin la cual la clave del día abría todo el tráfico:
+E7 la encuentra en el \ELrejEncontrada{} de los días. E7 no reproduce del todo a Kuhl; E8 usa
+\ELataqueN{} mensajes por celda; el corpus es literario, no naval.
 
 \section*{Referencias}
 {\footnotesize
 \begin{multicols}{2}
 \begin{enumerate}[label={[\arabic*]},leftmargin=2em,itemsep=0pt]
   \item A.~M.~Turing (c.~1941--42). \emph{The Applications of Probability to Cryptography}.
-  The National Archives, HW 25/37. \url{https://arxiv.org/abs/1505.04714}
+  The National Archives, HW 25/37 (edición en arXiv: 1505.04714).
   \item M.~Rejewski (1980). An application of the theory of permutations in breaking the Enigma
   cipher. \emph{Applicationes Mathematicae} 16(4), 543--559.
   \item J.~Wilcox (2006). \emph{Solving the Enigma: History of the Cryptanalytic Bombe}. NSA,

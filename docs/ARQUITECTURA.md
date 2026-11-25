@@ -123,6 +123,8 @@ completo, que no está en Docker ni en un clon sin `make corpus` (D-071).
 | `figuras.py` | Figuras del informe (`report/figuras/`) y respaldo 16:9 de las diapositivas | 6 |
 | `informe.py`, `report/informe.tex` | `numbers.tex` desde los resultados y compilación con latexmk o Tectonic | 6 |
 | `Dockerfile`, `docker-compose.yml` | Imagen con uv, Numba precompilado y la app sin internet | 6 |
+| `core/keyspace.py`, `stepping.py`, `banburismus/depth.py` | Conexiones con el curso: 25!! y 26!, ataque paralelo, la ρ del paso y el cumpleaños de las claves de mensaje | Después de la 6 |
+| `app/ui/course.py` | La línea «En clase» de cada página y de cada pestaña de Experimentos | Después de la 6 |
 
 ## Flujo de una letra en la página Máquina
 

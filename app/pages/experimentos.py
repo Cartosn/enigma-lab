@@ -38,7 +38,8 @@ from enigma_lab.experiments.common import read_summary
 from enigma_lab.viz import plotly_figs
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 from ui.charts import chart, figure_downloads
-from ui.layout import is_demo, what_am_i_seeing
+from ui.course import EXPERIMENTS as IN_CLASS
+from ui.layout import in_class, is_demo, what_am_i_seeing
 
 INFO: dict[str, dict[str, str]] = {
     "e1": {
@@ -522,6 +523,7 @@ tabs = st.tabs([info["tab"] for info in INFO.values()])
 
 for tab, (experiment, info) in zip(tabs, INFO.items(), strict=False):
     with tab:
+        in_class(IN_CLASS[experiment])
         st.markdown(
             f"**Pregunta.** {info['pregunta']}  \n**Método.** {info['metodo']}  \n"
             f"**Referencia.** {info['referencia']}"

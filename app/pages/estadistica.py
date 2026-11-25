@@ -5,6 +5,7 @@ from __future__ import annotations
 import numpy as np
 import streamlit as st
 
+from enigma_lab.core import keyspace as ks
 from enigma_lab.core.batch import encrypt_batch, random_key_batch, to_texts
 from enigma_lab.core.machine import groups_of_five
 from enigma_lab.stats.corpus import LANGUAGES, MODES, random_excerpts
@@ -18,15 +19,17 @@ from enigma_lab.stats.frequencies import (
 )
 from enigma_lab.stats.inference import no_fixed_point_probability
 from enigma_lab.viz import plotly_figs
-from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
+from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct, fmt_sci
 from ui.charts import chart
-from ui.layout import is_demo, what_am_i_seeing
+from ui.course import PAGES as IN_CLASS
+from ui.layout import in_class, is_demo, what_am_i_seeing
 
 K = "est_"
 
 demo = is_demo()
 st.title("Estadística del cifrado")
 st.caption("Enigma Lab › Estadística del cifrado")
+in_class(*IN_CLASS["estadistica"])
 what_am_i_seeing(
     "Un fragmento real del corpus (alemán o español) cifrado con una clave aleatoria de "
     "Enigma I con 10 cables.",
@@ -132,4 +135,11 @@ st.markdown(
     f"Si cada letra se cifrara con una sustitución al azar, que ninguna de {fmt_int(letters)} "
     f"coincida con su original pasaría con probabilidad (25/26)^{letters} = "
     f"**{fmt_pct(probability, 2)}**. En Enigma pasa siempre: es un distinguidor perfecto."
+)
+st.markdown(
+    "La razón es de conteo: en cada posición de los rotores, Enigma es una involución sin "
+    "puntos fijos, como el reflector, y no una permutación cualquiera. Hay 25!! = "
+    f"{fmt_int(ks.fixed_point_free_involutions())} ≈ {fmt_sci(ks.fixed_point_free_involutions())} "
+    f"así, entre las 26! ≈ {fmt_sci(ks.permutations())} permutaciones de 26 letras "
+    "(`core/keyspace.py`). Un cifrado ideal elegiría entre todas."
 )

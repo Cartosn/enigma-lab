@@ -41,7 +41,7 @@ from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 
 PHASES_LEFT = [
     (
-        "Guion y diapositiva 15 · las notas de «Con las diapositivas y el guion» "
+        "Guion y diapositivas 5, 6, 13 y 15 · las notas de «Con las diapositivas y el guion» "
         "(Discrepancias); ninguna cambia una cifra",
         "antes del primer ensayo",
     ),
@@ -168,17 +168,48 @@ def read_bench(results_dir: Path) -> dict[str, Any]:
 # ---------------------------------------------------------------- secciones
 
 
-def _demo1_timing() -> dict[str, float]:
-    """Milisegundos de cálculo de los dos preajustes de la demo 1 en este equipo."""
-    timings = {}
-    for name, (config, text) in {
-        "vector_bdzgo": (EnigmaConfig.from_strings("I II III"), "AAAAA"),
-        "portada": (EnigmaConfig.from_dict(vector("portada")["key"]), vector("portada")["output"]),
-    }.items():
-        start = time.perf_counter()
-        Enigma(config).trace(text)
-        timings[name] = (time.perf_counter() - start) * 1000
-    return timings
+def _demo1_timing() -> float:
+    """Milisegundos de cálculo del preajuste «Portada» (la demo 1) en este equipo."""
+    config = EnigmaConfig.from_dict(vector("portada")["key"])
+    start = time.perf_counter()
+    Enigma(config).trace(vector("portada")["output"])
+    return (time.perf_counter() - start) * 1000
+
+
+def _course_figures() -> list[str]:
+    """Las cifras de las conexiones con el curso (diapositivas 3, 5, 6, 7 y 13), del código."""
+    from enigma_lab.banburismus.depth import messages_for_repeat, repeat_probability
+    from enigma_lab.core import keyspace as ks
+    from enigma_lab.core.stepping import notch_sets, rho_structure
+
+    rho = rho_structure(notch_sets(["Q", "E", "V"]))
+    keys = ks.keyspace(ks.ENIGMA_I).total_without_rings
+    involutions, permutations = ks.fixed_point_free_involutions(), ks.permutations()
+    near, same = messages_for_repeat(26**2), messages_for_repeat()
+    return [
+        f"- **Conteo de permutaciones (diapositiva 6, semana 4):** 25!! = {fmt_int(involutions)} "
+        f"involuciones sin puntos fijos ({fmt_dec(ks.bits(involutions), 1)} bits; son también "
+        f"los plugboards de 13 cables) entre 26! = {fmt_int(permutations)} permutaciones "
+        f"({fmt_dec(ks.bits(permutations), 1)} bits). `core/keyspace.py`.",
+        f"- **La ρ (diapositivas 3 y 5, semana 6):** el ciclo tiene {fmt_int(rho.cycle)} "
+        f"posiciones y la cola {fmt_int(sum(rho.tail.values()))}: {fmt_int(rho.tail[1])} a un "
+        f"paso del ciclo y {fmt_int(rho.tail[2])} a dos. {fmt_int(rho.collisions)} posiciones del "
+        "ciclo tienen dos predecesoras (una del ciclo y otra de la cola): las colisiones del "
+        "doble paso. `core/stepping.py` · `rho_structure`.",
+        f"- **Ataque paralelo (diapositiva 7, semana 3):** "
+        f"{fmt_int(round(ks.brute_force_years(keys, 1e9)))} años con una máquina de 10⁹ claves "
+        f"por segundo y {fmt_dec(ks.brute_force_years(keys, 1e9, 1_000), 2)} con 1.000. "
+        "`core/keyspace.py` · `brute_force_years`.",
+        f"- **Cumpleaños de las claves de mensaje (diapositiva 13, semana 3):** con {same} claves "
+        "entre 17.576, alguna se repite con probabilidad "
+        f"{fmt_pct(float(repeat_probability(same)), 2)}; con {same - 1}, "
+        f"{fmt_pct(float(repeat_probability(same - 1)), 2)} (cálculo exacto con fracciones). Para "
+        f"compartir solo las dos primeras letras (676 valores) bastan {near} "
+        f"({fmt_pct(float(repeat_probability(near, 26**2)), 2)}). `banburismus/depth.py`.",
+        "- **La app:** cada página dice debajo del título su línea «En clase», con la etiqueta de "
+        "su diapositiva tal cual (`app/ui/course.py`); en Experimentos, una por pestaña. Se ve "
+        "también en modo demo.",
+    ]
 
 
 def _slide_14(e1: dict[str, Any]) -> list[str]:
@@ -753,7 +784,7 @@ def _other_results(e2: dict[str, Any], e3: dict[str, Any]) -> list[str]:
         de, es = e3["aleman"], e3["espanol"]
         length = fmt_int(de["L"])
         lines += [
-            f"- **E3 (diapositivas 6 y 23):** IC del corpus alemán {fmt_dec(de['ic_corpus'], 4)} "
+            f"- **E3 (diapositivas 6 y 22):** IC del corpus alemán {fmt_dec(de['ic_corpus'], 4)} "
             f"(Pommerening: {fmt_dec(e3['ic_referencia_aleman'], 4)}); español "
             f"{fmt_dec(es['ic_corpus'], 4)}. Con mensajes de {length} letras, el IC del alemán "
             f"pasa de {fmt_dec(de['ic_plano'][0], 4)} en el plano a "
@@ -824,11 +855,11 @@ def _message_length(bench: dict[str, Any], chosen: dict[str, Any]) -> str:
 
 
 def _kappa_note(e3: dict[str, Any], e4: dict[str, Any]) -> str:
-    """Diapositivas 15 y 23: dos IC del alemán, con X entre palabras y sin ellas."""
+    """Diapositivas 15 y 22: dos IC del alemán, con X entre palabras y sin ellas."""
     kappa = fmt_dec(e4["kappa_aleman_x"], 3)
     return (
-        f"- Diapositivas 15 y 23: κ = {kappa}, «el índice de coincidencia del alemán» de la 15, "
-        "es el del alemán escrito con X entre palabras, como los mensajes de E4. El de la 23 "
+        f"- Diapositivas 15 y 22: κ = {kappa}, «el índice de coincidencia del alemán» de la 15, "
+        "es el del alemán escrito con X entre palabras, como los mensajes de E4. El de la 22 "
         "(«Alemán ≈ 0,076») es el de solo letras: "
         f"{fmt_dec(e3['aleman']['ic_corpus'], 4)} en nuestro corpus y "
         f"{fmt_dec(e3['ic_referencia_aleman'], 4)} según Pommerening. Las dos cifras están "
@@ -837,14 +868,62 @@ def _kappa_note(e3: dict[str, Any], e4: dict[str, Any]) -> str:
     )
 
 
+def _pilot_note() -> str:
+    """Diapositiva 6: las cifras que rotula «Piloto» salen de E1, con el simulador validado."""
+    return (
+        "- Diapositiva 6 («Piloto: se cumple con 2.000 claves aleatorias» y «Piloto: 200.000 "
+        "letras cifradas, 0 puntos fijos»): en el repositorio, las dos cifras salen de E1, con "
+        "el simulador validado (`experiments/e1_validation.py` · `check_properties`); el piloto "
+        "fue solo el prototipo inicial y no es parte de los resultados. Si preguntan, es el "
+        "simulador del proyecto. Mejor rotular: «E1: …»."
+    )
+
+
+def _rho_note() -> str:
+    """Diapositiva 5 y guion: en qué pasos avanza el central y de dónde sale la cola de 676."""
+    from enigma_lab.core.stepping import notch_sets, rho_structure
+
+    rho = rho_structure(notch_sets(["Q", "E", "V"]))
+    return (
+        "- Diapositiva 5 y guion («en el paso 3 el central avanza dos veces seguidas»): el "
+        "central avanza en los pasos 2 y 3 (ADV → AEW → BFX: D → E → F); el 3 es el doble paso. "
+        "Mejor decir: «en los pasos 2 y 3 el central avanza dos veces seguidas». Y en "
+        "«Preguntas probables» («de ahí sale la cola de 676»): de las "
+        f"{fmt_int(rho.collisions)} colisiones cuelgan {fmt_int(rho.tail[1])} posiciones a un "
+        f"paso del ciclo, y de {fmt_int(rho.tail[2])} de ellas, otras {fmt_int(rho.tail[2])} a "
+        f"dos pasos: {fmt_int(rho.tail[1])} + {fmt_int(rho.tail[2])} = "
+        f"{fmt_int(sum(rho.tail.values()))}. Si piden el detalle: «{fmt_int(rho.tail[1])} "
+        f"posiciones entran al ciclo en un paso y {fmt_int(rho.tail[2])} en dos»."
+    )
+
+
+def _birthday_note() -> str:
+    """Diapositiva 13: el cumpleaños de las claves iguales y el de las que usa el Banburismus."""
+    from enigma_lab.banburismus.depth import messages_for_repeat
+
+    same, near = messages_for_repeat(), messages_for_repeat(26**2)
+    return (
+        f"- Diapositiva 13 y guion («con {same} mensajes ya es más probable que no que dos se "
+        "repitan»): es para dos claves de mensaje iguales en las tres letras, que dan "
+        "profundidad desde la primera letra (el two-time pad exacto). El Banburismus usa "
+        "también las claves que solo difieren en el rotor derecho, que comparten las dos "
+        f"primeras letras (676 valores): eso ya es más probable que no con {near} mensajes. La "
+        "diapositiva está bien; si preguntan por qué la profundidad era tan común, sirve el "
+        "segundo número."
+    )
+
+
 def _guion_notes(summary: dict[str, Any], bench: dict[str, Any]) -> list[str]:
-    """Lo que la versión 3 de las diapositivas y del guion dice distinto de la app o de los
+    """Lo que la versión 4 de las diapositivas y del guion dice distinto de la app o de los
     resultados, o que se presta a confusión, con la frase que conviene usar («Discrepancias»)."""
     head = (
-        "**Con las diapositivas y el guion (versión 3, 23-11-2026).** Ninguna cifra contradice "
-        "los resultados, y las ocho notas de la versión 2 quedaron corregidas: los pasos de la "
-        "demo 2, el pendiente del banco, «Vector BDZGO», el modelo del compañero, el tiempo de "
-        "la diapositiva 16 y tres respuestas de «Preguntas probables»."
+        "**Con las diapositivas y el guion (versión 4, 25-11-2026).** Ninguna cifra contradice "
+        "los resultados. Las cifras nuevas de las conexiones con el curso (25!! y 26! en la 6, la "
+        "cola de la ρ en la 5 y en «Preguntas probables», las 1.000 máquinas en la 7 y el "
+        "cumpleaños en la 13) coinciden con el código, y las etiquetas «EN CLASE» son las de la "
+        "app. Las tres notas de la versión 3 siguen abiertas (el banco de la demo 2, el largo del "
+        "mensaje y los dos IC del alemán), con la 22 en lugar de la 23; las tres últimas son "
+        "nuevas."
     )
     notes: list[str | None] = []
     chosen = next(
@@ -855,6 +934,7 @@ def _guion_notes(summary: dict[str, Any], bench: dict[str, Any]) -> list[str]:
     e3, e4 = summary.get("e3", {}), summary.get("e4", {})
     if e3 and e4.get("kappa_aleman_x") is not None:
         notes.append(_kappa_note(e3, e4))
+    notes += [_pilot_note(), _rho_note(), _birthday_note()]
     found = [n for n in notes if n]
     if not found:
         return [head]
@@ -972,6 +1052,13 @@ def build_markdown(
         "",
         *_slide_17(summary.get("e6", {})),
         "",
+        "### Conexiones con el curso (diapositivas 3 a 7, 13 y 18)",
+        "",
+        "Exactas, sin azar. La lista completa, semana por semana, está en la sección 7 de "
+        "`docs/GUIA_DE_ESTUDIO.md`.",
+        "",
+        *_course_figures(),
+        "",
         "### Otros resultados útiles",
         "",
         *_other_results(summary.get("e2", {}), summary.get("e3", {})),
@@ -1000,15 +1087,15 @@ def build_markdown(
         "",
         "## 3. Demos",
         "",
-        f"- **Demo 1 (diapositiva 4):** el cálculo es instantáneo. La traza de «Vector "
-        f"BDZGO» tarda {fmt_dec(timing['vector_bdzgo'], 1)} ms y la de «Portada» "
-        f"{fmt_dec(timing['portada'], 1)} ms en el equipo donde corrió `make resumen` "
-        f"({cpu}). Los 45 s del guion los pone la interacción.",
+        f"- **Demo 1 (diapositiva 4):** solo «Portada». El cálculo es instantáneo: su traza "
+        f"tarda {fmt_dec(timing, 1)} ms en el equipo donde corrió `make resumen` ({cpu}). Los "
+        "30 s del guion los pone la interacción.",
         "- **La app en clase:** abre `http://localhost:8501/maquina?demo=1` (el modo demo queda "
         "en la URL y sobrevive a una recarga) y, en otra pestaña, "
         "`http://localhost:8501/bombe?demo=1`; pliega la barra lateral para ganar ancho. En "
-        "modo demo, Máquina muestra solo «Vector BDZGO» y «Portada», y La Bombe, «Cifrado del "
-        "compañero» y «Caso de respaldo» (plan B).",
+        "modo demo, Máquina muestra «Portada» y «Vector BDZGO» (que el guion ya no usa), y La "
+        "Bombe, «Cifrado del compañero» y «Caso de respaldo» (plan B). Debajo del título, cada "
+        "página muestra su línea «En clase», la misma etiqueta de su diapositiva.",
         *_demo_2(bench or {}),
         "",
         "## 4. Discrepancias",

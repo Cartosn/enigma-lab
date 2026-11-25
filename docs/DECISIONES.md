@@ -844,6 +844,58 @@ pestañas, pueden detener el proceso. Ahora toman el mismo candado.
 - **Banco de la demo 2.** Ya no guarda el nombre del equipo; sí el procesador y los núcleos.
 - **Tipos.** `make lint` pasa mypy también por `app/` y `scripts/`.
 
+## Observaciones del profesor (25-11-2026)
+
+### D-078 · Conectar el análisis con el curso y exponer en 20 minutos
+- **Las observaciones.** Al aprobar el proyecto, el profesor pidió dos cosas: conectar el
+  análisis con los temas vistos en clase y, como el proyecto es individual, presentar en 20
+  minutos.
+- **La presentación pasa a la versión 4** (25-11-2026): 17:55 de exposición, y los mitos pasan a
+  los anexos. Las diapositivas 1 a 17 conservan su número; la 18 es «Lecciones del curso», la
+  conclusión es la 19 y las preguntas, la 20; los anexos son la 21 (la Bombe en software), la 22
+  (métodos), la 23 (mitos) y la 24 (fuentes). Cada diapositiva lleva arriba una etiqueta «EN
+  CLASE» con su conexión. El PDF se guarda con el nombre de siempre.
+- **Una sola lista de conexiones:** la sección 7 de la guía de estudio, por semanas del
+  programa del curso (que sigue *Serious Cryptography*, 2.ª ed.): 1, 2, 3, 4, 5, 6, 8, y 11 y 13.
+  Las semanas 7, 9, 10 y 12 no tienen una conexión directa con los resultados y no se fuerzan.
+  El informe, la guía, el resumen y la app usan esa lista y no agregan otras; una conexión mejor
+  iría como propuesta a «Discrepancias» de `RESUMEN.md`.
+- **Cifras nuevas en el registro** (69 en total, todas coinciden):
+  - 25!! = 7.905.853.580.625 involuciones sin puntos fijos, que es N(13), entre 26!
+    permutaciones (`keyspace.fixed_point_free_involutions`, `permutations`; diapositiva 6);
+  - la ρ del paso: 650 posiciones a un paso del ciclo, 26 a dos y 650 colisiones
+    (`stepping.rho_structure`; diapositiva 5 y una respuesta del guion);
+  - el cumpleaños de las claves de mensaje: con 157, 50,28 % (con 156, 49,84 %), exacto con
+    fracciones (`depth.repeat_probability`; diapositiva 13);
+  - 5,04 años de fuerza bruta con 1.000 máquinas (`brute_force_years(…, machines)`;
+    diapositiva 7).
+
+  Sale del registro la cota «±0,25 puntos» de los IC de E4 (D-073), que la diapositiva 15 ya no
+  muestra, y las referencias a las diapositivas 19 a 23 se renumeran.
+- **Demo 1:** solo «Portada», 30 s. «Vector BDZGO» se queda en la app, también en modo demo,
+  aunque el guion ya no lo usa.
+- **La línea «En clase» de la app** (`ui/course.py`, `layout.in_class`): debajo del título de
+  cada página, la etiqueta de su diapositiva, tal cual. Una página con dos diapositivas lleva las
+  dos (Máquina: 4 y 5; Cribs y menús: 10 y 11). Inicio y Ataque moderno, sin diapositiva, llevan
+  una frase de la fila de la semana 3. Experimentos la lleva en cada pestaña, con la diapositiva
+  de su experimento; E1, sin diapositiva, con Kerckhoffs (semana 1). Se ve también en modo demo:
+  es una línea, la misma de la diapositiva, a 20 px.
+- **Dos ajustes para que esas líneas sean ciertas en su página:** la calculadora de Espacio de
+  claves reparte la fuerza bruta entre máquinas en paralelo (con 1.000, 5,04 años), y Estadística
+  del cifrado dice cuántas involuciones sin puntos fijos hay entre las 26! permutaciones.
+- **Informe:** «Contexto en el curso» resume la lista semana por semana, y cada párrafo de
+  «Análisis y lecciones» dice su semana. Para seguir en 3 páginas se acortó la redacción, el
+  encabezado da solo el día de la corrida (`\ELdia`) y la figura de E6 ocupa el 92 % del ancho.
+- **Guía de estudio:** la sección 7, con la cifra y el archivo de cada semana, y las 15
+  preguntas frecuentes en el orden del guion: las cinco nuevas (Vigenère, A5/1, forward secrecy,
+  CTR y la ρ) y las diez de antes. Las cinco que salen (puntos fijos, validación, doble paso,
+  anillos y plugboard) quedan en las preguntas de sus temas.
+- **«Discrepancias»** conserva las tres notas de la versión 3, que el guion v4 no aplicó, y suma
+  tres: el rótulo «Piloto» de la diapositiva 6 (las cifras son de E1), los pasos del doble paso y
+  la cola de la ρ (diapositiva 5 y una respuesta), y el cumpleaños de las claves que solo
+  difieren en el rotor derecho, las del Banburismus (31 mensajes entre 676 valores).
+- **El computador de la exposición** sigue siendo este escritorio (D-072).
+
 ## Pendientes de decidir
 
 Ninguno.

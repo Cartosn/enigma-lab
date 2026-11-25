@@ -3,9 +3,29 @@
 from __future__ import annotations
 
 from enigma_lab.core.machine import Enigma, EnigmaConfig
-from enigma_lab.core.stepping import cycle_structure, notch_sets, step
+from enigma_lab.core.stepping import cycle_structure, notch_sets, rho_structure, step
 
 I_II_III = notch_sets(["Q", "E", "V"])
+LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+
+def test_rho_shape_of_the_odometer() -> None:
+    """La ρ: 676 posiciones de cola (650 a un paso del ciclo y 26 a dos) y 650 colisiones."""
+    rho = rho_structure(I_II_III)
+    assert rho.cycle == 16_900
+    assert rho.tail == {1: 650, 2: 26}
+    assert sum(rho.tail.values()) == cycle_structure(I_II_III)[1] == 676
+    assert rho.in_degree == {1: 16_250, 2: 650}
+    assert rho.collisions == 650
+
+
+def test_rho_collision_is_the_double_step() -> None:
+    """(L, E, R) y (L + 1, F, R) van a la misma posición; (A, E, V) está a dos pasos."""
+    e, f, v = (LETTERS.index(c) for c in "EFV")
+    assert step((0, e, 2), I_II_III).positions == step((1, f, 2), I_II_III).positions
+    first = step((0, e, v), I_II_III).positions  # (B, F, W): solo se llega desde (A, E, V)
+    assert first == (1, f, v + 1)
+    assert step(first, I_II_III).positions == step((0, e, v + 1), I_II_III).positions
 
 
 def test_double_step_sequence() -> None:

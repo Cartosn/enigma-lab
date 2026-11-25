@@ -28,7 +28,8 @@ from enigma_lab.rejewski.traffic import Day, core_position, known_after, simulat
 from enigma_lab.viz import plotly_figs
 from enigma_lab.viz.numfmt import fmt_int, fmt_pct
 from ui.charts import chart, csv_button
-from ui.layout import big_result, is_demo, what_am_i_seeing
+from ui.course import PAGES as IN_CLASS
+from ui.layout import big_result, in_class, is_demo, what_am_i_seeing
 from ui.rejewski_view import cycles_payload, indicators_table, product_state, render_cycles
 
 K = "rej_"
@@ -95,6 +96,7 @@ def _indicator_line(indicators: np.ndarray, count: int = 16) -> str:
 demo = is_demo()
 st.title("Rejewski")
 st.caption("Enigma Lab › Rejewski")
+in_class(*IN_CLASS["rejewski"])
 what_am_i_seeing(
     "Hasta 1940, cada mensaje empezaba con su clave de tres letras cifrada dos veces en la "
     "posición del día: seis letras, cifradas por seis permutaciones A, B, C, D, E y F.",

@@ -23,7 +23,7 @@ import numpy as np
 from enigma_lab import SEED, paths
 from enigma_lab.core import keyspace as ks
 from enigma_lab.core.machine import Enigma, EnigmaConfig, encrypt, groups_of_five
-from enigma_lab.core.stepping import cycle_structure, notch_sets
+from enigma_lab.core.stepping import Rho, cycle_structure, notch_sets, rho_structure
 from enigma_lab.core.vectors import vector
 from enigma_lab.cribs.dragging import alignments, valid_positions
 from enigma_lab.cribs.menu import MenuStats, menu_at, menu_stats
@@ -56,9 +56,33 @@ def _years() -> str:
     return fmt_int(round(ks.brute_force_years(SPACE.total_without_rings, 1e9)))
 
 
+def _years_parallel(machines: int = 1_000) -> str:
+    """Años de fuerza bruta repartida entre ``machines`` máquinas de 10⁹ claves por segundo."""
+    return fmt_dec(ks.brute_force_years(SPACE.total_without_rings, 1e9, machines), 2)
+
+
 @cache
 def _cycle() -> tuple[list[int], int]:
     return cycle_structure(notch_sets(["Q", "E", "V"]))
+
+
+@cache
+def _rho() -> Rho:
+    return rho_structure(notch_sets(["Q", "E", "V"]))
+
+
+def _rho_tail() -> str:
+    """Posiciones de la cola de la ρ según los pasos que les faltan para el ciclo: «650 y 26»."""
+    tail = _rho().tail
+    return " y ".join(fmt_int(tail[steps]) for steps in sorted(tail))
+
+
+def _birthday() -> tuple[int, float, float]:
+    """(claves de mensaje con las que una repetición pasa del 50 %, su P y la de una menos)."""
+    from enigma_lab.banburismus.depth import messages_for_repeat, repeat_probability
+
+    n = messages_for_repeat()
+    return n, float(repeat_probability(n)), float(repeat_probability(n - 1))
 
 
 def _windows_from_adu(presses: int = 3) -> str:
@@ -271,21 +295,6 @@ def _german_survival() -> str:
     return f"{_pct(by_length['13']['p'])} y {_pct(by_length['50']['p'])}"
 
 
-def _e4_ci_bound() -> str:
-    """Cota del semiancho de los IC 95 % de E4, en puntos porcentuales.
-
-    Es el mayor semiancho de las 20 celdas (dos textos por 10 longitudes), redondeado hacia
-    arriba a la centésima, porque la diapositiva lo da como cota: «±0,25 puntos o menos».
-    """
-    e4 = _saved("e4")
-    widest = max(
-        (high - low) / 2
-        for text in ("aleatorio", "aleman")
-        for low, high in (cell["ic"] for cell in e4[text]["por_L"].values())
-    )
-    return "±" + fmt_dec(math.ceil(widest * 10_000) / 100, 2)
-
-
 def _german_kappa() -> str:
     """κ del alemán con la X, y en cuántas longitudes la teoría corregida cae en el IC (E4)."""
     e4 = _saved("e4")
@@ -366,20 +375,25 @@ def _e6_pairs() -> str:
 # ---------------------------------------------------------------- registro
 
 CIFRAS: tuple[Cifra, ...] = (
-    # Diapositivas 2, 7, 8 y 20 · core/keyspace.py
+    # Diapositivas 2, 3, 7, 8, 12 y 19 · core/keyspace.py
     Cifra(
-        "2, 7, 20",
+        "2, 7, 19",
         "claves sin anillos",
         "158.962.555.217.826.360.000",
         lambda: fmt_int(SPACE.total_without_rings),
     ),
     Cifra(
-        "2, 7, 20",
+        "2, 7, 19",
         "claves sin anillos, redondeado",
         "1,6 × 10²⁰",
         lambda: fmt_sci(SPACE.total_without_rings, 2),
     ),
-    Cifra("7, 8", "bits sin anillos", "67,11", lambda: fmt_dec(ks.bits(SPACE.total_without_rings))),
+    Cifra(
+        "3, 7, 8, 19",
+        "bits sin anillos",
+        "67,11",
+        lambda: fmt_dec(ks.bits(SPACE.total_without_rings)),
+    ),
     Cifra("7", "claves con anillos", "1,0746 × 10²³", lambda: fmt_sci(SPACE.total_with_rings, 5)),
     Cifra(
         "7",
@@ -399,18 +413,24 @@ CIFRAS: tuple[Cifra, ...] = (
         lambda: _pct(SPACE.plugboard_share),
     ),
     Cifra(
-        "8, 20",
+        "8",
         "configuraciones que barre la Bombe",
         "1.054.560",
         lambda: fmt_int(SPACE.bombe_sweep),
     ),
     Cifra(
-        "8, 20",
+        "3, 8, 12, 19",
         "bits del barrido de la Bombe",
         "20,01",
         lambda: fmt_dec(ks.bits(SPACE.bombe_sweep)),
     ),
-    Cifra("7", "años de fuerza bruta a 10⁹ claves por segundo", "5.037", _years),
+    Cifra("7, 16", "años de fuerza bruta a 10⁹ claves por segundo", "5.037", _years),
+    Cifra(
+        "7",
+        "años con 1.000 máquinas de 10⁹ claves por segundo (la etiqueta lo redondea a 5)",
+        "5,04",
+        _years_parallel,
+    ),
     # Diapositivas 3, 5 y 14 · core/stepping.py
     Cifra(
         "3, 5, 14",
@@ -418,7 +438,16 @@ CIFRAS: tuple[Cifra, ...] = (
         "16.900",
         lambda: " + ".join(fmt_int(n) for n in _cycle()[0]),
     ),
-    Cifra("5", "posiciones fuera del ciclo", "676", lambda: fmt_int(_cycle()[1])),
+    Cifra(
+        "3, 5", "posiciones fuera del ciclo: la cola de la ρ", "676", lambda: fmt_int(_cycle()[1])
+    ),
+    Cifra("5", "posiciones de la cola a un paso y a dos pasos del ciclo", "650 y 26", _rho_tail),
+    Cifra(
+        "5",
+        "posiciones del ciclo con dos predecesoras, las colisiones del paso (guion, preguntas)",
+        "650",
+        lambda: fmt_int(_rho().collisions),
+    ),
     Cifra("5, 14", "doble paso desde ADU", "ADU → ADV → AEW → BFX", _windows_from_adu),
     # Diapositivas 1, 4 y 14 · core/machine.py
     Cifra(
@@ -476,9 +505,28 @@ CIFRAS: tuple[Cifra, ...] = (
     Cifra(
         "6, 14", "puntos fijos en esas 200.000 letras", "0", lambda: fmt_int(_pilot_properties()[2])
     ),
+    Cifra(
+        "6",
+        "involuciones sin puntos fijos de 26 letras: 25!! = 25 · 23 ··· 3 · 1",
+        "7.905.853.580.625",
+        lambda: fmt_int(ks.fixed_point_free_involutions()),
+    ),
+    Cifra(
+        "6",
+        "lo mismo, redondeado",
+        "7,9 × 10¹²",
+        lambda: fmt_sci(ks.fixed_point_free_involutions(), 2),
+    ),
+    Cifra(
+        "6",
+        "permutaciones de 26 letras: 26!",
+        "403.291.461.126.605.635.584.000.000",
+        lambda: fmt_int(ks.permutations()),
+    ),
+    Cifra("6", "lo mismo, redondeado", "4 × 10²⁶", lambda: fmt_sci(ks.permutations(), 1)),
     # Diapositiva 15 · fórmula; la simulación con alemán real es E4 (fase 2)
     Cifra(
-        "15, 20",
+        "15, 19",
         "(25/26)¹³: sobreviven a un crib de 13 letras",
         f"60,1{NBSP}%",
         lambda: _pct(no_fixed_point_probability(13)),
@@ -495,14 +543,13 @@ CIFRAS: tuple[Cifra, ...] = (
         f"61,6{NBSP}% y 15,4{NBSP}%",
         _german_survival,
     ),
-    Cifra("15", "cota del semiancho de los IC 95 % de E4, en puntos", "±0,25", _e4_ci_bound),
     Cifra(
         "15",
         "κ del alemán; longitudes con la teoría corregida dentro del IC (E4)",
         "κ = 0,080; 10 de 10",
         _german_kappa,
     ),
-    Cifra("15, 23", "E4: mensajes por longitud", "1.000 de 250 letras", _e4_design),
+    Cifra("15, 22", "E4: mensajes por longitud", "1.000 de 250 letras", _e4_design),
     # Diapositivas 10 y 11 · cribs/ (casos deterministas) y el caso de respaldo de la 12
     Cifra("10", "alineaciones de WETTERBERICHT sobre BBGCCKITCTTEZZZLCZ", "6", _slide10_count),
     Cifra("10", "alineaciones sin conflictos", "0, 1, 2, 3", _slide10_valid),
@@ -555,6 +602,18 @@ CIFRAS: tuple[Cifra, ...] = (
     ),
     # Diapositivas 13 y 17 · banburismus/ (tasas 1/17 y 1/26 de Wikipedia, «Banburismus»)
     Cifra(
+        "13",
+        "claves de mensaje con las que una repetición pasa del 50 %, entre 17.576 (cumpleaños)",
+        "157",
+        lambda: fmt_int(_birthday()[0]),
+    ),
+    Cifra(
+        "13",
+        "P(alguna se repite) con 157 y con 156 claves de mensaje (cálculo exacto)",
+        f"50,28{NBSP}% y 49,84{NBSP}%",
+        lambda: f"{_pct(_birthday()[1], 2)} y {_pct(_birthday()[2], 2)}",
+    ),
+    Cifra(
         "13, 17",
         "decibanes por repetición: 10·log₁₀((1/17)/(1/26))",
         f"+1,845{NBSP}dB",
@@ -597,8 +656,8 @@ CIFRAS: tuple[Cifra, ...] = (
         "254 · 332",
         _sprt_german,
     ),
-    Cifra("17, 23", "E6: pares por hipótesis", "2.000", _e6_pairs),
-    # Diapositivas 16 y 20 · data/reference/turing_stops.csv (Turing) y E5 (nuestra Bombe)
+    Cifra("17, 22", "E6: pares por hipótesis", "2.000", _e6_pairs),
+    # Diapositivas 16 y 19 · data/reference/turing_stops.csv (Turing) y E5 (nuestra Bombe)
     Cifra(
         "16",
         "Turing, 12 letras: paradas por orden con 0, 1, 2 y 3 lazos; en 60 órdenes con 2 y 3",
@@ -623,15 +682,15 @@ CIFRAS: tuple[Cifra, ...] = (
         f"12 veces; 0,11{NBSP}s frente a 0,009{NBSP}s",
         _robust_cost,
     ),
-    Cifra("16, 23", "E5: menús de 12 letras distintas por celda", "100", _e5_menus),
+    Cifra("16, 22", "E5: menús de 12 letras distintas por celda", "100", _e5_menus),
     Cifra(
-        "20",
+        "16, 19",
         "cada lazo divide las paradas falsas por (E5, media geométrica de 0 a 2 lazos)",
         "26",
         _per_loop,
     ),
 )
-"""Todas las cifras de la tabla 11.3, en el orden de las diapositivas."""
+"""Todas las cifras de las diapositivas y del guion, más o menos en su orden."""
 
 
 def evaluate() -> list[dict[str, object]]:

@@ -107,6 +107,36 @@ def best_cable_count(letters: int = ALPHABET_SIZE) -> int:
     return max(range(max_cables(letters) + 1), key=lambda k: plugboard_settings(k, letters))
 
 
+def permutations(letters: int = ALPHABET_SIZE) -> int:
+    """Permutaciones de n letras: n!. Con 26, 403.291.461.126.605.635.584.000.000 ≈ 4 × 10²⁶.
+
+    Es el tamaño del conjunto entre el que un cifrado ideal elegiría la sustitución de
+    cada letra (conteo de permutaciones, como en un cifrado de bloque ideal).
+    """
+    return math.factorial(letters)
+
+
+def fixed_point_free_involutions(letters: int = ALPHABET_SIZE) -> int:
+    """Involuciones sin puntos fijos de n letras: (n − 1)!! = (n − 1) · (n − 3) ··· 3 · 1.
+
+    Una involución sin puntos fijos empareja todas las letras de dos en dos, como el
+    reflector o un plugboard con todos sus cables: la primera letra libre tiene n − 1
+    parejas posibles, la siguiente libre n − 3, y así hasta la última pareja. Con 26
+    letras, 25!! = 7.905.853.580.625 ≈ 7,9 × 10¹², que es también N(13).
+
+    En cada posición de los rotores, Enigma es una de estas: la máquina conjuga el
+    reflector, y conjugar conserva la involución y la falta de puntos fijos. Así que
+    elige entre 7,9 × 10¹² sustituciones, no entre las 26! ≈ 4 × 10²⁶ de
+    :func:`permutations`, y por eso se distingue de una permutación al azar.
+
+    Raises:
+        ValueError: si n es negativo o impar (sin puntos fijos, toda letra necesita pareja).
+    """
+    if letters < 0 or letters % 2:
+        raise ValueError(f"{letters} letras no se pueden emparejar todas")
+    return math.prod(range(letters - 1, 0, -2))
+
+
 def bits(count: int | float) -> float:
     """Bits de información de un número de opciones: log₂(count)."""
     return math.log2(count)
@@ -161,12 +191,19 @@ def keyspace(model: Model = ENIGMA_I, cables: int = DEFAULT_CABLES) -> KeySpace:
     )
 
 
-def brute_force_years(keys: int, tests_per_second: float) -> float:
-    """Años que tarda probar todas las claves: claves / (pruebas por segundo × s por año).
+def brute_force_years(keys: int, tests_per_second: float, machines: int = 1) -> float:
+    """Años que tarda probar todas las claves: claves / (pruebas por s × máquinas × s por año).
 
     Con 158.962.555.217.826.360.000 claves a 10⁹ pruebas por segundo da unos
-    5.037 años (años de 365,25 días).
+    5.037 años (años de 365,25 días). La búsqueda exhaustiva se reparte sin esfuerzo
+    (ataque paralelo): m máquinas se dividen las claves y tardan m veces menos; con
+    1.000, unos 5,04 años. Ningún reparto cambia los bits: solo los divide entre máquinas.
+
+    Raises:
+        ValueError: si las pruebas por segundo no son positivas o no hay ninguna máquina.
     """
     if tests_per_second <= 0:
         raise ValueError("las pruebas por segundo deben ser positivas")
-    return keys / tests_per_second / SECONDS_PER_YEAR
+    if machines < 1:
+        raise ValueError("hace falta al menos una máquina")
+    return keys / (tests_per_second * machines) / SECONDS_PER_YEAR

@@ -31,8 +31,9 @@ from enigma_lab.cribs.dragging import alignments
 from enigma_lab.cribs.menu import menu_at, menu_stats
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int
 from ui.bombe_view import drums_payload, render_drums, stops_frame
+from ui.course import PAGES as IN_CLASS
 from ui.cribs_view import menu_payload, render_menu
-from ui.layout import big_result, hidden_in_demo, is_demo, what_am_i_seeing, x_as_space
+from ui.layout import big_result, hidden_in_demo, in_class, is_demo, what_am_i_seeing, x_as_space
 
 K = "bombe_"
 ORDER_SETS: dict[str, tuple[str, tuple[str, ...]]] = {
@@ -151,6 +152,7 @@ if K + "cipher" not in state:
 demo = is_demo()
 st.title("La Bombe")
 st.caption("Enigma Lab › La Bombe")
+in_class(*IN_CLASS["bombe"])
 what_am_i_seeing(
     "La Bombe no prueba claves: prueba hipótesis. En cada orden de rotores y cada una de "
     "sus 17.576 posiciones supone que la letra de prueba va con una letra x del plugboard.",

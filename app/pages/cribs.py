@@ -16,8 +16,9 @@ from enigma_lab.cribs.menu import menu_at, menu_stats
 from enigma_lab.stats.corpus import random_excerpts
 from enigma_lab.viz.numfmt import fmt_int, fmt_pct
 from ui.charts import csv_button
+from ui.course import PAGES as IN_CLASS
 from ui.cribs_view import drag_payload, menu_payload, menu_table, render_drag, render_menu
-from ui.layout import is_demo, what_am_i_seeing
+from ui.layout import in_class, is_demo, what_am_i_seeing
 
 K = "crib_"
 SLIDE_10 = ("BBGCCKITCTTEZZZLCZ", "WETTERBERICHT")
@@ -55,6 +56,7 @@ if K + "cipher" not in st.session_state:
 demo = is_demo()
 st.title("Cribs y menús")
 st.caption("Enigma Lab › Cribs y menús")
+in_class(*IN_CLASS["cribs"])
 what_am_i_seeing(
     "El crib (una palabra que se adivina) se desliza sobre el cifrado. Si una letra cae "
     "sobre la misma letra cifrada, esa alineación es imposible: Enigma nunca cifra una "

@@ -17,6 +17,7 @@ carpeta de usuario ``%LOCALAPPDATA%\\Programs\\tectonic`` (D-053).
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 import shutil
@@ -29,7 +30,7 @@ import pandas as pd
 
 from enigma_lab import paths
 from enigma_lab.core import keyspace as ks
-from enigma_lab.core.stepping import cycle_structure, notch_sets
+from enigma_lab.core.stepping import cycle_structure, notch_sets, rho_structure
 from enigma_lab.experiments.common import read_summary
 from enigma_lab.experiments.e5_bombe import turing_agreement
 from enigma_lab.viz.numfmt import NBSP, fmt_dec, fmt_int, fmt_pct
@@ -110,6 +111,30 @@ def _validation_macros(e1: dict[str, Any]) -> dict[str, str]:
         "ELinvolucion": fmt_int(e1["involucion_ok"]),
         "ELperiodo": fmt_int(max(cycles)),
         "ELfueraCiclo": fmt_int(outside),
+    }
+
+
+def _course_macros(e5: dict[str, Any]) -> dict[str, str]:
+    """Las cifras de las conexiones con el curso: conteos, la ρ, el cumpleaños y el paralelo."""
+    from enigma_lab.banburismus.depth import messages_for_repeat, repeat_probability
+    from enigma_lab.stats.inference import no_fixed_point_probability
+
+    rho = rho_structure(notch_sets(["Q", "E", "V"]))  # rotores I-II-III
+    keys = ks.keyspace(ks.ENIGMA_I).total_without_rings
+    messages = messages_for_repeat()
+    twelve = e5["doce_letras"]
+    per_loop = math.sqrt(twelve["0"]["paradas"] / twelve["2"]["paradas"])
+    return {
+        "ELinvoluciones": sci(ks.fixed_point_free_involutions(), 2),
+        "ELpermutaciones": sci(ks.permutations(), 1),
+        "ELcolaUno": fmt_int(rho.tail[1]),
+        "ELcolaDos": fmt_int(rho.tail[2]),
+        "ELcolisiones": fmt_int(rho.collisions),
+        "ELcumpleanos": fmt_int(messages),
+        "ELcumpleanosP": fmt_pct(float(repeat_probability(messages)), 2),
+        "ELanosMilMaquinas": fmt_dec(ks.brute_force_years(keys, 1e9, 1_000), 2),
+        "ELsinPuntoFijoCien": fmt_pct(no_fixed_point_probability(100), 2),
+        "ELporLazo": fmt_int(round(per_loop)),
     }
 
 
@@ -324,6 +349,7 @@ def macros(results_dir: Path | None = None) -> dict[str, str]:
         | _validation_macros(summary["e1"])
         | _crib_macros(summary["e4"], summary["e3"])
         | _bombe_macros(summary["e5"], pd.read_parquet(folder / "e5_bombe.parquet"))
+        | _course_macros(summary["e5"])
         | _banburismus_macros(summary["e6"])
         | _rejewski_macros(summary.get("e7"))
         | _attack_macros(summary.get("e8"))
@@ -333,6 +359,7 @@ def macros(results_dir: Path | None = None) -> dict[str, str]:
             "ELmodo": run["modo"],
             "ELcommit": run["commit"],
             "ELfecha": run["fecha"],
+            "ELdia": run["fecha"].split()[0],
             "ELminutosExperimentos": fmt_int(max(1, round(seconds / 60))),
         }
     )

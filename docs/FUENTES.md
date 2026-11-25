@@ -104,11 +104,23 @@ el 20-11-2026). El detalle, con la licencia, está en `data/corpora/README.md`.
 | Kafka, F. (1915). *Die Verwandlung* | 22367 | `22367-8.txt` | `fe91c871104780ce5a8fe3e12e79b757f6fb5ffa28ed83d6186e618fb3bf344a` |
 | Cervantes, M. de (1605). *El ingenioso hidalgo don Quijote de la Mancha* | 2000 | `2000-0.txt` | `1d0eb85cbe75661d50cc5b50c4537cddd37b6ae9f29d778dded2d80c689fe1dc` |
 
-## Citadas además en la presentación (diapositiva 24)
+## Temas del curso
 
-- Crypto Museum: páginas de la Bombe y de Colossus. https://www.cryptomuseum.com/
-- Agar, J. (2014). UCL STS Observatory.
-- Stanford Encyclopedia of Philosophy: «Alan Turing».
+- Aumasson, J.-P. (2024). *Serious Cryptography: A Practical Introduction to Modern
+  Encryption* (2.ª ed.). No Starch Press. Es el libro que sigue el curso, y de su programa
+  salen las semanas de «Conexiones con el curso» en la guía de estudio: Vigenère y el
+  two-time pad, la aleatoriedad, la seguridad, el conteo de permutaciones y el modo CTR, A5/1
+  y RC4 en WEP, el método rho, el nonce de AES-GCM, TLS y Diffie-Hellman.
+
+## Citadas además en la presentación
+
+- Crypto Museum: páginas de la Bombe y de Colossus. https://www.cryptomuseum.com/ (diapositivas
+  12, 23 y 24)
+- Agar, J. (2014). UCL STS Observatory (diapositivas 23 y 24).
+- Stanford Encyclopedia of Philosophy: «Alan Turing» (diapositivas 23 y 24).
+- Wikipedia: «John Herivel», para las claves de mensaje predecibles, las «cillies»
+  (diapositiva 18).
+- El programa del curso y sus retos semanales (diapositiva 3).
 
 ## Diseño y software
 

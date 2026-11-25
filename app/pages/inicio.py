@@ -14,7 +14,8 @@ from enigma_lab.experiments.common import read_summary
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct, fmt_sci
 from enigma_lab.viz.theme import DARK
 from ui.catalog import MODULES
-from ui.layout import segmented_bar, what_am_i_seeing
+from ui.course import PAGES as IN_CLASS
+from ui.layout import in_class, segmented_bar, what_am_i_seeing
 
 space = ks.keyspace(ks.ENIGMA_I, cables=ks.DEFAULT_CABLES)
 parts = space.component_bits()
@@ -26,6 +27,7 @@ st.caption(
     "Simulación y criptoanálisis estadístico de Enigma y la Bombe de Turing-Welchman · "
     "Proyecto final de Criptografía · Universidad Nacional de Colombia · 2026"
 )
+in_class(*IN_CLASS["inicio"])
 
 what_am_i_seeing(
     "La pregunta del proyecto y su hipótesis: la estructura de Enigma permite apartar "

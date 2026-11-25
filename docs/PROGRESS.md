@@ -1,10 +1,10 @@
 # Progreso
 
-Última actualización: 23-11-2026 · fase 5 cerrada: E7 (Rejewski) y E8 (ataque moderno). Docker
-probado después de la fase 5; Experimentos ya funciona sin el corpus completo (D-071). Repositorio
-remoto creado, con la CI en verde. La exposición será en este equipo (P-001 resuelto, D-072).
-Diapositivas y guion en su versión 3: sus 61 cifras coinciden con el código (D-073, D-074).
-Revisión final de la entrega el mismo día (D-075 a D-077).
+Última actualización: 25-11-2026 · las observaciones del profesor: el análisis conectado con los
+temas del curso y la presentación en 20 minutos, con las diapositivas y el guion en su versión 4
+(D-078). Antes: fase 5 cerrada, E7 (Rejewski) y E8 (ataque moderno); Docker probado después de
+la fase 5 (D-071); repositorio remoto con la CI en verde; la exposición, en este equipo (D-072);
+revisión final de la entrega el 23-11-2026 (D-075 a D-077).
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
@@ -15,6 +15,77 @@ Revisión final de la entrega el mismo día (D-075 a D-077).
 | 4 · Banburismus | Cerrada (21-11-2026) | 3 |
 | 5 · Extensiones P2 | Cerrada (22-11-2026), después de la fase 6 | 3 |
 | 6 · Pulido y entrega | Cerrada (22-11-2026) | Fin de la 3 |
+
+## Conexiones con el curso y 20 minutos (25-11-2026)
+
+Al aprobar el proyecto, el profesor pidió conectar el análisis con los temas vistos en clase y,
+como el proyecto es individual, presentar en 20 minutos. Las diapositivas y el guion pasaron a la
+versión 4: 17:55 de exposición, los mitos a los anexos (18 «Lecciones del curso», 19 conclusión,
+20 preguntas, 21 a 24 anexos) y una etiqueta «EN CLASE» en cada diapositiva (D-078).
+
+**Qué quedó:**
+- **Una sola lista de conexiones**, la sección 7 de la guía de estudio: cada semana del curso con
+  la cifra del repositorio que la respalda y el archivo donde se calcula.
+- **Código nuevo, con sus pruebas:**
+  - `core/keyspace.py`: `permutations` y `fixed_point_free_involutions` (25!!, comprobado a
+    fuerza bruta hasta 8 letras y igual a N(13)), y el ataque paralelo en `brute_force_years`;
+  - `core/stepping.py`: `rho_structure`, la ρ del paso (cola, ciclo y colisiones);
+  - `banburismus/depth.py`: `repeat_probability` y `messages_for_repeat`, el cumpleaños exacto
+    de las claves de mensaje.
+- **Cifras de la presentación:** 69, todas coinciden (9 nuevas; sale la cota «±0,25» de E4, que
+  la diapositiva 15 ya no muestra). Las diapositivas 19 a 23 se renumeraron en el registro.
+- **App:** la línea «En clase» debajo del título de cada página y en cada pestaña de
+  Experimentos, también en modo demo (`app/ui/course.py`); la calculadora de Espacio de claves
+  con máquinas en paralelo, y en Estadística el conteo de involuciones entre las 26!
+  permutaciones.
+- **Informe:** «Contexto en el curso» resume la lista por semanas y cada párrafo de «Análisis y
+  lecciones» dice su semana; sigue en 3 páginas (se acortó la redacción y la figura de E6 ocupa
+  el 92 % del ancho).
+- **Guía de estudio:** sección 7 y las 15 preguntas frecuentes en el orden del guion v4 (cinco
+  nuevas: Vigenère, A5/1, forward secrecy, CTR y la ρ); la ρ, el conteo de permutaciones, el
+  ataque paralelo y el cumpleaños también en sus temas.
+- **`RESUMEN.md`:** «Conexiones con el curso» con las cifras nuevas; «Demos» con la demo 1 de
+  30 s, solo «Portada»; «Discrepancias» con las tres notas de la versión 3, que siguen abiertas,
+  y tres nuevas (el rótulo «Piloto» de la diapositiva 6, los pasos del doble paso y la cola de la
+  ρ, y el cumpleaños de las claves cercanas).
+- **Documentos:** DECISIONES (D-078), FUENTES (el libro del curso y las citas de las diapositivas
+  3 y 18), ARQUITECTURA.
+
+**Cifras obtenidas** (exactas, sin azar):
+- 25!! = 7.905.853.580.625 ≈ 7,9 × 10¹² involuciones sin puntos fijos (42,8 bits), entre
+  26! = 403.291.461.126.605.635.584.000.000 ≈ 4 × 10²⁶ permutaciones (88,4 bits);
+- la ρ del paso con I-II-III: ciclo de 16.900 y cola de 676, con 650 posiciones a un paso del
+  ciclo y 26 a dos; 650 posiciones del ciclo tienen dos predecesoras;
+- fuerza bruta: 5.037 años con una máquina de 10⁹ claves por segundo, 5,04 con 1.000;
+- cumpleaños: con 157 claves de mensaje entre 17.576, alguna se repite con probabilidad 50,28 %
+  (con 156, 49,84 %); con las dos primeras letras (676 valores), bastan 31 (50,26 %).
+
+`make test`: 401 pruebas (38 nuevas) en 2 min 14 s, con las lentas incluidas; `make lint`, sin
+errores (mypy en 84 archivos); `make report`: 3 páginas.
+
+**Revisado en el navegador** (Inicio, Máquina, Espacio de claves, Estadística, Cribs y menús,
+Experimentos y La Bombe; las pruebas cubren las diez páginas, con y sin modo demo): la línea se
+ve a 16 px, y a 20 px en modo demo; «Portada» descifra la portada; la calculadora y la frase de
+Estadística dan sus cifras. Se encontró y corrigió un texto suelto que la «magia» de Streamlit
+dibujaba en Espacio de claves (una prueba nueva lo vigila en todas las páginas).
+
+**Encontrado, sin corregir (no es de este cambio):** con el servidor recién arrancado, si la
+primera página que se abre es `http://localhost:8501/maquina?demo=1` o `/bombe?demo=1`,
+Streamlit la corre sin pasar por `Inicio.py`: sin modo demo, sin estilos y con la barra lateral
+de nombres de archivo. Pasa porque las páginas viven en `app/pages/`, la carpeta que Streamlit
+descubre sola antes de que `st.navigation` se registre. Desde la segunda carga, o si primero se
+abre `http://localhost:8501`, todo funciona. `make app` abre la raíz, así que la demo no se ve
+afectada si se arranca así.
+
+**Pendiente:**
+- pasar al guion y a las diapositivas 5, 6, 13 y 15 las seis notas de «Discrepancias» de
+  `RESUMEN.md` (ninguna cambia una cifra);
+- reescribir con voz propia «Contexto en el curso» y «Análisis y lecciones» del informe, que
+  cambiaron;
+- ensayar dos veces con cronómetro y preguntar al profesor si las preguntas cuentan dentro de
+  los 20 minutos;
+- decidir si se corrige la primera carga directa de las páginas (por ejemplo, con otro nombre
+  para `app/pages/`).
 
 ## Revisión final (23-11-2026)
 

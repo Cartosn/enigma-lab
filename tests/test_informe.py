@@ -32,6 +32,17 @@ def test_macros_are_the_presentation_figures() -> None:
     assert values["ELturingCero"] == "820" and values["ELturingTres"] == "0,04"
 
 
+def test_macros_of_the_course_connections() -> None:
+    """Las cifras nuevas del contexto en el curso salen del código, como en las diapositivas."""
+    values = informe.macros()
+    assert values["ELcolaUno"] == "650" and values["ELcolaDos"] == "26"
+    assert values["ELcolisiones"] == "650"
+    assert values["ELcumpleanos"] == "157" and values["ELcumpleanosP"] == "50,28~\\%"
+    assert values["ELanosMilMaquinas"] == "5,04" and values["ELporLazo"] == "26"
+    assert values["ELinvoluciones"] == "$\\mathrm{7{,}9}\\times10^{12}$"
+    assert values["ELpermutaciones"] == "$\\mathrm{4}\\times10^{26}$"
+
+
 def test_tex_escapes_spanish_number_format() -> None:
     assert informe.tex("60,1 %") == "60,1~\\%"
     assert informe.tex("−0,093") == "\\ensuremath{-}0,093"

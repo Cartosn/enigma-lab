@@ -28,12 +28,18 @@ máquina.
 - ``"aleman"``: dos fragmentos independientes del corpus alemán, que no se solapan;
 - ``"tasa_1_17"``: texto sintético en el que cada columna en profundidad repite con
   probabilidad 1/17 exacta, columna por columna e independiente: el modelo de Turing.
+
+**Cuán frecuente es la profundidad.** La clave de mensaje es un nonce de 3 letras con
+17.576 valores: por la paradoja del cumpleaños, con 157 mensajes en un día ya es más
+probable que no que dos se repitan (:func:`repeat_probability`, cálculo exacto).
 """
 
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass
+from fractions import Fraction
 from typing import Literal
 
 import numpy as np
@@ -56,6 +62,40 @@ OFFSETS = np.arange(-MAX_OFFSET, MAX_OFFSET + 1)
 
 TURING_RATE = 1 / 17
 """Tasa de repetición en profundidad del texto naval alemán (Wikipedia, «Banburismus»)."""
+
+MESSAGE_KEYS = 26**3
+"""Claves de mensaje posibles: las 17.576 posiciones iniciales de los tres rotores."""
+
+
+# ---------------------------------------------------------------- cumpleaños de las claves
+
+
+def repeat_probability(messages: int, keys: int = MESSAGE_KEYS) -> Fraction:
+    """Probabilidad exacta de que entre n claves de mensaje al azar alguna se repita.
+
+    Es la paradoja del cumpleaños con K valores: ninguna se repite con probabilidad
+    (K/K) · ((K − 1)/K) ··· ((K − n + 1)/K) = K! / ((K − n)! · K^n), así que
+    P(alguna se repite) = 1 − K! / ((K − n)! · K^n). Se calcula con enteros y fracciones,
+    sin la aproximación 1 − e^(−n²/2K). La clave de mensaje hace de nonce de 3 letras: dos
+    mensajes del mismo día con la misma clave de mensaje recorren los mismos estados desde
+    la primera letra y quedan en profundidad completa, el two-time pad.
+    """
+    if messages < 0:
+        raise ValueError("el número de mensajes no puede ser negativo")
+    return 1 - Fraction(math.perm(keys, messages), keys**messages)
+
+
+def messages_for_repeat(keys: int = MESSAGE_KEYS, target: Fraction = Fraction(1, 2)) -> int:
+    """La menor cantidad de claves de mensaje con la que una repetición pasa de ``target``.
+
+    Con las 17.576 posiciones son 157 (50,28 %; con 156, 49,84 %). Con K = 676, el número
+    de pares (izquierdo, central), es la cantidad de mensajes con la que ya es probable que
+    dos claves solo difieran en el rotor derecho, las que usa el Banburismus.
+    """
+    messages = 1
+    while repeat_probability(messages, keys) <= target:
+        messages += 1
+    return messages
 
 
 # ---------------------------------------------------------------- el desplazamiento verdadero

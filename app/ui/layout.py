@@ -40,6 +40,11 @@ _CSS = f"""
               color: {DARK.text_muted}; }}
 .el-legend .key {{ display: inline-block; width: 0.75rem; height: 0.75rem;
                    border-radius: 2px; margin-right: 0.4rem; vertical-align: -0.05rem; }}
+.el-inclass {{ font-size: 1rem; color: {DARK.text_muted}; line-height: 1.4;
+               margin: 0 0 0.6rem; }}
+.el-inclass .tag {{ color: {DARK.accent}; font-weight: 650; letter-spacing: 0.08em;
+                    margin-right: 0.3rem; }}
+.el-inclass .sep {{ color: {DARK.text_muted}; margin: 0 0.25rem; }}
 @media (prefers-reduced-motion: reduce) {{
   * {{ animation: none !important; transition: none !important; }}
 }}
@@ -66,7 +71,7 @@ html {{ font-size: 20px !important; }}
 [data-testid="stSliderTickBarMax"], [data-testid="stSliderTickBarMin"] *,
 [data-testid="stSliderTickBarMax"] *, [data-testid="stPageLink"] p,
 [data-testid="stMarkdownBadge"], [data-testid="stDownloadButton"] p,
-.el-legend, .el-segbar .part {{ font-size: 1rem !important; }}
+.el-legend, .el-segbar .part, .el-inclass {{ font-size: 1rem !important; }}
 [data-testid="stMetricValue"] div {{ font-size: 2rem !important; }}
 [class*="st-key-{HIDDEN_IN_DEMO}"] {{ display: none !important; }}
 """
@@ -112,6 +117,21 @@ def hidden_in_demo(name: str) -> DeltaGenerator:
     si no se dibujaran, Streamlit borraría su estado; ocultos, lo conservan.
     """
     return st.container(key=HIDDEN_IN_DEMO + name)
+
+
+def in_class(*labels: str) -> None:
+    """La línea «En clase» debajo del título: la conexión de la página con el curso.
+
+    Los textos son las etiquetas «EN CLASE» de las diapositivas (``ui/course.py``). Se ve
+    también en modo demo: es una sola línea, la misma que está en la diapositiva.
+    """
+    if not labels:
+        raise ValueError("la línea «En clase» lleva al menos una conexión")
+    joined = ' <span class="sep">|</span> '.join(escape(label) for label in labels)
+    st.markdown(
+        f'<p class="el-inclass"><span class="tag">EN CLASE</span> {joined}</p>',
+        unsafe_allow_html=True,
+    )
 
 
 def what_am_i_seeing(*lines: str) -> None:
