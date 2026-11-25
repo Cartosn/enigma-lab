@@ -1,7 +1,7 @@
 {
   "cifras": [
     {
-      "diapositivas": "2, 7, 20",
+      "diapositivas": "2, 7, 19",
       "cifra": "claves sin anillos",
       "esperado": "158.962.555.217.826.360.000",
       "obtenido": "158.962.555.217.826.360.000",
@@ -9,7 +9,7 @@
       "pendiente": ""
     },
     {
-      "diapositivas": "2, 7, 20",
+      "diapositivas": "2, 7, 19",
       "cifra": "claves sin anillos, redondeado",
       "esperado": "1,6 × 10²⁰",
       "obtenido": "1,6 × 10²⁰",
@@ -17,7 +17,7 @@
       "pendiente": ""
     },
     {
-      "diapositivas": "7, 8",
+      "diapositivas": "3, 7, 8, 19",
       "cifra": "bits sin anillos",
       "esperado": "67,11",
       "obtenido": "67,11",
@@ -89,7 +89,7 @@
       "pendiente": ""
     },
     {
-      "diapositivas": "8, 20",
+      "diapositivas": "8",
       "cifra": "configuraciones que barre la Bombe",
       "esperado": "1.054.560",
       "obtenido": "1.054.560",
@@ -97,7 +97,7 @@
       "pendiente": ""
     },
     {
-      "diapositivas": "8, 20",
+      "diapositivas": "3, 8, 12, 19",
       "cifra": "bits del barrido de la Bombe",
       "esperado": "20,01",
       "obtenido": "20,01",
@@ -105,10 +105,18 @@
       "pendiente": ""
     },
     {
-      "diapositivas": "7",
+      "diapositivas": "7, 16",
       "cifra": "años de fuerza bruta a 10⁹ claves por segundo",
       "esperado": "5.037",
       "obtenido": "5.037",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "7",
+      "cifra": "años con 1.000 máquinas de 10⁹ claves por segundo (la etiqueta lo redondea a 5)",
+      "esperado": "5,04",
+      "obtenido": "5,04",
       "coincide": true,
       "pendiente": ""
     },
@@ -121,10 +129,26 @@
       "pendiente": ""
     },
     {
-      "diapositivas": "5",
-      "cifra": "posiciones fuera del ciclo",
+      "diapositivas": "3, 5",
+      "cifra": "posiciones fuera del ciclo: la cola de la ρ",
       "esperado": "676",
       "obtenido": "676",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "5",
+      "cifra": "posiciones de la cola a un paso y a dos pasos del ciclo",
+      "esperado": "650 y 26",
+      "obtenido": "650 y 26",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "5",
+      "cifra": "posiciones del ciclo con dos predecesoras, las colisiones del paso (guion, preguntas)",
+      "esperado": "650",
+      "obtenido": "650",
       "coincide": true,
       "pendiente": ""
     },
@@ -233,7 +257,39 @@
       "pendiente": ""
     },
     {
-      "diapositivas": "15, 20",
+      "diapositivas": "6",
+      "cifra": "involuciones sin puntos fijos de 26 letras: 25!! = 25 · 23 ··· 3 · 1",
+      "esperado": "7.905.853.580.625",
+      "obtenido": "7.905.853.580.625",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "6",
+      "cifra": "lo mismo, redondeado",
+      "esperado": "7,9 × 10¹²",
+      "obtenido": "7,9 × 10¹²",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "6",
+      "cifra": "permutaciones de 26 letras: 26!",
+      "esperado": "403.291.461.126.605.635.584.000.000",
+      "obtenido": "403.291.461.126.605.635.584.000.000",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "6",
+      "cifra": "lo mismo, redondeado",
+      "esperado": "4 × 10²⁶",
+      "obtenido": "4 × 10²⁶",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "15, 19",
       "cifra": "(25/26)¹³: sobreviven a un crib de 13 letras",
       "esperado": "60,1 %",
       "obtenido": "60,1 %",
@@ -258,14 +314,6 @@
     },
     {
       "diapositivas": "15",
-      "cifra": "cota del semiancho de los IC 95 % de E4, en puntos",
-      "esperado": "±0,25",
-      "obtenido": "±0,25",
-      "coincide": true,
-      "pendiente": ""
-    },
-    {
-      "diapositivas": "15",
       "cifra": "κ del alemán; longitudes con la teoría corregida dentro del IC (E4)",
       "esperado": "κ = 0,080; 10 de 10",
       "obtenido": "κ = 0,080; 10 de 10",
@@ -273,7 +321,7 @@
       "pendiente": ""
     },
     {
-      "diapositivas": "15, 23",
+      "diapositivas": "15, 22",
       "cifra": "E4: mensajes por longitud",
       "esperado": "1.000 de 250 letras",
       "obtenido": "1.000 de 250 letras",
@@ -369,6 +417,22 @@
       "pendiente": ""
     },
     {
+      "diapositivas": "13",
+      "cifra": "claves de mensaje con las que una repetición pasa del 50 %, entre 17.576 (cumpleaños)",
+      "esperado": "157",
+      "obtenido": "157",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "13",
+      "cifra": "P(alguna se repite) con 157 y con 156 claves de mensaje (cálculo exacto)",
+      "esperado": "50,28 % y 49,84 %",
+      "obtenido": "50,28 % y 49,84 %",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
       "diapositivas": "13, 17",
       "cifra": "decibanes por repetición: 10·log₁₀((1/17)/(1/26))",
       "esperado": "+1,845 dB",
@@ -433,7 +497,7 @@
       "pendiente": ""
     },
     {
-      "diapositivas": "17, 23",
+      "diapositivas": "17, 22",
       "cifra": "E6: pares por hipótesis",
       "esperado": "2.000",
       "obtenido": "2.000",
@@ -473,7 +537,7 @@
       "pendiente": ""
     },
     {
-      "diapositivas": "16, 23",
+      "diapositivas": "16, 22",
       "cifra": "E5: menús de 12 letras distintas por celda",
       "esperado": "100",
       "obtenido": "100",
@@ -481,7 +545,7 @@
       "pendiente": ""
     },
     {
-      "diapositivas": "20",
+      "diapositivas": "16, 19",
       "cifra": "cada lazo divide las paradas falsas por (E5, media geométrica de 0 a 2 lazos)",
       "esperado": "26",
       "obtenido": "26",
