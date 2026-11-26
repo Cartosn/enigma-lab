@@ -1,7 +1,7 @@
 # Resumen de resultados para la presentación
 
-- **Fecha:** 2026-11-25 23:36 UTC
-- **Commit:** 041419c
+- **Fecha:** 2026-11-26 00:23 UTC
+- **Commit:** 295f15b
 - **Semilla:** 2026
 - **Modo:** completo
 - **Corridas:** E1: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E2: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E3: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E4: modo completo, 2026-11-22 16:43 UTC, commit 67e022b; E5: modo completo, 2026-11-22 16:47 UTC, commit 67e022b; E6: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E7: modo completo, 2026-11-22 16:48 UTC, commit 67e022b; E8: modo completo, 2026-11-22 17:13 UTC, commit 67e022b
@@ -127,6 +127,7 @@ Exactas, sin azar. La lista completa, semana por semana, está en la sección 7 
 | 15 | sobreviven con alemán real, con 13 y con 50 letras (E4) | 61,6 % y 15,4 % | 61,6 % y 15,4 % | sí |
 | 15 | κ del alemán; longitudes con la teoría corregida dentro del IC (E4) | κ = 0,080; 10 de 10 | κ = 0,080; 10 de 10 | sí |
 | 15, 22 | E4: mensajes por longitud | 1.000 de 250 letras | 1.000 de 250 letras | sí |
+| 22 | IC del alemán solo con letras (E3) y con X entre palabras (E4); al azar, 1/26 | 0,076 · 0,080 · 0,038 | 0,076 · 0,080 · 0,038 | sí |
 | 10 | alineaciones de WETTERBERICHT sobre BBGCCKITCTTEZZZLCZ | 6 | 6 | sí |
 | 10 | alineaciones sin conflictos | 0, 1, 2, 3 | 0, 1, 2, 3 | sí |
 | 10 | conflicto de las alineaciones 4 y 5 | T sobre la T de la posición 7 | T sobre la T de la posición 7 | sí |
@@ -134,12 +135,15 @@ Exactas, sin azar. La lista completa, semana por semana, está en la sección 7 
 | 11 | letra de prueba y su grado | T, grado 6 | T, grado 6 | sí |
 | 12 | menú del caso de respaldo: letras, aristas, componentes y lazos | 11 · 13 · 1 · 3 | 11 · 13 · 1 · 3 | sí |
 | 12 | letra de prueba del caso de respaldo | T, grado 4 | T, grado 4 | sí |
+| 12 | demo 2, 60 órdenes en modo robusto: casos resueltos; p50 · p95 · máximo (guion) | 60 de 60; 6,4 · 9,8 · 14,9 s | 60 de 60; 6,4 · 9,8 · 14,9 s | sí |
+| 12 | letras de los mensajes del banco de la demo 2 (guion: «unas 80 letras») | 78 | 78 | sí |
 | 9 | configuraciones del catálogo: 6 órdenes × 17.576 posiciones (E7) | 105.456 | 105.456 | sí |
 | 9 | nuestro catálogo: características distintas y únicas (E7, exacto) | 21.225 · 11.578 | 21.225 · 11.578 | sí |
 | 9 | Kuhl (2007): características distintas y únicas, junto a las nuestras | 21.230 · 11.466 | 21.230 · 11.466 | sí |
 | 9 | días en que el catálogo encuentra la configuración del día (E7) | 75 % de 4.000 días | 75 % de 4.000 días | sí |
 | 13 | claves de mensaje con las que una repetición pasa del 50 %, entre 17.576 (cumpleaños) | 157 | 157 | sí |
 | 13 | P(alguna se repite) con 157 y con 156 claves de mensaje (cálculo exacto) | 50,28 % y 49,84 % | 50,28 % y 49,84 % | sí |
+| 13 | claves que comparten las dos primeras letras (676 valores): repetición sobre el 50 % (guion, preguntas) | 31 (50,26 %) | 31 (50,26 %) | sí |
 | 13, 17 | decibanes por repetición: 10·log₁₀((1/17)/(1/26)) | +1,845 dB | +1,845 dB | sí |
 | 13 | decibanes por no repetición: 10·log₁₀((16/17)/(25/26)) | −0,093 dB | −0,093 dB | sí |
 | 17 | decibanes por letra, en promedio, en profundidad | +0,0211 dB | +0,0211 dB | sí |
@@ -156,11 +160,11 @@ Exactas, sin azar. La lista completa, semana por semana, está en la sección 7 
 | 16, 22 | E5: menús de 12 letras distintas por celda | 100 | 100 | sí |
 | 16, 19 | cada lazo divide las paradas falsas por (E5, media geométrica de 0 a 2 lazos) | 26 | 26 | sí |
 
-69 de 69 cifras calculadas coinciden.
+73 de 73 cifras calculadas coinciden.
 
 ## 3. Demos
 
-- **Demo 1 (diapositiva 4):** solo «Portada». El cálculo es instantáneo: su traza tarda 0,7 ms en el equipo donde corrió `make resumen` (Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos). Los 30 s del guion los pone la interacción.
+- **Demo 1 (diapositiva 4):** solo «Portada». El cálculo es instantáneo: su traza tarda 0,8 ms en el equipo donde corrió `make resumen` (Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos). Los 30 s del guion los pone la interacción.
 - **La app en clase:** abre `http://localhost:8501/maquina?demo=1` (el modo demo queda en la URL y sobrevive a una recarga) y, en otra pestaña, `http://localhost:8501/bombe?demo=1`; pliega la barra lateral para ganar ancho. En modo demo, Máquina muestra «Portada» y «Vector BDZGO» (que el guion ya no usa), y La Bombe, «Cifrado del compañero» y «Caso de respaldo» (plan B). Debajo del título, cada página muestra su línea «En clase», la misma etiqueta de su diapositiva.
 - **Demo 2 (diapositiva 12):** `make bench-demo` del 2026-11-21 18:25 UTC (commit 5b34896) en Intel64 Family 6 Model 158 Stepping 10, GenuineIntel, 6 núcleos lógicos, Windows 11. Casos de compañero: clave como la de «Clave aleatoria» (10 cables), mensaje alemán de 78 letras que empieza por el crib, crib en la posición 0. Flujo completo de la página La Bombe: barrido, máquina de verificación y «Verificar». Éxito: el descifrado es el mensaje letra por letra.
 
@@ -177,14 +181,7 @@ p95: el 95 % de los casos tardó eso o menos; «Máximo» es el más lento.
 
 ## 4. Discrepancias
 
-**Con las diapositivas y el guion (versión 4, 25-11-2026).** Ninguna cifra contradice los resultados. Las cifras nuevas de las conexiones con el curso (25!! y 26! en la 6, la cola de la ρ en la 5 y en «Preguntas probables», las 1.000 máquinas en la 7 y el cumpleaños en la 13) coinciden con el código, y las etiquetas «EN CLASE» son las de la app. Las tres notas de la versión 3 siguen abiertas (el banco de la demo 2, el largo del mensaje y los dos IC del alemán), con la 22 en lugar de la 23; las tres últimas son nuevas. Quedan detalles que se prestan a confusión; cada uno con la frase que conviene usar:
-
-- Guion, «Antes de exponer · Computador» («6,4 s en un caso típico y 9,8 s en el peor 5 %»): 9,8 s es el percentil 95 del total (barrido y «Verificar»). El 95 % de los casos tardó eso o menos, y los 3 más lentos tardaron 10,2 s, 11,6 s y 14,9 s. En el más lento, el barrido tardó 8,6 s y «Verificar», 6,3 s. El barrido nunca pasó de 8,6 s, así que valen los «6 a 10 s» del paso 3 de la demo 2; «Verificar» suele tardar 0,8 s, pero llegó a 6,3 s. Mejor decir: «6,4 s en un caso típico, 9,8 s o menos en el 95 % de los casos y 14,9 s en el peor», y en el paso 4, que «Verificar» puede tardar unos segundos.
-- Guion, «Antes de exponer · Compañero»: el éxito y los tiempos del banco son con mensajes de 78 letras (60 de 60), y el guion no fija el largo. Para que la demo sea la que se midió, conviene pedir uno parecido. Mejor pedir: «cifra un mensaje de unas 80 letras que empiece por WETTERBERICHT».
-- Diapositivas 15 y 22: κ = 0,080, «el índice de coincidencia del alemán» de la 15, es el del alemán escrito con X entre palabras, como los mensajes de E4. El de la 22 («Alemán ≈ 0,076») es el de solo letras: 0,0757 en nuestro corpus y 0,0758 según Pommerening. Las dos cifras están bien, pero juntas parecen contradecirse. En la 15 conviene decir: «… del alemán con X entre palabras (κ = 0,080)».
-- Diapositiva 6 («Piloto: se cumple con 2.000 claves aleatorias» y «Piloto: 200.000 letras cifradas, 0 puntos fijos»): en el repositorio, las dos cifras salen de E1, con el simulador validado (`experiments/e1_validation.py` · `check_properties`); el piloto fue solo el prototipo inicial y no es parte de los resultados. Si preguntan, es el simulador del proyecto. Mejor rotular: «E1: …».
-- Diapositiva 5 y guion («en el paso 3 el central avanza dos veces seguidas»): el central avanza en los pasos 2 y 3 (ADV → AEW → BFX: D → E → F); el 3 es el doble paso. Mejor decir: «en los pasos 2 y 3 el central avanza dos veces seguidas». Y en «Preguntas probables» («de ahí sale la cola de 676»): de las 650 colisiones cuelgan 650 posiciones a un paso del ciclo, y de 26 de ellas, otras 26 a dos pasos: 650 + 26 = 676. Si piden el detalle: «650 posiciones entran al ciclo en un paso y 26 en dos».
-- Diapositiva 13 y guion («con 157 mensajes ya es más probable que no que dos se repitan»): es para dos claves de mensaje iguales en las tres letras, que dan profundidad desde la primera letra (el two-time pad exacto). El Banburismus usa también las claves que solo difieren en el rotor derecho, que comparten las dos primeras letras (676 valores): eso ya es más probable que no con 31 mensajes. La diapositiva está bien; si preguntan por qué la profundidad era tan común, sirve el segundo número.
+**Con las diapositivas y el guion (versión 5, 25-11-2026).** Ninguna cifra contradice los resultados, y las seis notas de la versión 4 quedaron corregidas: el banco de la demo 2 (p50, p95 y el más lento) y «Verificar», el largo del mensaje del compañero, los dos IC del alemán (diapositivas 15 y 22), el rótulo «E1» de la diapositiva 6, los pasos 2 y 3 del doble paso con la cola de la ρ y el cumpleaños de las claves que comparten las dos primeras letras, ahora en «Preguntas probables». Las cifras nuevas de la versión 5 (los 31 mensajes, el IC de la diapositiva 22 y los tiempos de la demo 2) están en el registro y coinciden. No queda ninguna nota.
 
 **Notas sobre los resultados y las fuentes.**
 
@@ -201,4 +198,4 @@ p95: el 95 % de los casos tardó eso o menos; «Máximo» es el más lento.
 
 ## 5. Pendientes
 
-- Guion y diapositivas 5, 6, 13 y 15 · las notas de «Con las diapositivas y el guion» (Discrepancias); ninguna cambia una cifra: antes del primer ensayo.
+- Ninguno.

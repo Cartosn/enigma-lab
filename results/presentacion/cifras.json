@@ -329,6 +329,14 @@
       "pendiente": ""
     },
     {
+      "diapositivas": "22",
+      "cifra": "IC del alemán solo con letras (E3) y con X entre palabras (E4); al azar, 1/26",
+      "esperado": "0,076 · 0,080 · 0,038",
+      "obtenido": "0,076 · 0,080 · 0,038",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
       "diapositivas": "10",
       "cifra": "alineaciones de WETTERBERICHT sobre BBGCCKITCTTEZZZLCZ",
       "esperado": "6",
@@ -385,6 +393,22 @@
       "pendiente": ""
     },
     {
+      "diapositivas": "12",
+      "cifra": "demo 2, 60 órdenes en modo robusto: casos resueltos; p50 · p95 · máximo (guion)",
+      "esperado": "60 de 60; 6,4 · 9,8 · 14,9 s",
+      "obtenido": "60 de 60; 6,4 · 9,8 · 14,9 s",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "12",
+      "cifra": "letras de los mensajes del banco de la demo 2 (guion: «unas 80 letras»)",
+      "esperado": "78",
+      "obtenido": "78",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
       "diapositivas": "9",
       "cifra": "configuraciones del catálogo: 6 órdenes × 17.576 posiciones (E7)",
       "esperado": "105.456",
@@ -429,6 +453,14 @@
       "cifra": "P(alguna se repite) con 157 y con 156 claves de mensaje (cálculo exacto)",
       "esperado": "50,28 % y 49,84 %",
       "obtenido": "50,28 % y 49,84 %",
+      "coincide": true,
+      "pendiente": ""
+    },
+    {
+      "diapositivas": "13",
+      "cifra": "claves que comparten las dos primeras letras (676 valores): repetición sobre el 50 % (guion, preguntas)",
+      "esperado": "31 (50,26 %)",
+      "obtenido": "31 (50,26 %)",
       "coincide": true,
       "pendiente": ""
     },
