@@ -1,10 +1,11 @@
 # Progreso
 
-Última actualización: 25-11-2026 · las observaciones del profesor: el análisis conectado con los
-temas del curso y la presentación en 20 minutos, con las diapositivas y el guion en su versión 4
-(D-078). Antes: fase 5 cerrada, E7 (Rejewski) y E8 (ataque moderno); Docker probado después de
-la fase 5 (D-071); repositorio remoto con la CI en verde; la exposición, en este equipo (D-072);
-revisión final de la entrega el 23-11-2026 (D-075 a D-077).
+Última actualización: 25-11-2026 · diapositivas y guion en su versión 5, con las notas aplicadas
+y 73 de 73 cifras (D-080). Antes, el mismo día: las observaciones del profesor, el análisis
+conectado con los temas del curso y la presentación en 20 minutos (D-078), y las páginas de la
+app en `app/paginas/` (D-079). Antes: fase 5 cerrada, E7 (Rejewski) y E8 (ataque moderno);
+Docker probado después de la fase 5 (D-071); repositorio remoto con la CI en verde; la
+exposición, en este equipo (D-072); revisión final de la entrega el 23-11-2026 (D-075 a D-077).
 
 | Fase | Estado | Semana |
 | --- | --- | --- |
@@ -15,6 +16,27 @@ revisión final de la entrega el 23-11-2026 (D-075 a D-077).
 | 4 · Banburismus | Cerrada (21-11-2026) | 3 |
 | 5 · Extensiones P2 | Cerrada (22-11-2026), después de la fase 6 | 3 |
 | 6 · Pulido y entrega | Cerrada (22-11-2026) | Fin de la 3 |
+
+## Presentación, versión 5 (25-11-2026)
+
+Las diapositivas y el guion aplican las seis notas de «Discrepancias» de la versión 4 (D-080):
+«E1» en la 6, los dos IC del alemán en la 15 y la 22, y en el guion el largo del mensaje del
+compañero, los tiempos de la demo 2 y de «Verificar», los pasos 2 y 3 del doble paso, la cola
+de la ρ como 650 + 26 y una pregunta nueva sobre por qué la profundidad era tan común. Ninguna
+cifra cambió.
+
+**Qué quedó:**
+- El PDF de la versión 5 en `docs/presentacion/` (con el nombre de siempre).
+- Cuatro cifras más en `cifras.py`, comprobadas por `tests/test_presentacion.py`: 31 mensajes
+  con 676 valores (50,26 %), el IC de la diapositiva 22 (0,076 · 0,080 · 0,038), la demo 2
+  (60 de 60; 6,4 · 9,8 · 14,9 s) y sus mensajes de 78 letras. **73 de 73 coinciden.**
+- `RESUMEN.md`: «Discrepancias» sin notas pendientes con las diapositivas ni con el guion, y
+  «Pendientes», vacío.
+- Guía de estudio: la pregunta nueva en su lugar, y las dos de los lazos juntas para seguir en 15.
+
+**Pendiente** (fuera del código): reescribir con voz propia «Contexto en el curso» y «Análisis y
+lecciones» del informe; ensayar dos veces con cronómetro y preguntar al profesor si las
+preguntas cuentan dentro de los 20 minutos.
 
 ## Conexiones con el curso y 20 minutos (25-11-2026)
 

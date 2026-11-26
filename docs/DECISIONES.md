@@ -917,6 +917,24 @@ pestañas, pueden detener el proceso. Ahora toman el mismo candado.
   nombre que manda el navegador. En el navegador, con el servidor recién arrancado,
   `/bombe?demo=1` y `/maquina?demo=1` abren como primera página en modo demo.
 
+### D-080 · Presentación, versión 5: las seis notas aplicadas y cuatro cifras más
+- **Qué cambió** (25-11-2026), sin cambiar ninguna cifra. Diapositivas: «E1:» en lugar de
+  «Piloto:» en la 6; en la 15, el IC «del alemán con X entre palabras»; en la 22, los dos IC del
+  alemán, solo con letras y con X. Guion: un mensaje de unas 80 letras para el compañero, los
+  tiempos de la demo 2 como p50, p95 y el más lento, «Verificar» puede tardar unos segundos, el
+  central avanza en los pasos 2 y 3, la cola de la ρ como 650 + 26, y una pregunta nueva,
+  «¿Por qué la profundidad era tan común?». El PDF se guarda con el nombre de siempre.
+- **Cuatro cifras más en el registro** (73, todas coinciden): 31 mensajes bastan para que dos
+  claves compartan las dos primeras letras (676 valores; 50,26 %); el IC de la diapositiva 22
+  (0,076 solo con letras, de E3; 0,080 con X, de E4; 0,038, 1/26); la demo 2 (60 de 60; 6,4 ·
+  9,8 · 14,9 s) y el largo de los mensajes del banco (78 letras, las «unas 80» del guion). Las
+  de la demo 2 salen de `results/bench_demo2.json`: sin él, como sin la corrida completa, su
+  prueba se salta (`SinCorrida`).
+- **«Discrepancias»** quita las seis notas, que la versión 5 aplicó (como en D-074), y
+  «Pendientes» del resumen queda vacío.
+- **Guía de estudio:** la pregunta nueva va sexta, en el orden del guion, y para seguir en 15
+  se unen las dos de los lazos (por qué cada lazo divide por 26 y por qué con tres da 0,11).
+
 ## Pendientes de decidir
 
 Ninguno.

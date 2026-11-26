@@ -26,7 +26,6 @@ import time
 from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from statistics import median
 from typing import Any
 
 import pandas as pd
@@ -39,13 +38,8 @@ from enigma_lab.experiments.common import git_commit, read_summary
 from enigma_lab.experiments.e5_bombe import bletchley_same_menus, turing_agreement
 from enigma_lab.viz.numfmt import fmt_dec, fmt_int, fmt_pct
 
-PHASES_LEFT = [
-    (
-        "Guion y diapositivas 5, 6, 13 y 15 · las notas de «Con las diapositivas y el guion» "
-        "(Discrepancias); ninguna cambia una cifra",
-        "antes del primer ensayo",
-    ),
-]
+PHASES_LEFT: list[tuple[str, str]] = []
+"""Lo que falta para la presentación: (qué, para cuándo). Vacío: no falta nada."""
 R2_COLUMNS = ["L", "texto", "n", "sobreviven", "p", "ic_bajo", "ic_alto", "teorico"]
 R3_COLUMNS = [
     "letras",
@@ -817,132 +811,21 @@ def _other_results(e2: dict[str, Any], e3: dict[str, Any]) -> list[str]:
     return lines or ["Sin resultados de E2 ni E3."]
 
 
-def _bench_tail(chosen: dict[str, Any]) -> str | None:
-    """Lo que el p95 del banco de la demo 2 no dice: los casos más lentos y en qué se van."""
-    cases = chosen.get("casos") or []
-    if not cases or chosen.get("maximo") is None:
-        return None
-    slowest = max(cases, key=lambda c: c["segundos"])
-    slower = sorted(c["segundos"] for c in cases if c["segundos"] > chosen["p95"])
-    p50, p95 = fmt_dec(chosen["p50"], 1), fmt_dec(chosen["p95"], 1)
-    return (
-        f"- Guion, «Antes de exponer · Computador» («{p50} s en un caso típico y {p95} s en el "
-        f"peor 5 %»): {p95} s es el percentil 95 del total (barrido y «Verificar»). El 95 % de "
-        f"los casos tardó eso o menos, y los {len(slower)} más lentos tardaron "
-        f"{_and([f'{fmt_dec(v, 1)} s' for v in slower])}. En el más lento, el barrido tardó "
-        f"{fmt_dec(slowest['segundos_barrido'], 1)} s y «Verificar», "
-        f"{fmt_dec(slowest['segundos_verificacion'], 1)} s. El barrido nunca pasó de "
-        f"{fmt_dec(max(c['segundos_barrido'] for c in cases), 1)} s, así que valen los «6 a "
-        "10 s» del paso 3 de la demo 2; «Verificar» suele tardar "
-        f"{fmt_dec(median(c['segundos_verificacion'] for c in cases), 1)} s, pero llegó a "
-        f"{fmt_dec(max(c['segundos_verificacion'] for c in cases), 1)} s. Mejor decir: «{p50} s "
-        f"en un caso típico, {p95} s o menos en el 95 % de los casos y "
-        f"{fmt_dec(chosen['maximo'], 1)} s en el peor», y en el paso 4, que «Verificar» puede "
-        "tardar unos segundos."
-    )
+def _guion_notes() -> list[str]:
+    """Lo que la versión 5 de las diapositivas y del guion dice distinto de la app o de los
+    resultados, o que se presta a confusión, con la frase que conviene usar («Discrepancias»).
 
-
-def _message_length(bench: dict[str, Any], chosen: dict[str, Any]) -> str:
-    """El largo del mensaje del compañero: el banco midió con uno solo."""
-    letters = bench["letras_mensaje"]
-    return (
-        "- Guion, «Antes de exponer · Compañero»: el éxito y los tiempos del banco son con "
-        f"mensajes de {letters} letras ({chosen['exitos']} de {chosen['n']}), y el guion no "
-        "fija el largo. Para que la demo sea la que se midió, conviene pedir uno parecido. "
-        f"Mejor pedir: «cifra un mensaje de unas {fmt_int(round(letters, -1))} letras que "
-        "empiece por WETTERBERICHT»."
-    )
-
-
-def _kappa_note(e3: dict[str, Any], e4: dict[str, Any]) -> str:
-    """Diapositivas 15 y 22: dos IC del alemán, con X entre palabras y sin ellas."""
-    kappa = fmt_dec(e4["kappa_aleman_x"], 3)
-    return (
-        f"- Diapositivas 15 y 22: κ = {kappa}, «el índice de coincidencia del alemán» de la 15, "
-        "es el del alemán escrito con X entre palabras, como los mensajes de E4. El de la 22 "
-        "(«Alemán ≈ 0,076») es el de solo letras: "
-        f"{fmt_dec(e3['aleman']['ic_corpus'], 4)} en nuestro corpus y "
-        f"{fmt_dec(e3['ic_referencia_aleman'], 4)} según Pommerening. Las dos cifras están "
-        "bien, pero juntas parecen contradecirse. En la 15 conviene decir: «… del alemán con X "
-        f"entre palabras (κ = {kappa})»."
-    )
-
-
-def _pilot_note() -> str:
-    """Diapositiva 6: las cifras que rotula «Piloto» salen de E1, con el simulador validado."""
-    return (
-        "- Diapositiva 6 («Piloto: se cumple con 2.000 claves aleatorias» y «Piloto: 200.000 "
-        "letras cifradas, 0 puntos fijos»): en el repositorio, las dos cifras salen de E1, con "
-        "el simulador validado (`experiments/e1_validation.py` · `check_properties`); el piloto "
-        "fue solo el prototipo inicial y no es parte de los resultados. Si preguntan, es el "
-        "simulador del proyecto. Mejor rotular: «E1: …»."
-    )
-
-
-def _rho_note() -> str:
-    """Diapositiva 5 y guion: en qué pasos avanza el central y de dónde sale la cola de 676."""
-    from enigma_lab.core.stepping import notch_sets, rho_structure
-
-    rho = rho_structure(notch_sets(["Q", "E", "V"]))
-    return (
-        "- Diapositiva 5 y guion («en el paso 3 el central avanza dos veces seguidas»): el "
-        "central avanza en los pasos 2 y 3 (ADV → AEW → BFX: D → E → F); el 3 es el doble paso. "
-        "Mejor decir: «en los pasos 2 y 3 el central avanza dos veces seguidas». Y en "
-        "«Preguntas probables» («de ahí sale la cola de 676»): de las "
-        f"{fmt_int(rho.collisions)} colisiones cuelgan {fmt_int(rho.tail[1])} posiciones a un "
-        f"paso del ciclo, y de {fmt_int(rho.tail[2])} de ellas, otras {fmt_int(rho.tail[2])} a "
-        f"dos pasos: {fmt_int(rho.tail[1])} + {fmt_int(rho.tail[2])} = "
-        f"{fmt_int(sum(rho.tail.values()))}. Si piden el detalle: «{fmt_int(rho.tail[1])} "
-        f"posiciones entran al ciclo en un paso y {fmt_int(rho.tail[2])} en dos»."
-    )
-
-
-def _birthday_note() -> str:
-    """Diapositiva 13: el cumpleaños de las claves iguales y el de las que usa el Banburismus."""
-    from enigma_lab.banburismus.depth import messages_for_repeat
-
-    same, near = messages_for_repeat(), messages_for_repeat(26**2)
-    return (
-        f"- Diapositiva 13 y guion («con {same} mensajes ya es más probable que no que dos se "
-        "repitan»): es para dos claves de mensaje iguales en las tres letras, que dan "
-        "profundidad desde la primera letra (el two-time pad exacto). El Banburismus usa "
-        "también las claves que solo difieren en el rotor derecho, que comparten las dos "
-        f"primeras letras (676 valores): eso ya es más probable que no con {near} mensajes. La "
-        "diapositiva está bien; si preguntan por qué la profundidad era tan común, sirve el "
-        "segundo número."
-    )
-
-
-def _guion_notes(summary: dict[str, Any], bench: dict[str, Any]) -> list[str]:
-    """Lo que la versión 4 de las diapositivas y del guion dice distinto de la app o de los
-    resultados, o que se presta a confusión, con la frase que conviene usar («Discrepancias»)."""
-    head = (
-        "**Con las diapositivas y el guion (versión 4, 25-11-2026).** Ninguna cifra contradice "
-        "los resultados. Las cifras nuevas de las conexiones con el curso (25!! y 26! en la 6, la "
-        "cola de la ρ en la 5 y en «Preguntas probables», las 1.000 máquinas en la 7 y el "
-        "cumpleaños en la 13) coinciden con el código, y las etiquetas «EN CLASE» son las de la "
-        "app. Las tres notas de la versión 3 siguen abiertas (el banco de la demo 2, el largo del "
-        "mensaje y los dos IC del alemán), con la 22 en lugar de la 23; las tres últimas son "
-        "nuevas."
-    )
-    notes: list[str | None] = []
-    chosen = next(
-        (c for c in bench.get("configuraciones", []) if c["id"] == bench.get("recomendada")), None
-    )
-    if chosen is not None:
-        notes += [_bench_tail(chosen), _message_length(bench, chosen)]
-    e3, e4 = summary.get("e3", {}), summary.get("e4", {})
-    if e3 and e4.get("kappa_aleman_x") is not None:
-        notes.append(_kappa_note(e3, e4))
-    notes += [_pilot_note(), _rho_note(), _birthday_note()]
-    found = [n for n in notes if n]
-    if not found:
-        return [head]
+    Las notas que una versión deja corregidas se quitan; el historial está en DECISIONES.
+    """
     return [
-        head
-        + " Quedan detalles que se prestan a confusión; cada uno con la frase que conviene usar:",
-        "",
-        *found,
+        "**Con las diapositivas y el guion (versión 5, 25-11-2026).** Ninguna cifra contradice "
+        "los resultados, y las seis notas de la versión 4 quedaron corregidas: el banco de la "
+        "demo 2 (p50, p95 y el más lento) y «Verificar», el largo del mensaje del compañero, los "
+        "dos IC del alemán (diapositivas 15 y 22), el rótulo «E1» de la diapositiva 6, los pasos "
+        "2 y 3 del doble paso con la cola de la ρ y el cumpleaños de las claves que comparten las "
+        "dos primeras letras, ahora en «Preguntas probables». Las cifras nuevas de la versión 5 "
+        "(los 31 mensajes, el IC de la diapositiva 22 y los tiempos de la demo 2) están en el "
+        "registro y coinciden. No queda ninguna nota."
     ]
 
 
@@ -1100,7 +983,7 @@ def build_markdown(
         "",
         "## 4. Discrepancias",
         "",
-        *_guion_notes(summary, bench or {}),
+        *_guion_notes(),
         "",
         *_discrepancies(summary.get("e4", {}), e4_table, e5_table, summary.get("e6", {})),
         *_kuhl_notes(summary.get("e7", {})),

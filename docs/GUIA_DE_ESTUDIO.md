@@ -733,11 +733,11 @@ diapositivas 3, 9 y 18).
 
 ## Preguntas frecuentes
 
-Las 15 preguntas más probables, en el orden en que conviene prepararlas. Cada respuesta dice
-dónde está en el código. Otras salen en las preguntas de cada tema: por qué ninguna letra se
-cifra a sí misma y cómo se valida el simulador (tema 2), por qué con alemán real sobreviven
-más alineaciones que (25/26)^L (tema 3), los anillos y el rotor central (tema 4) y por qué el
-plugboard no protege (tema 1).
+Las 15 preguntas más probables, en el orden en que conviene prepararlas; la 9 junta las dos de
+los lazos. Cada respuesta dice dónde está en el código. Otras salen en las preguntas de cada
+tema: por qué ninguna letra se cifra a sí misma y cómo se valida el simulador (tema 2), por qué
+con alemán real sobreviven más alineaciones que (25/26)^L (tema 3), los anillos y el rotor
+central (tema 4) y por qué el plugboard no protege (tema 1).
 
 1. *¿En qué se parece a Vigenère?* Los dos son polialfabéticos: cada letra se cifra con otro
    alfabeto. Vigenère repite la clave con un periodo corto, y por eso caen Kasiski y el índice
@@ -765,28 +765,34 @@ plugboard no protege (tema 1).
 5. *¿Por qué el paso de los rotores es una ρ?* Toda función de un conjunto finito en sí mismo,
    iterada, termina en un ciclo; el método rho usa eso para encontrar colisiones. Por el doble
    paso, el paso de los rotores no es inyectivo: 650 posiciones del ciclo tienen dos
-   predecesoras (son sus colisiones), una en el ciclo y otra en la cola. De ellas cuelga la cola
-   de 676: 650 posiciones a un paso del ciclo y 26 a dos. Y el doble paso también fija el
-   ciclo: el central se salta una posición por vuelta del izquierdo, así que tiene
-   26 · 25 · 26 = 16.900 posiciones (`core/stepping.py` · `rho_structure`, `cycle_structure`;
-   tema 2).
-6. *¿Y la máquina de Turing?* Es el modelo teórico de computación de 1936. La Bombe es una
+   predecesoras (son sus colisiones), una en el ciclo y otra en la cola. De cada colisión
+   cuelga una posición que entra al ciclo en un paso (650), y de 26 de ellas, otra que entra en
+   dos (26): 650 + 26 = 676. Y el doble paso también fija el ciclo: el central se salta una
+   posición por vuelta del izquierdo, así que tiene 26 · 25 · 26 = 16.900 posiciones
+   (`core/stepping.py` · `rho_structure`, `cycle_structure`; tema 2).
+6. *¿Por qué la profundidad era tan común?* Dos claves de mensaje iguales en las tres letras
+   dan profundidad desde la primera letra, y eso pasa del 50 % con 157 mensajes en un día. Pero
+   al Banburismus le basta que dos claves compartan las dos primeras letras (el rotor izquierdo
+   y el central), que tienen 676 valores: eso pasa del 50 % con solo 31 mensajes (50,26 %).
+   Esos pares quedan en profundidad, corridos un desplazamiento, que es lo que busca el
+   Banburismus (`banburismus/depth.py` · `repeat_probability`, `messages_for_repeat`,
+   `true_offset`; tema 5).
+7. *¿Y la máquina de Turing?* Es el modelo teórico de computación de 1936. La Bombe es una
    máquina electromecánica de 1940, hecha para una búsqueda concreta: probar hipótesis de
    plugboard en cada posición de los rotores. Nuestra Bombe está en `bombe/`.
-7. *¿Y si el crib está mal?* La Bombe solo da paradas falsas, o ninguna, y el verificador
+8. *¿Y si el crib está mal?* La Bombe solo da paradas falsas, o ninguna, y el verificador
    no encuentra un descifrado que parezca alemán. La página La Bombe lo dice: «Ninguna parada
    da un texto que parezca alemán» (`bombe/checker.py` · `Verification.plausible`, con el
    umbral `PLAUSIBLE`). Entonces se prueba otra posición del crib u otro crib.
-8. *¿Por qué cada lazo divide por 26?* La letra supuesta debe ser un punto fijo de la
-   permutación que da la vuelta al lazo; al azar eso pasa con probabilidad 1/26 (tema 4). E5
-   lo mide frente a la tabla de Turing: con 12 letras, 678 → 26,3 → 0,99 paradas por orden
-   con 0, 1 y 2 lazos (`experiments/e5_bombe.py`).
-9. *¿Por qué con tres lazos da 0,11 y no 0,04?* Con tan pocas paradas (11 en 100 menús; IC
-   95 %: 0,05 a 0,17) la estimación es imprecisa, pero su IC no incluye 0,04, así que lo
-   reportamos como diferencia y no ajustamos nada. Turing daba estimaciones redondas para
-   menús típicos de su tráfico; nuestros menús salen de cribs alemanes con clave aleatoria.
-   En 15 de las 17 celdas de su tabla, lo medido queda entre la mitad y el doble
-   (`experiments/e5_bombe.py`, E5).
+9. *¿Por qué cada lazo divide por 26, y por qué con tres lazos da 0,11 y no 0,04?* La letra
+   supuesta debe ser un punto fijo de la permutación que da la vuelta al lazo; al azar eso
+   pasa con probabilidad 1/26 (tema 4). E5 lo mide frente a la tabla de Turing: con 12 letras,
+   678 → 26,3 → 0,99 paradas por orden con 0, 1 y 2 lazos. Con tres lazos hubo tan pocas
+   paradas (11 en 100 menús; IC 95 %: 0,05 a 0,17) que la estimación es imprecisa, pero su IC
+   no incluye 0,04, así que lo reportamos como diferencia y no ajustamos nada. Turing daba
+   estimaciones redondas para menús típicos de su tráfico; nuestros menús salen de cribs
+   alemanes con clave aleatoria. En 15 de las 17 celdas de su tabla, lo medido queda entre la
+   mitad y el doble (`experiments/e5_bombe.py`, E5).
 10. *¿Qué hace el diagonal board?* Impone la simetría del plugboard: une el hilo u del cable a
     con el hilo a del cable u (`bombe/wiring.py` · `_diagonal_pairs`; diapositiva 21). Así las
     contradicciones se propagan más. Sin él, un menú sin lazos no descarta casi nada (paran

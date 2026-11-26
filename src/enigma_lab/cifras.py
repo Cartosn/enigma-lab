@@ -85,6 +85,16 @@ def _birthday() -> tuple[int, float, float]:
     return n, float(repeat_probability(n)), float(repeat_probability(n - 1))
 
 
+def _birthday_near() -> str:
+    """Claves que solo deben compartir las dos primeras letras, 676 valores: con cuántas una
+    repetición pasa del 50 % y con qué probabilidad («31 (50,26 %)»)."""
+    from enigma_lab.banburismus.depth import messages_for_repeat, repeat_probability
+
+    keys = 26**2
+    n = messages_for_repeat(keys)
+    return f"{n} ({_pct(float(repeat_probability(n, keys)), 2)})"
+
+
 def _windows_from_adu(presses: int = 3) -> str:
     machine = Enigma(EnigmaConfig.from_strings("I II III", positions="ADU"))
     windows = [machine.window]
@@ -259,7 +269,8 @@ def _u264_start() -> str:
 
 
 class SinCorrida(LookupError):
-    """Falta la corrida completa de un experimento en ``results/summary.json``."""
+    """Falta una medición guardada: la corrida completa de un experimento en
+    ``results/summary.json`` o el banco de la demo 2 en ``results/bench_demo2.json``."""
 
 
 def _saved(name: str) -> dict[str, Any]:
@@ -293,6 +304,33 @@ def _german_survival() -> str:
     """Alineaciones falsas que sobreviven con alemán real, con 13 y con 50 letras (E4)."""
     by_length = _saved("e4")["aleman"]["por_L"]
     return f"{_pct(by_length['13']['p'])} y {_pct(by_length['50']['p'])}"
+
+
+def _german_ic_slide_22() -> str:
+    """El IC de la diapositiva 22, con tres decimales: alemán solo con letras (corpus, E3), con
+    X entre palabras (E4) y al azar (1/26)."""
+    e3, e4 = _saved("e3"), _saved("e4")
+    values = (e3["aleman"]["ic_corpus"], e4["kappa_aleman_x"], 1 / 26)
+    return " · ".join(fmt_dec(v, 3) for v in values)
+
+
+def _bench() -> tuple[dict[str, Any], dict[str, Any]]:
+    """El banco de la demo 2 (``make bench-demo``) y su configuración recomendada."""
+    import json
+
+    path = paths.RESULTS / "bench_demo2.json"
+    if not path.is_file():
+        raise SinCorrida("falta el banco de la demo 2 (make bench-demo)")
+    bench: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
+    chosen = next(c for c in bench["configuraciones"] if c["id"] == bench["recomendada"])
+    return bench, chosen
+
+
+def _demo2_times() -> str:
+    """La demo 2 en el banco: casos resueltos y tiempos p50, p95 y máximo, en segundos."""
+    _, chosen = _bench()
+    times = " · ".join(fmt_dec(chosen[k], 1) for k in ("p50", "p95", "maximo"))
+    return f"{chosen['exitos']} de {chosen['n']}; {times}{NBSP}s"
 
 
 def _german_kappa() -> str:
@@ -550,6 +588,12 @@ CIFRAS: tuple[Cifra, ...] = (
         _german_kappa,
     ),
     Cifra("15, 22", "E4: mensajes por longitud", "1.000 de 250 letras", _e4_design),
+    Cifra(
+        "22",
+        "IC del alemán solo con letras (E3) y con X entre palabras (E4); al azar, 1/26",
+        "0,076 · 0,080 · 0,038",
+        _german_ic_slide_22,
+    ),
     # Diapositivas 10 y 11 · cribs/ (casos deterministas) y el caso de respaldo de la 12
     Cifra("10", "alineaciones de WETTERBERICHT sobre BBGCCKITCTTEZZZLCZ", "6", _slide10_count),
     Cifra("10", "alineaciones sin conflictos", "0, 1, 2, 3", _slide10_valid),
@@ -574,6 +618,18 @@ CIFRAS: tuple[Cifra, ...] = (
     ),
     Cifra(
         "12", "letra de prueba del caso de respaldo", "T, grado 4", lambda: _test_letter("backup")
+    ),
+    Cifra(
+        "12",
+        "demo 2, 60 órdenes en modo robusto: casos resueltos; p50 · p95 · máximo (guion)",
+        f"60 de 60; 6,4 · 9,8 · 14,9{NBSP}s",
+        _demo2_times,
+    ),
+    Cifra(
+        "12",
+        "letras de los mensajes del banco de la demo 2 (guion: «unas 80 letras»)",
+        "78",
+        lambda: fmt_int(_bench()[0]["letras_mensaje"]),
     ),
     # Diapositiva 9 · rejewski/ (el catálogo) y data/reference/kuhl_2007.json (la cita)
     Cifra(
@@ -612,6 +668,13 @@ CIFRAS: tuple[Cifra, ...] = (
         "P(alguna se repite) con 157 y con 156 claves de mensaje (cálculo exacto)",
         f"50,28{NBSP}% y 49,84{NBSP}%",
         lambda: f"{_pct(_birthday()[1], 2)} y {_pct(_birthday()[2], 2)}",
+    ),
+    Cifra(
+        "13",
+        "claves que comparten las dos primeras letras (676 valores): repetición sobre el 50 % "
+        "(guion, preguntas)",
+        f"31 (50,26{NBSP}%)",
+        _birthday_near,
     ),
     Cifra(
         "13, 17",
